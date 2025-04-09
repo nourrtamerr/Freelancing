@@ -10,10 +10,11 @@ namespace Freelancing.Models
 		{
 			this.ChangeTracker.LazyLoadingEnabled = true;
 		}
+		public DbSet<Admin> Admins { get; set; }
 		public DbSet<Client> clients { get; set; }
 		public DbSet<Freelancer> freelancers { get; set; }
 		public DbSet<Ban> Bans { get; set; }
-		public DbSet<Project> Projects { get; set; }
+		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
@@ -23,7 +24,7 @@ namespace Freelancing.Models
 		public DbSet<Experience> Experiences { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<Notification> Notifications { set; get; }
-		public DbSet<Payment> Payments { get; set; }
+		//public DbSet<Payment> Payments { get; set; }
 		public DbSet<MilestonePayment> MilestonePayments { get; set; }
 		public DbSet<SubscriptionPayment> SubscriptionPayments { get; set; }
 		public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
@@ -48,26 +49,34 @@ namespace Freelancing.Models
 					foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
 				}
 			}
-			modelBuilder.Entity<AppUser>()
-		   .HasDiscriminator<string>("UserType")
-		   .HasValue<AppUser>("AppUser")
-		   .HasValue<Client>("Client")
-		   .HasValue<Freelancer>("Freelancer");
 
-			modelBuilder.Entity<Project>()
-		   .HasDiscriminator<string>("ProjectType")
-		   .HasValue<BiddingProject>("Bidding")   
-		   .HasValue<FixedPriceProject>("FixedPrice");
+			modelBuilder.Entity<BiddingProject>().ToTable("biddingProjects");
+			modelBuilder.Entity<FixedPriceProject>().ToTable("fixedPriceProjects");
+			modelBuilder.Entity<MilestonePayment>().ToTable("MilestonePayments");
+			modelBuilder.Entity<SubscriptionPayment>().ToTable("SubscriptionPayments");
+			modelBuilder.Entity<Admin>().ToTable("Admins");
+			modelBuilder.Entity<Client>().ToTable("clients");
+			modelBuilder.Entity<Freelancer>().ToTable("freelancers");
 
-			modelBuilder.Entity<Project>()
-		   .HasDiscriminator<string>("ProjectType")
-		   .HasValue<BiddingProject>("Bidding")
-		   .HasValue<FixedPriceProject>("FixedPrice");
+			var hasher = new PasswordHasher<Admin>();
+			var admin = new Admin
+			{
+				Id = "1", // Use string ID for IdentityUser
+				UserName = "admin",
+				NormalizedUserName = "ADMIN",
+				Email = "admin@example.com",
+				NormalizedEmail = "ADMIN@EXAMPLE.COM",
+				EmailConfirmed = true,
+				SecurityStamp = Guid.NewGuid().ToString("D"),
+				PasswordHash = hasher.HashPassword(null, "Admin@123"),
+				City = "Admin City",
+				Country = "Admin Country",
+				firstname = "Admin",
+				lastname = "User",
 
-			modelBuilder.Entity<Payment>()
-			.HasDiscriminator<string>("PaymentType")
-			.HasValue<MilestonePayment>("Milestone")
-			.HasValue<SubscriptionPayment>("Subscription");
+			};
+
+			modelBuilder.Entity<Admin>().HasData(admin);
 
 			modelBuilder.Entity<MilestonePayment>()
 				.HasOne(mp => mp.Milestone)

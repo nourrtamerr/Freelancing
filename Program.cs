@@ -1,4 +1,5 @@
 
+using Freelancing.Helpers;
 using Freelancing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace Freelancing
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -43,11 +44,17 @@ namespace Freelancing
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-            #region Services
-            
-            #endregion
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+			using (var scope = app.Services.CreateScope())
+			{
+				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+				await RoleSeeder.SeedRolesAsync(roleManager);
+			}
+			#region Services
+
+			#endregion
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

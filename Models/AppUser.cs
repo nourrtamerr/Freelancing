@@ -2,7 +2,7 @@ using Freelancing.Models;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class AppUser:IdentityUser
+public abstract class AppUser :IdentityUser
 {
 
     public string firstname { get; set; }
