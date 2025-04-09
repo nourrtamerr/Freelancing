@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ITI_Content\\GRAD\\Freelancing.csproj": {}
+    "E:\\ITI\\BackGp2\\Freelancing\\Freelancing.csproj": {}
   },
   "projects": {
-    "D:\\ITI_Content\\GRAD\\Freelancing.csproj": {
+    "E:\\ITI\\BackGp2\\Freelancing\\Freelancing.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ITI_Content\\GRAD\\Freelancing.csproj",
+        "projectUniqueName": "E:\\ITI\\BackGp2\\Freelancing\\Freelancing.csproj",
         "projectName": "Freelancing",
-        "projectPath": "D:\\ITI_Content\\GRAD\\Freelancing.csproj",
-        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-        "outputPath": "D:\\ITI_Content\\GRAD\\obj\\",
+        "projectPath": "E:\\ITI\\BackGp2\\Freelancing\\Freelancing.csproj",
+        "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
+        "outputPath": "E:\\ITI\\BackGp2\\Freelancing\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -42,9 +42,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
+          "auditMode": "all"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -92,7 +92,11 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
+>>>>>>> 2fb77a4a333f93c0f3493679e4617830b3d15c05
         }
       }
     }
