@@ -7,6 +7,7 @@ public class UserSkill
 
 	[ForeignKey("Freelancer")]
     public string FreelancerId { get; set; }
+    public bool IsDelete { get; set; }
     public Freelancer Freelancer { get; set; }
     [ForeignKey("Skill")]
     public int SkillId { get; set; }
