@@ -4745,23 +4745,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nourt\\.nuget\\packages\\": {},
-    "D:\\Visual Studio tools, SDKs\\NuGetPackages": {}
+    "C:\\Users\\LENOVO\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Downloads-D\\Freelancing\\Freelancing\\Freelancing.csproj",
+      "projectUniqueName": "D:\\ITI_Content\\GRAD\\Freelancing.csproj",
       "projectName": "Freelancing",
-      "projectPath": "D:\\Downloads-D\\Freelancing\\Freelancing\\Freelancing.csproj",
-      "packagesPath": "C:\\Users\\nourt\\.nuget\\packages\\",
-      "outputPath": "D:\\Downloads-D\\Freelancing\\Freelancing\\obj\\",
+      "projectPath": "D:\\ITI_Content\\GRAD\\Freelancing.csproj",
+      "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
+      "outputPath": "D:\\ITI_Content\\GRAD\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "D:\\Visual Studio tools, SDKs\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\nourt\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
