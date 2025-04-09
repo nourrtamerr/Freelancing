@@ -1,66 +1,38 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Downloads-D\\Freelancing\\Freelancing\\",
+  "WorkspaceRootPath": "D:\\ITI_Content\\GRAD\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\fixedpriceproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\fixedpriceproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\ITI_Content\\GRAD\\Migrations\\20250409160807_isdeleted added.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20250409160807_isdeleted added.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\biddingproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\biddingproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\repositoryservice\\certificateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:repositoryservice\\certificateservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\repositoryservice\\skillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:repositoryservice\\skillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\milestone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\milestone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\certificate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\certificate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Downloads-D\\Freelancing\\Freelancing\\Migrations\\20250409122601_IsDeleted.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20250409122601_IsDeleted.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\repositoryservice\\userskillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:repositoryservice\\userskillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\irepositoryservice\\icertificatesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:irepositoryservice\\icertificatesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\milestonepayment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\milestonepayment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\irepositoryservice\\iuserskillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:irepositoryservice\\iuserskillservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\portofolioprojectimage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\portofolioprojectimage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\portofolioproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\portofolioproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\repositoryservice\\milestoneservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:repositoryservice\\milestoneservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\irepositoryservice\\iprojectservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:irepositoryservice\\iprojectservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\irepositoryservice\\imilestoneservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:irepositoryservice\\imilestoneservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\dtos\\milestonedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:dtos\\milestonedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\models\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\downloads-d\\freelancing\\freelancing\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\userskill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\userskill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,202 +42,15 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Project.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Project.cs",
-              "RelativeDocumentMoniker": "Models\\Project.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Project.cs",
-              "RelativeToolTip": "Models\\Project.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAA9wAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:31:33.752Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "FixedPriceProject.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\FixedPriceProject.cs",
-              "RelativeDocumentMoniker": "Models\\FixedPriceProject.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\FixedPriceProject.cs",
-              "RelativeToolTip": "Models\\FixedPriceProject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAACAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:31:28.141Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "BiddingProject.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\BiddingProject.cs",
-              "RelativeDocumentMoniker": "Models\\BiddingProject.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\BiddingProject.cs",
-              "RelativeToolTip": "Models\\BiddingProject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:31:23.481Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "20250409122601_IsDeleted.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Migrations\\20250409122601_IsDeleted.cs",
-              "RelativeDocumentMoniker": "Migrations\\20250409122601_IsDeleted.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Migrations\\20250409122601_IsDeleted.cs",
-              "RelativeToolTip": "Migrations\\20250409122601_IsDeleted.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:26:01.566Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Payment.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Payment.cs",
-              "RelativeDocumentMoniker": "Models\\Payment.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Payment.cs",
-              "RelativeToolTip": "Models\\Payment.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:25:15.017Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "PortofolioProjectImage.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\PortofolioProjectImage.cs",
-              "RelativeDocumentMoniker": "Models\\PortofolioProjectImage.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\PortofolioProjectImage.cs",
-              "RelativeToolTip": "Models\\PortofolioProjectImage.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:23:33.713Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "PortofolioProject.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\PortofolioProject.cs",
-              "RelativeDocumentMoniker": "Models\\PortofolioProject.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\PortofolioProject.cs",
-              "RelativeToolTip": "Models\\PortofolioProject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:23:23.053Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "MilestonePayment.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\MilestonePayment.cs",
-              "RelativeDocumentMoniker": "Models\\MilestonePayment.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\MilestonePayment.cs",
-              "RelativeToolTip": "Models\\MilestonePayment.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:23:13.059Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "MilestoneDTO.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\DTOs\\MilestoneDTO.cs",
-              "RelativeDocumentMoniker": "DTOs\\MilestoneDTO.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\DTOs\\MilestoneDTO.cs",
-              "RelativeToolTip": "DTOs\\MilestoneDTO.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:13:50.495Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Milestone.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Milestone.cs",
-              "RelativeDocumentMoniker": "Models\\Milestone.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\Milestone.cs",
-              "RelativeToolTip": "Models\\Milestone.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAQwBAAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:02:31.766Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "MilestoneService.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\RepositoryService\\MilestoneService.cs",
-              "RelativeDocumentMoniker": "RepositoryService\\MilestoneService.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\RepositoryService\\MilestoneService.cs",
-              "RelativeToolTip": "RepositoryService\\MilestoneService.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAwwCoAAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:05:08.288Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "IProjectService.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\IRepositoryService\\IProjectService.cs",
-              "RelativeDocumentMoniker": "IRepositoryService\\IProjectService.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\IRepositoryService\\IProjectService.cs",
-              "RelativeToolTip": "IRepositoryService\\IProjectService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T11:59:41.012Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "IMilestoneService.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\IRepositoryService\\IMilestoneService.cs",
-              "RelativeDocumentMoniker": "IRepositoryService\\IMilestoneService.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\IRepositoryService\\IMilestoneService.cs",
-              "RelativeToolTip": "IRepositoryService\\IMilestoneService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T12:00:04.712Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "AppUser.cs",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\AppUser.cs",
-              "RelativeDocumentMoniker": "Models\\AppUser.cs",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\Models\\AppUser.cs",
-              "RelativeToolTip": "Models\\AppUser.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAQwBAAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T11:57:23.946Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\Downloads-D\\Freelancing\\Freelancing\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "D:\\Downloads-D\\Freelancing\\Freelancing\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-04-09T11:51:46.514Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
               "$type": "Bookmark",
@@ -273,7 +58,115 @@
             },
             {
               "$type": "Bookmark",
+              "Name": "ST:0:0:{fbcae063-e2c0-4ab1-a516-996ea3dafb72}"
+            },
+            {
+              "$type": "Bookmark",
               "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20250409160807_isdeleted added.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Migrations\\20250409160807_isdeleted added.cs",
+              "RelativeDocumentMoniker": "Migrations\\20250409160807_isdeleted added.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\Migrations\\20250409160807_isdeleted added.cs",
+              "RelativeToolTip": "Migrations\\20250409160807_isdeleted added.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T16:08:07.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Certificate.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\Certificate.cs",
+              "RelativeDocumentMoniker": "Models\\Certificate.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\Certificate.cs",
+              "RelativeToolTip": "Models\\Certificate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T16:01:59.939Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CertificateService.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\RepositoryService\\CertificateService.cs",
+              "RelativeDocumentMoniker": "RepositoryService\\CertificateService.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\RepositoryService\\CertificateService.cs",
+              "RelativeToolTip": "RepositoryService\\CertificateService.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAQwBwAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:31:05.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UserSkill.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\UserSkill.cs",
+              "RelativeDocumentMoniker": "Models\\UserSkill.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\UserSkill.cs",
+              "RelativeToolTip": "Models\\UserSkill.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:48:09.328Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SkillService.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\RepositoryService\\SkillService.cs",
+              "RelativeDocumentMoniker": "RepositoryService\\SkillService.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\RepositoryService\\SkillService.cs",
+              "RelativeToolTip": "RepositoryService\\SkillService.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAYwC0AAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:36:33.77Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserSkillService.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\RepositoryService\\UserSkillService.cs",
+              "RelativeDocumentMoniker": "RepositoryService\\UserSkillService.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\RepositoryService\\UserSkillService.cs",
+              "RelativeToolTip": "RepositoryService\\UserSkillService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:30:24.262Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ICertificatesService.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\IRepositoryService\\ICertificatesService.cs",
+              "RelativeDocumentMoniker": "IRepositoryService\\ICertificatesService.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\IRepositoryService\\ICertificatesService.cs",
+              "RelativeToolTip": "IRepositoryService\\ICertificatesService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:29:58.696Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "IUserSkillService.cs",
+              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\IRepositoryService\\IUserSkillService.cs",
+              "RelativeDocumentMoniker": "IRepositoryService\\IUserSkillService.cs",
+              "ToolTip": "D:\\ITI_Content\\GRAD\\IRepositoryService\\IUserSkillService.cs",
+              "RelativeToolTip": "IRepositoryService\\IUserSkillService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:29:16.934Z",
+              "EditorCaption": ""
             }
           ]
         }

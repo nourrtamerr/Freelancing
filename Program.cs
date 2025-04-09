@@ -1,6 +1,8 @@
 
-using Freelancing.Helpers;
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Freelancing.Helpers;
+using Freelancing.RepositoryService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +16,11 @@ namespace Freelancing
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); ;
+            builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+            builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
+            builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
+            builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 
             //builder.Services.AddAuthentication(op => {
             //	op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
