@@ -49,7 +49,7 @@ namespace Freelancing.Models
 					foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
 				}
 			}
-
+			
 			modelBuilder.Entity<BiddingProject>().ToTable("biddingProjects");
 			modelBuilder.Entity<FixedPriceProject>().ToTable("fixedPriceProjects");
 			modelBuilder.Entity<MilestonePayment>().ToTable("MilestonePayments");
