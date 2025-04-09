@@ -1,0 +1,78 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
+namespace Freelancing.Models
+{
+	public class ApplicationDbContext:IdentityDbContext<AppUser>
+	{
+		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+		{
+			this.ChangeTracker.LazyLoadingEnabled = true;
+		}
+		public DbSet<Client> clients { get; set; }
+		public DbSet<Freelancer> freelancers { get; set; }
+		public DbSet<Ban> Bans { get; set; }
+		public DbSet<Project> Projects { get; set; }
+		public DbSet<BiddingProject> biddingProjects { get; set; }
+		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
+		public DbSet<Category> categories { get; set; }
+		public DbSet<Certificate> certificates { get; set; }
+		public DbSet<Chat> Chats { set; get; }
+		public DbSet<Education> Educations { set; get; }
+		public DbSet<Experience> Experiences { set; get; }
+		public DbSet<Milestone> Milestones { get; set; }
+		public DbSet<Notification> Notifications { set; get; }
+		public DbSet<Payment> Payments { get; set; }
+		public DbSet<MilestonePayment> MilestonePayments { get; set; }
+		public DbSet<SubscriptionPayment> SubscriptionPayments { get; set; }
+		public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+		public DbSet<PortofolioProject> PortofolioProjects { get; set; }
+		public DbSet<PortofolioProjectImage> PortofolioProjectImages { get; set; }
+		public DbSet<Proposal> Proposals { get; set; }
+		public DbSet<Review> Reviews { get; set; }
+		public DbSet<Skill> Skills { get; set; }
+		public DbSet<Subcategory> Subcategories { get; set; }
+		public DbSet<UserSkill> UserSkills { get; set; }
+		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var foreignKey in entityType.GetForeignKeys())
+				{
+					// Set the delete behavior to NoAction for all foreign keys
+					foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
+				}
+			}
+			modelBuilder.Entity<AppUser>()
+		   .HasDiscriminator<string>("UserType")
+		   .HasValue<AppUser>("AppUser")
+		   .HasValue<Client>("Client")
+		   .HasValue<Freelancer>("Freelancer");
+
+			modelBuilder.Entity<Project>()
+		   .HasDiscriminator<string>("ProjectType")
+		   .HasValue<BiddingProject>("Bidding")   
+		   .HasValue<FixedPriceProject>("FixedPrice");
+
+			modelBuilder.Entity<Project>()
+		   .HasDiscriminator<string>("ProjectType")
+		   .HasValue<BiddingProject>("Bidding")
+		   .HasValue<FixedPriceProject>("FixedPrice");
+
+			modelBuilder.Entity<Payment>()
+			.HasDiscriminator<string>("PaymentType")
+			.HasValue<MilestonePayment>("Milestone")
+			.HasValue<SubscriptionPayment>("Subscription");
+
+			modelBuilder.Entity<MilestonePayment>()
+				.HasOne(mp => mp.Milestone)
+				.WithOne(m => m.MilestonePayment)
+				.HasForeignKey<MilestonePayment>(mp => mp.MilestoneId);
+		}
+	}
+}
