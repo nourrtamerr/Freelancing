@@ -5,6 +5,8 @@ namespace Freelancing.Models
 	public class UserSubscriptionPlanPayment
 	{
 		public int Id { get; set; }
+		public bool isDeleted { get; set; } = false;
+
 		[ForeignKey("SubscriptionPlan")]
 		public int SubscriptionPlanId { get; set; }
 		public virtual SubscriptionPlan SubscriptionPlan { get; set; } //navigation property

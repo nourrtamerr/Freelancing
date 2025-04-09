@@ -21,7 +21,7 @@ namespace Freelancing.RepositoryService
 			}
 			else
 			{
-				payment.isDeleted = true;
+				payment.IsDeleted = true;
 				_context.SubscriptionPayments.Update(payment);
 				return await _context.SaveChangesAsync() > 0;
 			}

@@ -11,6 +11,7 @@ public abstract class AppUser :IdentityUser
 	public string Country { get; set; }
 	public string? ProfilePicture { get; set; }
 
+	public bool isDeleted { get; set; } = false;
 
 
 	[InverseProperty("Reviewee")]
