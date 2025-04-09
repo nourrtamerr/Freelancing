@@ -1,1 +1,4 @@
+# Ignore build output folders
+bin/
+obj/
 .vs/
