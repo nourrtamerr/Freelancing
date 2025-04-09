@@ -1,33 +1,41 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\ITI_Content\\GRAD\\",
+  "WorkspaceRootPath": "E:\\ITI\\BackGp2\\Freelancing\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\userskill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\irepositoryservice\\inotificationrepositoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:irepositoryservice\\inotificationrepositoryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\userskill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\userskill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\skill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\skill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\skill.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\certificate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\certificate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\certificate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\project.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\milestone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\milestone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\milestone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\milestonepayment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\milestonepayment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\milestonepayment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|d:\\iti_content\\grad\\models\\portofolioproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|e:\\iti\\backgp2\\freelancing\\models\\portofolioproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A9F08A3-1FB4-4EF1-8E9E-C74EA25E4F75}|Freelancing.csproj|solutionrelative:models\\portofolioproject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -38,44 +46,65 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{fbcae063-e2c0-4ab1-a516-996ea3dafb72}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Certificate.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\Certificate.cs",
-              "RelativeDocumentMoniker": "Models\\Certificate.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\Certificate.cs",
-              "RelativeToolTip": "Models\\Certificate.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T14:22:54.779Z",
-              "EditorCaption": ""
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAACYAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:09:50.382Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "INotificationRepositoryService.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\IRepositoryService\\INotificationRepositoryService.cs",
+              "RelativeDocumentMoniker": "IRepositoryService\\INotificationRepositoryService.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\IRepositoryService\\INotificationRepositoryService.cs",
+              "RelativeToolTip": "IRepositoryService\\INotificationRepositoryService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T15:08:31.945Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Certificate.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Certificate.cs",
+              "RelativeDocumentMoniker": "Models\\Certificate.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Certificate.cs",
+              "RelativeToolTip": "Models\\Certificate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-09T14:22:54.779Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "UserSkill.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\UserSkill.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\UserSkill.cs",
               "RelativeDocumentMoniker": "Models\\UserSkill.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\UserSkill.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\UserSkill.cs",
               "RelativeToolTip": "Models\\UserSkill.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -84,24 +113,23 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Skill.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\Skill.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Skill.cs",
               "RelativeDocumentMoniker": "Models\\Skill.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\Skill.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Skill.cs",
               "RelativeToolTip": "Models\\Skill.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T14:20:03.822Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-09T14:20:03.822Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "PortofolioProject.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\PortofolioProject.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\PortofolioProject.cs",
               "RelativeDocumentMoniker": "Models\\PortofolioProject.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\PortofolioProject.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\PortofolioProject.cs",
               "RelativeToolTip": "Models\\PortofolioProject.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -109,11 +137,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "MilestonePayment.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\MilestonePayment.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\MilestonePayment.cs",
               "RelativeDocumentMoniker": "Models\\MilestonePayment.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\MilestonePayment.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\MilestonePayment.cs",
               "RelativeToolTip": "Models\\MilestonePayment.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -121,11 +149,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "Milestone.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\Milestone.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Milestone.cs",
               "RelativeDocumentMoniker": "Models\\Milestone.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\Milestone.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Milestone.cs",
               "RelativeToolTip": "Models\\Milestone.cs",
               "ViewState": "AgIAAAUAAAAAAAAAAAAQwBAAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -133,19 +161,35 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Project.cs",
-              "DocumentMoniker": "D:\\ITI_Content\\GRAD\\Models\\Project.cs",
+              "DocumentMoniker": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Project.cs",
               "RelativeDocumentMoniker": "Models\\Project.cs",
-              "ToolTip": "D:\\ITI_Content\\GRAD\\Models\\Project.cs",
+              "ToolTip": "E:\\ITI\\BackGp2\\Freelancing\\Models\\Project.cs",
               "RelativeToolTip": "Models\\Project.cs",
               "ViewState": "AgIAAAgAAAAAAAAAAAA9wAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-09T12:31:33.752Z"
-            },
+            }
+          ]
+        },
+        {
+          "DockedWidth": 996,
+          "SelectedChildIndex": -1,
+          "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 993,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }
