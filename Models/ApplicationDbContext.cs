@@ -24,6 +24,7 @@ namespace Freelancing.Models
 		public DbSet<Experience> Experiences { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<Notification> Notifications { set; get; }
+
 		//public DbSet<Payment> Payments { get; set; }
 		public DbSet<MilestonePayment> MilestonePayments { get; set; }
 		public DbSet<SubscriptionPayment> SubscriptionPayments { get; set; }
