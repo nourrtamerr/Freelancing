@@ -4751,11 +4751,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Downloads-D\\Freelancing\\Freelancing\\Freelancing.csproj",
+      "projectUniqueName": "D:\\ITI\\Graduation Project\\Freelancing.csproj",
       "projectName": "Freelancing",
-      "projectPath": "D:\\Downloads-D\\Freelancing\\Freelancing\\Freelancing.csproj",
+      "projectPath": "D:\\ITI\\Graduation Project\\Freelancing.csproj",
       "packagesPath": "C:\\Users\\nourt\\.nuget\\packages\\",
-      "outputPath": "D:\\Downloads-D\\Freelancing\\Freelancing\\obj\\",
+      "outputPath": "D:\\ITI\\Graduation Project\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\Visual Studio tools, SDKs\\NuGetPackages"

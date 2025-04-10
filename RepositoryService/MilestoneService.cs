@@ -10,12 +10,12 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<Milestone>> GetAllAsync()
         {
-            return await context.Milestones.ToListAsync();
+            return await context.Milestones.Where(m=>!m.IsDeleted).ToListAsync();
         }
 
         public async Task<Milestone> GetByIdAsync(int id)
         {
-            return await context.Milestones.FindAsync(id);
+            return await context.Milestones.SingleOrDefaultAsync(m=>m.Id==id);
         }
 
 
@@ -23,7 +23,7 @@ namespace Freelancing.RepositoryService
         {
             Milestone ms = new Milestone()
             {
-                Id = milestone.Id,
+                
                 Title = milestone.Title,
                 Description = milestone.Description,
                 Status = milestone.Status,
@@ -34,22 +34,57 @@ namespace Freelancing.RepositoryService
 
             };
 
-            context.Add(ms);
-            context.SaveChanges();
+            await context.AddAsync(ms);
+            await context.SaveChangesAsync();
 
             return ms;
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var milestone = context.Milestones.SingleOrDefault(m => m.Id == id && !m.IsDeleted);
+            if (milestone != null)
+            {
+                milestone.IsDeleted = true;
+                context.Milestones.Update(milestone);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+
         }
 
 
 
-        public Task<Milestone> UpdateAsync(Milestone milestone)
+        public async Task<Milestone> UpdateAsync(MilestoneDTO milestone)
         {
-            throw new NotImplementedException();
+            var ms = context.Milestones.SingleOrDefault(m => m.Id == milestone.Id);
+           
+                ms.Title = milestone.Title;
+                ms.Description = milestone.Description;
+                ms.Amount = milestone.Amount;
+                ms.ProjectId = milestone.ProjectId;
+                ms.Status = milestone.Status;
+                ms.StartDate = milestone.StartDate;
+                ms.EndDate = milestone.EndDate;
+
+                await context.SaveChangesAsync();
+                return ms;
+        }
+
+        public async Task<List<Milestone>> GetByProjectId(int id)
+        {
+            var project = context.Projects.SingleOrDefault(p => p.Id == id);
+            if(project is not null)
+            {
+                if(project.Milestones is not null)
+                {
+                    List<Milestone> milestones = context.Milestones.Where(m => m.ProjectId == id).ToList();
+                    return milestones;
+                }
+                throw new InvalidOperationException("This project doesn't have any milestones.");
+            }
+            throw new KeyNotFoundException("Project not found.");
         }
     }
 }

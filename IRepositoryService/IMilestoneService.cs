@@ -8,9 +8,11 @@ namespace Freelancing.IRepositoryService
 
         Task<Milestone> GetByIdAsync(int id);
 
+        Task<List<Milestone>> GetByProjectId(int id);
+
         Task<Milestone> CreateAsync(MilestoneDTO milestone);
 
-        Task<Milestone> UpdateAsync(Milestone milestone);
+        Task<Milestone> UpdateAsync(MilestoneDTO milestone);
 
         Task<bool> DeleteAsync(int id);
 
