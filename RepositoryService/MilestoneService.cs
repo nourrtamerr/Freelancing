@@ -1,11 +1,12 @@
-﻿using Freelancing.DTOs;
+﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class MilestoneService(ApplicationDbContext context) : IMilestoneService
+    public class MilestoneService(ApplicationDbContext context, IMapper mapper) : IMilestoneService
     {
 
         public async Task<List<Milestone>> GetAllAsync()
@@ -21,18 +22,20 @@ namespace Freelancing.RepositoryService
 
         public async Task<Milestone> CreateAsync(MilestoneDTO milestone)
         {
-            Milestone ms = new Milestone()
-            {
-                
-                Title = milestone.Title,
-                Description = milestone.Description,
-                Status = milestone.Status,
-                Amount = milestone.Amount,
-                ProjectId = milestone.ProjectId,
-                StartDate = milestone.StartDate,
-                EndDate = milestone.EndDate,
+            //Milestone ms = new Milestone()
+            //{
 
-            };
+            //    Title = milestone.Title,
+            //    Description = milestone.Description,
+            //    Status = milestone.Status,
+            //    Amount = milestone.Amount,
+            //    ProjectId = milestone.ProjectId,
+            //    StartDate = milestone.StartDate,
+            //    EndDate = milestone.EndDate,
+
+            //};
+
+            Milestone ms = mapper.Map<Milestone>(milestone);
 
             await context.AddAsync(ms);
             await context.SaveChangesAsync();
@@ -59,16 +62,21 @@ namespace Freelancing.RepositoryService
         public async Task<Milestone> UpdateAsync(MilestoneDTO milestone)
         {
             var ms = context.Milestones.SingleOrDefault(m => m.Id == milestone.Id);
-           
-                ms.Title = milestone.Title;
-                ms.Description = milestone.Description;
-                ms.Amount = milestone.Amount;
-                ms.ProjectId = milestone.ProjectId;
-                ms.Status = milestone.Status;
-                ms.StartDate = milestone.StartDate;
-                ms.EndDate = milestone.EndDate;
-
+            if(ms is not null)
+            {
+                mapper.Map(milestone, ms); // ✅ Map into existing entity
                 await context.SaveChangesAsync();
+
+            }
+                //ms.Title = milestone.Title;
+                //ms.Description = milestone.Description;
+                //ms.Amount = milestone.Amount;
+                //ms.ProjectId = milestone.ProjectId;
+                //ms.Status = milestone.Status;
+                //ms.StartDate = milestone.StartDate;
+                //ms.EndDate = milestone.EndDate;
+
+                //await context.SaveChangesAsync();
                 return ms;
         }
 

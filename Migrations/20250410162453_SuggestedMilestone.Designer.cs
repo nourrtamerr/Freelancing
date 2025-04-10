@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250410162453_SuggestedMilestone")]
+    partial class SuggestedMilestone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,17 +52,11 @@ namespace Freelancing.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NationalId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -764,9 +761,6 @@ namespace Freelancing.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("File")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -955,17 +949,16 @@ namespace Freelancing.Migrations
                             Id = "1",
                             AccessFailedCount = 0,
                             City = "Admin City",
-                            ConcurrencyStamp = "96fa1d22-15fc-49ee-ae9d-a2d72dde0bfb",
+                            ConcurrencyStamp = "d71c26cf-06bc-4c3a-9ede-fc401b57b250",
                             Country = "Admin Country",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
-                            IsVerified = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELwhapaH68Y4Ad/K3QzL34mltOxGFnh6mLdMVepJxCeMixT4hMjsL8/DkSUIL3PdOg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI+40O+DkbSUIbLrWwVpYUhpUnpEsf8XlweSE3SK0jO8krtDSjsH8Y+VpIESiTBVjA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c974c1f2-7bb0-4d3e-a632-7836742415cf",
+                            SecurityStamp = "52fc2b80-8f48-430f-9027-51227c7290be",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
