@@ -2,7 +2,7 @@ using Freelancing.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
 
-public class Project
+public abstract class Project
 {
     public int Id { get; set; }
     public string Title { get; set; }

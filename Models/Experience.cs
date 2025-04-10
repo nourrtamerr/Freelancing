@@ -1,4 +1,6 @@
-﻿namespace Freelancing.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Freelancing.Models
 {
 	public class Experience
 	{
@@ -9,6 +11,9 @@
 		public DateTime? EndDate { get; set; } 
 		public string Location { get; set; } 
 		public string Description { get; set; }
+
+		public bool isDeleted { get; set; } = false;
+		[ForeignKey("Freelancer")]
 		public string FreelancerId { get; set; }
 		public Freelancer Freelancer { get; set; } 
 

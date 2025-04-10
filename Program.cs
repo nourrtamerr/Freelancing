@@ -1,5 +1,8 @@
 
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Freelancing.Helpers;
+using Freelancing.RepositoryService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,13 +10,17 @@ namespace Freelancing
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); ;
+            builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+            builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
+            builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
+            builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 
             //builder.Services.AddAuthentication(op => {
             //	op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -43,11 +50,17 @@ namespace Freelancing
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-            #region Services
-            
-            #endregion
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+			using (var scope = app.Services.CreateScope())
+			{
+				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+				await RoleSeeder.SeedRolesAsync(roleManager);
+			}
+			#region Services
+
+			#endregion
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

@@ -1,4 +1,4 @@
-public class Payment
+public abstract class Payment
 {
     public int Id { get; set; }
 
