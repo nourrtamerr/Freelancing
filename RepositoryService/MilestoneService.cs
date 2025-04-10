@@ -74,8 +74,9 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<Milestone>> GetByProjectId(int id)
         {
-            var project = context.Projects.SingleOrDefault(p => p.Id == id);
-            if(project is not null)
+            Project project = context.fixedPriceProjects.SingleOrDefault(p => p.Id == id) == null ?
+             context.biddingProjects.SingleOrDefault(p => p.Id == id) : context.fixedPriceProjects.SingleOrDefault(p => p.Id == id);
+			if (project is not null)
             {
                 if(project.Milestones is not null)
                 {
