@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250410192601_Adding is deleted property to the education model")]
+    partial class Addingisdeletedpropertytotheeducationmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,17 +52,11 @@ namespace Freelancing.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NationalId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -442,32 +439,6 @@ namespace Freelancing.Migrations
                     b.ToTable("PortofolioProjectImages");
                 });
 
-            modelBuilder.Entity("Freelancing.Models.ProjectSkill", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("ProjectSkills");
-                });
-
             modelBuilder.Entity("Freelancing.Models.Proposal", b =>
                 {
                     b.Property<int>("Id")
@@ -491,9 +462,6 @@ namespace Freelancing.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SuggestedDuration")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -557,34 +525,6 @@ namespace Freelancing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SubscriptionPayments", (string)null);
-                });
-
-            modelBuilder.Entity("Freelancing.Models.SuggestedMilestone", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProposalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProposalId");
-
-                    b.ToTable("suggestedMilestones");
                 });
 
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>
@@ -770,9 +710,6 @@ namespace Freelancing.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("File")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -815,11 +752,8 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ExpectedDuration")
-                        .HasColumnType("int");
 
                     b.Property<string>("FreelancerId")
                         .HasColumnType("nvarchar(450)");
@@ -964,17 +898,16 @@ namespace Freelancing.Migrations
                             Id = "1",
                             AccessFailedCount = 0,
                             City = "Admin City",
-                            ConcurrencyStamp = "96fa1d22-15fc-49ee-ae9d-a2d72dde0bfb",
+                            ConcurrencyStamp = "3ede74c3-bcb4-4606-b109-7627c3f05437",
                             Country = "Admin Country",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
-                            IsVerified = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELwhapaH68Y4Ad/K3QzL34mltOxGFnh6mLdMVepJxCeMixT4hMjsL8/DkSUIL3PdOg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC/sN11fxkQIWQO5bV08T7GiQm5uL3MLTz9FJZl4MfvJ/97CkTS215TkfoWV43yCIg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c974c1f2-7bb0-4d3e-a632-7836742415cf",
+                            SecurityStamp = "774ac722-e9d4-45bd-999e-b5b9bb358c06",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1146,25 +1079,6 @@ namespace Freelancing.Migrations
                     b.Navigation("PreviousProject");
                 });
 
-            modelBuilder.Entity("Freelancing.Models.ProjectSkill", b =>
-                {
-                    b.HasOne("Project", "Project")
-                        .WithMany("ProjectSkills")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Skill", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("Skill");
-                });
-
             modelBuilder.Entity("Freelancing.Models.Proposal", b =>
                 {
                     b.HasOne("Freelancing.Models.Freelancer", "Freelancer")
@@ -1201,17 +1115,6 @@ namespace Freelancing.Migrations
                     b.Navigation("Reviewee");
 
                     b.Navigation("Reviewer");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.SuggestedMilestone", b =>
-                {
-                    b.HasOne("Freelancing.Models.Proposal", "Proposal")
-                        .WithMany("suggestedMilestones")
-                        .HasForeignKey("ProposalId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>
@@ -1429,11 +1332,6 @@ namespace Freelancing.Migrations
                     b.Navigation("Images");
                 });
 
-            modelBuilder.Entity("Freelancing.Models.Proposal", b =>
-                {
-                    b.Navigation("suggestedMilestones");
-                });
-
             modelBuilder.Entity("Milestone", b =>
                 {
                     b.Navigation("MilestonePayment")
@@ -1443,8 +1341,6 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Project", b =>
                 {
                     b.Navigation("Milestones");
-
-                    b.Navigation("ProjectSkills");
 
                     b.Navigation("Proposals");
                 });
