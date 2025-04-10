@@ -74,20 +74,18 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<Milestone>> GetByProjectId(int id)
         {
-            //var project = context.proj.SingleOrDefault(p => p.Id == id);
-            //if(project is not null)
-            //{
-            //    if(project.Milestones is not null)
-            //    {
-            //        List<Milestone> milestones = context.Milestones.Where(m => m.ProjectId == id).ToList();
-            //        return milestones;
-            //    }
-            //    throw new InvalidOperationException("This project doesn't have any milestones.");
-            //}
-            //throw new KeyNotFoundException("Project not found.");
-
-            return await context.Milestones.Where(m => m.ProjectId == id).ToListAsync();
-
+            Project project = context.fixedPriceProjects.SingleOrDefault(p => p.Id == id) == null ?
+             context.biddingProjects.SingleOrDefault(p => p.Id == id) : context.fixedPriceProjects.SingleOrDefault(p => p.Id == id);
+			if (project is not null)
+            {
+                if(project.Milestones is not null)
+                {
+                    List<Milestone> milestones = context.Milestones.Where(m => m.ProjectId == id).ToList();
+                    return milestones;
+                }
+                throw new InvalidOperationException("This project doesn't have any milestones.");
+            }
+            throw new KeyNotFoundException("Project not found.");
         }
     }
 }
