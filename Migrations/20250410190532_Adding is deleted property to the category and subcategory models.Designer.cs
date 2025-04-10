@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250410190532_Adding is deleted property to the category and subcategory models")]
+    partial class Addingisdeletedpropertytothecategoryandsubcategorymodels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,9 +261,6 @@ namespace Freelancing.Migrations
                     b.Property<string>("Institution")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -895,16 +895,16 @@ namespace Freelancing.Migrations
                             Id = "1",
                             AccessFailedCount = 0,
                             City = "Admin City",
-                            ConcurrencyStamp = "3ede74c3-bcb4-4606-b109-7627c3f05437",
+                            ConcurrencyStamp = "0de9937a-02aa-4948-8838-b37af2f3fd63",
                             Country = "Admin Country",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC/sN11fxkQIWQO5bV08T7GiQm5uL3MLTz9FJZl4MfvJ/97CkTS215TkfoWV43yCIg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDKEfD98ZnqxnTHpn2WMwnUKvWKDUeMUubJbDT2iIrwpvbgXgtsNs1FSvEQ5nBPgbQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "774ac722-e9d4-45bd-999e-b5b9bb358c06",
+                            SecurityStamp = "88fc0fe8-29e8-4dac-b04b-62d6623a9fe7",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
