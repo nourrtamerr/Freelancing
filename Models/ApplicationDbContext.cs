@@ -23,7 +23,9 @@ namespace Freelancing.Models
 		public DbSet<Education> Educations { set; get; }
 		public DbSet<Experience> Experiences { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
-		public DbSet<Notification> Notifications { set; get; }
+		public DbSet<SuggestedMilestone> suggestedMilestones { get; set; }
+
+        public DbSet<Notification> Notifications { set; get; }
 
 		//public DbSet<Payment> Payments { get; set; }
 		public DbSet<MilestonePayment> MilestonePayments { get; set; }
@@ -36,7 +38,8 @@ namespace Freelancing.Models
 		public DbSet<Skill> Skills { get; set; }
 		public DbSet<Subcategory> Subcategories { get; set; }
 		public DbSet<UserSkill> UserSkills { get; set; }
-		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
+		public DbSet<ProjectSkill> ProjectSkills { get; set; }
+        public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

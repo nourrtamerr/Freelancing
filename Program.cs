@@ -5,6 +5,11 @@ using Freelancing.Helpers;
 using Freelancing.RepositoryService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+//using AutoMapper
+
+using AutoMapper;
+//using AutoMapper.Extensions.Microsoft.DependencyInjection;
+
 
 namespace Freelancing
 {
@@ -21,6 +26,18 @@ namespace Freelancing
             builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
             builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
+            builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+
+
+            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
+
+            //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
+            //builder.Services, typeof(MappingProfile));
+
+            builder.Services.AddAutoMapper(typeof(MappingProfiles));
+
+            //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
+
 
             //builder.Services.AddAuthentication(op => {
             //	op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
