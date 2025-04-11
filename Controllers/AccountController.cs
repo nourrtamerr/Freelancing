@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,7 +21,7 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IWebHostEnvironment _env, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(IWebHostEnvironment _env,SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
 		[HttpGet("test")]
 		[Authorize]
@@ -27,14 +30,31 @@ namespace Freelancing.Controllers
 			return Ok(new {str= "hh" });
 		}
 
+
+		[HttpGet("IsAuthenticated")]
+		public IActionResult IsAuthenticated()
+		{
+			return Ok(new { User.Identity.IsAuthenticated, UserName = User.FindFirstValue(ClaimTypes.Name) });
+		}
+
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromForm] RegisterDTO dto)
 		{
 
 			#region ExistingAccount
-			if ((await _userManager.FindByEmailAsync(dto.Email)) is not null)
+
+			if ((await _userManager.FindByEmailAsync(dto.Email) ) is AppUser myuser )
 			{
-				return BadRequest("Email already exists");
+				if(myuser is not null) { 
+				if (myuser.EmailConfirmed == true)
+				{
+					return BadRequest("Email already exists");
+				}
+				else
+				{
+					return BadRequest("Email already exists but not confirmed");
+				}
+				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
 			{
@@ -42,19 +62,13 @@ namespace Freelancing.Controllers
 			}
 
 			#endregion
-			string savedProfilePicturePath = null;
-			if (dto.ProfilePicture != null)
-			{
-				savedProfilePicturePath = dto.ProfilePicture.Save(_env);  // Save the image
-				dto.ProfilePicture = null;  // Set ProfilePicture to null after saving
-			}
+			
 
 			IdentityResult result;
 			AppUser newuser;
 			if(dto.Role==userRole.Freelancer)
 			{
 				Freelancer freelancer = _mapper.Map<Freelancer>(dto);
-				freelancer.ProfilePicture = savedProfilePicturePath;
 				result =await _userManager.CreateAsync(freelancer, dto.Password);
 				await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
@@ -62,7 +76,6 @@ namespace Freelancing.Controllers
 			else
 			{
 				Client client = _mapper.Map<Client>(dto);
-				client.ProfilePicture = savedProfilePicturePath;
 				result = await _userManager.CreateAsync(client, dto.Password);
 				await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
@@ -88,12 +101,161 @@ namespace Freelancing.Controllers
 				};
 				return BadRequest(errorResponse);
 			}
+			if (dto.ProfilePicture is not null)
+			{
+				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
+			}
 			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
-		
-				return Ok(new { token=await GenerateToken(newuser) });
+			await _userManager.UpdateAsync(newuser);
+
+
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(newuser);
+			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token}, Request.Scheme);
+
+			// Send confirmation email
+			var email = new Email2
+			{
+				To = newuser.Email,
+				Subject = "Confirm Email",
+				Body = $"Please confirm your email by clicking on this link: {confirmationLink}"
+			};
+			_emailSettings.SendEmail(email);
+			return Ok(new { message = "Account Created Successfully" +
+					". Please check your email to confirm your account." });
 			
 			
-		}	
+		}
+
+
+		[HttpGet("ConfirmEmail")]
+		public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		{ 
+			if (userId == null || token == null)
+			{
+				return BadRequest("Invalid email confirmation request.");
+			}
+
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return NotFound("User not found.");
+			}
+
+			var result = await _userManager.ConfirmEmailAsync(user, token);
+			if (result.Succeeded)
+			{
+				return Ok(new { message = "EmailConfirmed" });
+
+
+			}
+			else
+			{
+				return BadRequest(new { message = "Email confirmation failed." });
+			}
+		}
+
+
+
+
+		[HttpGet("External-login")]
+		[AllowAnonymous]
+		public IActionResult ExternalLogin(string provider,userRole role, string returnUrl = null,string errorurl=null)
+		{
+
+			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl,role });
+			var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+			properties.Items["LoginProvider"] = provider;
+			return Challenge(properties, provider);
+		}
+
+		[HttpGet("external-login-callback")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ExternalLoginCallback(userRole role,string returnUrl = null, string remoteError = null, string errorurl = null)
+		{
+
+			if (remoteError != null)
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
+				
+
+
+			}
+
+			var info = await _signinManager.GetExternalLoginInfoAsync();
+			if (info == null)
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
+
+			}
+
+			var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+			var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+			if (string.IsNullOrEmpty(email))
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
+			}
+			var userbyname = await _userManager.FindByNameAsync(name);
+			var userbyemail = await _userManager.FindByEmailAsync(email);	
+			if ((userbyname!=null && userbyemail !=null)&&( userbyemail.UserName!=userbyname.UserName ||userbyname.Email!=userbyemail.Email) )
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email is already associated with another account.")}");
+			}
+			var user = userbyemail;
+			if (user == null)
+			{
+				if (role == userRole.Client)
+				{
+					user = new Client
+					{
+						UserName = name.Replace(" ", ""),
+						Email = email,
+						firstname = name,
+						lastname = "",
+						City = "",
+						Country = "",	
+						EmailConfirmed = true
+					};
+				}
+				else
+				{
+					user = new Freelancer
+					{
+						UserName = name.Replace(" ",""),
+						Email = email,
+						firstname = name,
+						lastname = "",
+						City = "",
+						Country = "",
+						EmailConfirmed = true
+					};
+				}
+
+				var result = await _userManager.CreateAsync(user);
+				if (!result.Succeeded)
+				{
+					//return BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
+					var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				user.EmailConfirmed = true;
+				var result2 = await _userManager.UpdateAsync(user);
+				if (!result2.Succeeded)
+				{
+					var errorMessages = string.Join(", ", result2.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				await _userManager.AddLoginAsync(user, info);
+			}
+			else
+			{
+				await _userManager.AddLoginAsync(user, info);
+			}
+			var token = await GenerateToken(user);
+			return Redirect($"{returnUrl}?token={token}");
+		}
 
 
 		private async Task<string> GenerateToken(AppUser user)

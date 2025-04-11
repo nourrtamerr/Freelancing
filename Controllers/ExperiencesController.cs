@@ -89,9 +89,6 @@ namespace Freelancing.Controllers
         [Authorize(Roles ="Freelancer")]
         public async Task<IActionResult> CreateExperience([FromBody] CreateExperienceDTO experienceDto)
         {
-            //var freelancerid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //var freelancername = User.FindFirstValue(ClaimTypes.Name);
-
 			if (!ModelState.IsValid)
             {
                 return BadRequest(experienceDto);

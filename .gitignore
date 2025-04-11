@@ -14,5 +14,6 @@ obj/
 *.DS_Store
 *.vscode/
 
+appsettings.Development.json
 
 
