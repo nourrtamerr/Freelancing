@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Freelancing.Attributes;
 using System.Text.Json.Serialization;
+using System.ComponentModel;
 
 namespace Freelancing.DTOs.AuthDTOs
 {
@@ -24,6 +25,7 @@ namespace Freelancing.DTOs.AuthDTOs
 		[MinLength(11)]
 		public string PhoneNumber { set; get; }
 		[DataType(DataType.Password)]
+		
 		public string Password { set; get; }
 		[Compare("Password")]
 		[DataType(DataType.Password)]

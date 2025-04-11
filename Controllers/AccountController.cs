@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,11 +16,16 @@ using System.Text;
 
 namespace Freelancing.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AccountController(IWebHostEnvironment _env,IMapper _mapper,RoleManager<IdentityRole> _roleManager,UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
-    {
-
+	[Route("api/[controller]")]
+	[ApiController]
+	public class AccountController(IWebHostEnvironment _env, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	{
+		[HttpGet("test")]
+		[Authorize]
+		public async Task<IActionResult> test()
+		{
+			return Ok(new {str= "hh" });
+		}
 
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromForm] RegisterDTO dto)
@@ -61,12 +67,32 @@ namespace Freelancing.Controllers
 				await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
 			}
-			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
-			if (result.Succeeded)
+			if (!result.Succeeded)
 			{
-				return Ok(GenerateToken(newuser));
+				foreach (var error in result.Errors)
+				{
+					ModelState.AddModelError("", error.Description);
+				}
+				var validationErrors = ModelState
+		.Where(ms => ms.Value.Errors.Count > 0)  // Only include fields with errors
+		.ToDictionary(
+			kv => kv.Key, // Field name
+			kv => kv.Value.Errors.Select(e => new { errorMessage = e.ErrorMessage }).ToList() // List of error messages
+		);
+
+				var errorResponse = new
+				{
+					title = "One or more validation errors occurred.",
+					status = 400,
+					errors = validationErrors,
+				};
+				return BadRequest(errorResponse);
 			}
-			return BadRequest(result.Errors);
+			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
+		
+				return Ok(new { token=await GenerateToken(newuser) });
+			
+			
 		}	
 
 
