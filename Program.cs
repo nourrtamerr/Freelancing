@@ -27,6 +27,9 @@ namespace Freelancing
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
             builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
             builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
+            builder.Services.AddScoped<IEducationService, EducationService>();
 
 
             //builder.Services.AddAutoMapper(typeof(MappingProfiles));
