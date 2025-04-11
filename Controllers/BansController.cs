@@ -1,18 +1,23 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class BansController : ControllerBase
     {
         private readonly IBanRepositoryService banService;
         private readonly IMapper mapper;
+        private readonly ApplicationDbContext context;
 
-        public BansController(IBanRepositoryService banService, IMapper mapper)
+        public BansController(IBanRepositoryService banService, IMapper mapper , ApplicationDbContext context)
         {
             this.banService = banService;
             this.mapper = mapper;
+            this.context = context;
         }
 
         [HttpGet("{id}")]
@@ -43,13 +48,17 @@ namespace Freelancing.Controllers
         [HttpPost]
         public async Task<ActionResult<BanDto>> CreateBan([FromBody] BanDto banDto)
         {
-            if (banDto is null)
+            if (banDto == null)
                 return BadRequest("BanDto cannot be null");
+
+            var userExists = await context.Users.AnyAsync(u => u.Id == banDto.BannedUserId);
+            if (!userExists)
+                return BadRequest("Invalid BannedUserId");
 
             var ban = mapper.Map<Ban>(banDto);
 
             var createdBan = await banService.CreateBanAsync(ban);
-            if (createdBan is null)
+            if (createdBan == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to create ban");
 
             var createdBanDto = mapper.Map<BanDto>(createdBan);
@@ -60,7 +69,6 @@ namespace Freelancing.Controllers
                 createdBanDto
             );
         }
-
         [HttpPut("{id}")]
         public async Task<ActionResult<BanDto>> UpdateBan(int id, [FromBody] BanDto banDto)
         {
@@ -88,6 +96,17 @@ namespace Freelancing.Controllers
             }
             await banService.DeleteBanAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("active/{userId}")]
+        public async Task<ActionResult<BanDto>> GetActiveBan(string userId)
+        {
+            var ban = await banService.GetActiveBansByUserIdAsync(userId);
+            if (ban == null)
+            {
+                return NotFound("No active ban found for this user.");
+            }
+            return Ok(mapper.Map<BanDto>(ban));
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 //using AutoMapper
 
 using AutoMapper;
+using Freelancing.Middlewares;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -87,6 +88,7 @@ namespace Freelancing
             app.UseAuthorization();
 
 
+            app.UseMiddleware<BanCheckMiddleware>();
             app.MapControllers();
 
             app.Run();
