@@ -34,8 +34,7 @@ namespace Freelancing
             //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
             //builder.Services, typeof(MappingProfile));
 
-            builder.Services.AddAutoMapper(typeof(MappingProfiles));
-            builder.Services.AddAutoMapper(typeof(ReviewProfile));
+            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
