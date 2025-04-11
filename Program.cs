@@ -8,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 //using AutoMapper
 
 using AutoMapper;
+using Freelancing.Middlewares;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Freelancing.Middlewares;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -63,6 +65,9 @@ namespace Freelancing
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
             builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
             builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
+            builder.Services.AddScoped<IEducationService, EducationService>();
 
             #endregion
 
@@ -71,7 +76,7 @@ namespace Freelancing
             //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
             //builder.Services, typeof(MappingProfile));
 
-            builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
@@ -137,6 +142,7 @@ namespace Freelancing
             app.UseAuthorization();
 
 
+            app.UseMiddleware<BanCheckMiddleware>();
             app.MapControllers();
 
             app.Run();
