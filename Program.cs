@@ -31,6 +31,7 @@ namespace Freelancing
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
             builder.Services.AddScoped<IEducationService, EducationService>();
+            builder.Services.AddScoped<IExperienceService, ExperienceService>();
 
 
             //builder.Services.AddAutoMapper(typeof(MappingProfiles));
