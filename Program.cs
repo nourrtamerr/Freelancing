@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 //using AutoMapper
 
 using AutoMapper;
+using Freelancing.Middlewares;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -37,7 +38,7 @@ namespace Freelancing
             //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
             //builder.Services, typeof(MappingProfile));
 
-            builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
@@ -90,6 +91,7 @@ namespace Freelancing
             app.UseAuthorization();
 
 
+            app.UseMiddleware<BanCheckMiddleware>();
             app.MapControllers();
 
             app.Run();
