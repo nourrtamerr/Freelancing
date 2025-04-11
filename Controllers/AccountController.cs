@@ -101,10 +101,10 @@ namespace Freelancing.Controllers
 			
 			var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 			var signcred = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+			//var _userfromdb = _context.AppUsers.iNCL.FirstOrDefault(u => u.Id == user.Id);
+
 			var userClaims = await _userManager.GetClaimsAsync(user);
 			var roles = await _userManager.GetRolesAsync(user);
-			//var _userfromdb = _context.AppUsers.iNCL.FirstOrDefault(u => u.Id == user.Id);
-			
 			var roleClaims = new List<Claim>();
 			foreach (var role in roles)
 			{
@@ -112,11 +112,13 @@ namespace Freelancing.Controllers
 			}
 			var claims = new[]
 			 {
-				new  Claim(JwtRegisteredClaimNames.Sub,user.UserName),
+				new  Claim(ClaimTypes.Name,user.UserName),
+				new  Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
 				new  Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
 				new  Claim(JwtRegisteredClaimNames.Email,user.Email),
-				new Claim("Id",user.Id.ToString())
 			}.Union(userClaims).Union(roleClaims);
+
+
 			var expiry = DateTime.UtcNow.AddMinutes(25);
 
 			var token =

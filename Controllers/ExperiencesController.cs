@@ -1,7 +1,9 @@
 ﻿using Freelancing.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -80,10 +82,14 @@ namespace Freelancing.Controllers
             return Ok(experienceDto);
         }
 
-        [HttpPost("{id}")]
-        public async Task<IActionResult> CreateExperience(string id,[FromBody] CreateExperienceDTO experienceDto)
+        [HttpPost]
+        [Authorize(Roles ="Freelancer")]
+        public async Task<IActionResult> CreateExperience([FromBody] CreateExperienceDTO experienceDto)
         {
-            if (!ModelState.IsValid)
+            //var freelancerid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var freelancername = User.FindFirstValue(ClaimTypes.Name);
+
+			if (!ModelState.IsValid)
             {
                 return BadRequest(experienceDto);
             }
@@ -95,13 +101,25 @@ namespace Freelancing.Controllers
                 StartDate = experienceDto.StartDate,
                 EndDate = experienceDto.EndDate,
                 Description = experienceDto.Description,
-                FreelancerId = id
+                FreelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
             };
             var created = await _experienceService.AddExperience(exp);
             if (created)
             {
-                var createdExperience = _experienceService.GetExperienceById(exp.Id);
-                return CreatedAtAction(nameof(GetExperienceById), new { id = createdExperience.Id }, createdExperience);
+                var createdExperience = await _experienceService.GetExperienceById(exp.Id);
+                return CreatedAtAction(nameof(GetExperienceById), new { id = createdExperience.Id }, 
+                    new
+                    {
+					createdExperience.Id,
+                    createdExperience.Freelancer.UserName,
+					createdExperience.JobTitle,
+					createdExperience.Company,
+					createdExperience.Location,
+					createdExperience.StartDate,
+					createdExperience.EndDate,
+				    createdExperience.Description
+					}
+                    );
             }
             return BadRequest(new { msg = "failed to create experience" });
         }

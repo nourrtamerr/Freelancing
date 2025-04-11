@@ -59,8 +59,9 @@ namespace Freelancing.RepositoryService
 
 		public async Task<Experience> GetExperienceById(int id)
 		{
-			var exp= await _context.Experiences
-				.Include(e=>e.Freelancer)
+			var exp = await _context.Experiences
+				.Include(e => e.Freelancer)
+				.AsNoTracking()
 				.FirstOrDefaultAsync(e => e.Id == id);
 			return exp;
 		}
