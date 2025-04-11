@@ -26,6 +26,7 @@ namespace Freelancing.Controllers
             }
             var experienceDtolist = experienceslist.Select(e => new ExperienceDTO
             {
+                Id = e.Id,
                 JobTitle = e.JobTitle,
                 isDeleted = e.isDeleted,
                 Company = e.Company,
@@ -48,6 +49,7 @@ namespace Freelancing.Controllers
             }
             var experienceDtolist = experienceslist.Select(e => new ExperienceDTO
             {
+                Id = e.Id,
                 JobTitle = e.JobTitle,
                 isDeleted = e.isDeleted,
                 Company = e.Company,
@@ -70,6 +72,7 @@ namespace Freelancing.Controllers
             }
             var experienceDto = new ExperienceDTO
             {
+                Id = experience.Id,
                 JobTitle = experience.JobTitle,
                 isDeleted = experience.isDeleted,
                 Company = experience.Company,
@@ -125,7 +128,7 @@ namespace Freelancing.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateExperience(int id, [FromBody] ExperienceDTO experienceDto)
+        public async Task<IActionResult> UpdateExperience(int id, [FromBody] CreateExperienceDTO experienceDto)
         {
             var exp =await _experienceService.GetExperienceById(id);            
             if (exp == null || !ModelState.IsValid)
