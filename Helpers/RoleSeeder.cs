@@ -2,9 +2,13 @@
 {
 	public static class RoleSeeder
 	{
+		public static readonly string client= "Client";
+		public static readonly string freelancer = "Freelancer";
+		public static readonly string admin= "Admin";
+
+		public static string[] roles = { admin, client, freelancer };
 		public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
 		{
-			string[] roles = { "Admin", "Client", "Freelancer" };
 
 			foreach (var role in roles)
 			{
