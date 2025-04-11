@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Freelancing.Models
+﻿namespace Freelancing.Models
 {
 	public class Freelancer : AppUser
 	{
@@ -10,7 +8,7 @@ namespace Freelancing.Models
 		public decimal Balance { get; set; } = 0;
 		public Education Education { get; set; }
 		public List<Experience> Experiences { get; set; }
-		public List<Language> Languages { get; set; }
+		public List<FreelancerLanguage> Languages { get; set; }
 		public List<PortofolioProject> Portofolio { get; set; }
         public bool IsDeleted { get; set; } = false;
 

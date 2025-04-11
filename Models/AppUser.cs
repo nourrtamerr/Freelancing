@@ -5,8 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 public abstract class AppUser :IdentityUser
 {
 
-    public string firstname { get; set; }
+	public string firstname { get; set; }
 	public string lastname { get; set; }
+	public DateOnly DateOfBirth { get; set; }
+	public DateOnly AccountCreationDate { set; get; }
 	public string City { get; set; }
 	public string Country { get; set; }
 	public string? ProfilePicture { get; set; }
