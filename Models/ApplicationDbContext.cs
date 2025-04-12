@@ -78,6 +78,8 @@ namespace Freelancing.Models
 				Country = "Admin Country",
 				firstname = "Admin",
 				lastname = "User",
+				RefreshToken = "",
+				RefreshTokenExpiryDate = DateTime.Now
 
 			};
 

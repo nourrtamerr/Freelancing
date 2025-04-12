@@ -10,8 +10,9 @@ namespace Freelancing.Helpers
         {
             CreateMap<Milestone, MilestoneDTO>();
             CreateMap<MilestoneDTO, Milestone>();
-            CreateMap<RegisterDTO, Client>();
-            CreateMap<Client, RegisterDTO>();
+            CreateMap<RegisterDTO, Client>()
+            .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+			CreateMap<Client, RegisterDTO>();
             CreateMap<Freelancer, RegisterDTO>();
             CreateMap<RegisterDTO, Freelancer>()
                 .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore()); 
