@@ -48,6 +48,21 @@ namespace Freelancing.Helpers
 
 			CreateMap<Client, ViewClientDTO>();
 			CreateMap<ViewClientDTO, Client>();
+			CreateMap<AppUser, UsersViewDTO>()
+            .ForMember(dest=>dest.role,opt=>opt.MapFrom(src=>(src.GetType()==typeof(Admin)?Accountrole.Admin :src.GetType()==typeof(Freelancer)?Accountrole.Freelancer:Accountrole.Client)))
+			.AfterMap((src, dest) =>
+			{
+				if (src is Freelancer freelancer)
+				{
+					dest.isAvailable = freelancer.isAvailable;
+					dest.Balance = (int?)freelancer.Balance;
+				}
+                if(src is Client client)
+				{
+					dest.PaymentVerified = client.PaymentVerified;
+				}
+			});
+			//CreateMap<ViewClientDTO, Client>();
 
 
 			#endregion

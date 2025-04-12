@@ -11,5 +11,7 @@
 		public string Email { set; get; }
 		public string? ProfilePicture { get; set; }
 		public bool IsVerified { get; set; }
+		public bool PaymentVerified { get; set; } 
+
 	}
 }
