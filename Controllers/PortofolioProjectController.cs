@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Freelancing.DTOs;
 using Freelancing.Models;
 using AutoMapper;
-using Humanizer;
+
 using System.Threading.Channels;
 
 namespace Freelancing.Controllers
