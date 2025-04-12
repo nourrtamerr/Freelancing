@@ -22,15 +22,46 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
+
 		[HttpGet("test")]
 		[Authorize]
 		public async Task<IActionResult> test()
 		{
 			return Ok(new { str = "hh" });
 		}
-		
+		[HttpGet("FreeAgents")]
+		public async Task<IActionResult> getAllFreelancers()
+		{
+			return Ok(await _freelancersmanager.GetAllAsync());
+		}
+		[HttpGet("FreeAgent/{username}")]
+		public async Task<IActionResult> getFreelancerById(string username)
+		{
+			string userid = (await _userManager.FindByNameAsync(username)).Id;
+			if(userid==null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(await _freelancersmanager.GetByIDAsync(userid));
+		}
+		[HttpGet("Clients/{username}")]
+		public async Task<IActionResult> getClientsById(string username)
+		{
+			string userid = (await _userManager.FindByNameAsync(username)).Id;
+			if (userid == null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(await _freelancersmanager.GetByIDAsync(userid));
+		}
+		[HttpGet("Clients")]
+		public async Task<IActionResult> getAllClients()
+		{
+			return Ok(await _freelancersmanager.GetAllAsync());
+		}
+
 		[HttpGet]
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUserIdentityPicture(string userid)

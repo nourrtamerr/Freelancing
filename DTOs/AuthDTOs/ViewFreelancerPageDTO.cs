@@ -4,22 +4,18 @@ namespace Freelancing.DTOs.AuthDTOs
 {
 	public class ViewFreelancerPageDTO
 	{
+		public string Id { set; get; }
 		public DateOnly AccountCreationDate { set; get; }
 		public string firstname { get; set; }
 		public string lastname { get; set; }
 		public string UserName { set; get; }
 		public string Country { get; set; }
+		public string Email { set; get; }
 		public string? ProfilePicture { get; set; }
 		public bool IsVerified { get; set; }
 		public bool isAvailable { get; set; }
-
-		[InverseProperty("Reviewee")]
-		public virtual List<Review> Reviewed { get; set; }
-		public List<Certificate> Certificates { get; set; }
-		public List<UserSkill> UserSkills { get; set; }
-		public Education Education { get; set; }
-		public List<Experience> Experiences { get; set; }
-		public List<FreelancerLanguage> Languages { get; set; }
-		public List<PortofolioProject> Portofolio { get; set; }
+		public List<string> UserSkills { get; set; }
+		public List<string> Languages { get; set; }
+		
 	}
 }
