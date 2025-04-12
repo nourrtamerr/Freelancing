@@ -38,7 +38,7 @@ namespace Freelancing.Controllers
         }
         
         [HttpGet("freelancer/{username}")]
-        public async Task<IActionResult> GetAllCertificatesByFreelancerId(string username)
+        public async Task<IActionResult> GetAllCertificatesByFreelancerUserNme(string username)
         {
             var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerUserName(username);
             if (certificateslist == null)
