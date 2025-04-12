@@ -4,5 +4,7 @@ public class SubscriptionPlan
     public string name { set; get; }
     public string Description { get; set; }
     public decimal Price { get; set; }
-    public DateTime EndDate { get; set; } 
+    public DateTime EndDate { get; set; }
+	public bool isDeleted { get; set; } = false;
+
 }

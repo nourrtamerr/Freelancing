@@ -2,16 +2,22 @@ using Freelancing.Models;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class AppUser:IdentityUser
+public abstract class AppUser :IdentityUser
 {
 
-    public string firstname { get; set; }
+	public DateOnly AccountCreationDate { set; get; }
+	public string firstname { get; set; }
 	public string lastname { get; set; }
+	public DateOnly DateOfBirth { get; set; }
 	public string City { get; set; }
 	public string Country { get; set; }
 	public string? ProfilePicture { get; set; }
+    public string? NationalId { get; set; }
+	public bool IsVerified { get; set; } = false;
+	public bool isDeleted { get; set; } = false;
 
-
+	public string RefreshToken { set; get; }
+	public DateTime RefreshTokenExpiryDate { set; get; }
 
 	[InverseProperty("Reviewee")]
 	public virtual List<Review> Reviewed { get; set; }

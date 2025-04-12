@@ -1,1 +1,19 @@
+﻿# Ignore Visual Studio temporary files
 .vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+
+# Others (optional)
+*.log
+*.DS_Store
+*.vscode/
+
+appsettings.Development.json
+
+

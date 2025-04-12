@@ -1,7 +1,7 @@
-public class Payment
+public abstract class Payment
 {
     public int Id { get; set; }
-    //public Guid MilestoneId { get; set; }
+
     public decimal Amount { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public DateTime Date { get; set; }

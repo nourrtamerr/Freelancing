@@ -15,5 +15,10 @@ namespace Freelancing.Models
 		public int ProjectId { get; set; }
 		public virtual Project Project { get; set; }
 
+		public int SuggestedDuration { get; set; } //in days
+		public bool IsDeleted { get; set; } = false;
+
+		public List<SuggestedMilestone> suggestedMilestones { get; set; }
+
 	}
 }

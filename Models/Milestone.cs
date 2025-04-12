@@ -19,6 +19,8 @@ public class Milestone
 	public DateTime EndDate { get; set; } //duration in days
     public bool IsDeleted { get; set; } = false;
     public virtual MilestonePayment MilestonePayment { get; set; } //navigation property
+
+    public string? File { get; set; }
 }
 public enum MilestoneStatus
 {

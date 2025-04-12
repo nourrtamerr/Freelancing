@@ -6,64 +6,59 @@ namespace Freelancing.RepositoryService
 {
     public class CertificateService(ApplicationDbContext context) : ICertificatesService
     {
-        public async Task<Certificate> CreateCertificateAsync(Certificate certificate)
-        {
-            Certificate newCertificate = new Certificate()
-            {
-                Name = certificate.Name,
-                IsDeleted = certificate.IsDeleted,
-                IssueDate = certificate.IssueDate,
-                FreelancerId = certificate.FreelancerId
-            };
-            context.certificates.Add(newCertificate);
-            await context.SaveChangesAsync();
-            return newCertificate;
+        public async Task<bool> CreateCertificateAsync(Certificate certificate)
+        {            
+            await context.certificates.AddAsync(certificate);
+            return await context.SaveChangesAsync()>0;            
         }
 
         public async Task<bool> DeleteCertificateAsync(int id)
         {
-            var certificate = await context.certificates.FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
-
+            var certificate = await GetCertificateByIDAsync(id);
             if (certificate == null)
             {
                 return false;
             }
             certificate.IsDeleted = true;
-            await context.SaveChangesAsync();
-            return true;
-
-           
+            context.Update(certificate);
+            return await context.SaveChangesAsync()>0;                       
         }
 
-        public async Task<List<Certificate>> GetAllUserSkillAsync()
+        public async Task<IEnumerable<Certificate>> GetAllCertificatesByFreelancerUserName(string username)
         {
-            return await context.certificates.Where(c => !c.IsDeleted).ToListAsync();
+           var certificates = await context.certificates
+                .Include(c=>c.Freelancer)
+                .Where(c=>c.Freelancer.UserName == username)
+                .ToListAsync();
+            return certificates;
         }
+
+        public async Task<IEnumerable<Certificate>> GetAllUserCertificatesAsync()
+        {
+            return await context.certificates
+                .Include(c=>c.Freelancer)
+                .Where(c => !c.IsDeleted)
+                .ToListAsync();
+        }
+
 
         public async Task<Certificate> GetCertificateByIDAsync(int id)
         {
-            return await context.certificates.FirstOrDefaultAsync(c => c.Id==id && !c.IsDeleted);
+            var cert= await context.certificates
+                .Include(c=>c.Freelancer)
+                .FirstOrDefaultAsync(c => c.Id==id && !c.IsDeleted);
+            return cert;
         }
-
-        public async Task<Certificate> UpdateCertificateAsync(Certificate certificate)
+        
+        public async Task<bool> UpdateCertificateAsync(Certificate certificate)
         {
-            var existingCertificate = await context.certificates.FirstOrDefaultAsync(c => c.Id == certificate.Id && !c.IsDeleted);
-
+            var existingCertificate = await GetCertificateByIDAsync(certificate.Id);
             if (existingCertificate == null)
             {
-                return null;
-              
+                return false;
             }
-
-            existingCertificate.Name = certificate.Name;
-            existingCertificate.IssueDate = certificate.IssueDate;
-            existingCertificate.FreelancerId = certificate.FreelancerId;
-
-            
-            await context.SaveChangesAsync();
-            return existingCertificate;
-
-
+            context.certificates.Update(certificate);
+            return await context.SaveChangesAsync() > 0;
         }
     }
 }

@@ -14,7 +14,8 @@
 		public string Grade { get; set; } // Optional, e.g., "3.8 GPA"
 		public string Description { get; set; } // Optional summary of coursework or honors
 
-		public string FreelancerId { get; set; }
+		public bool IsDeleted { get; set; } = false; // Soft delete flag
+        public string FreelancerId { get; set; }
 		public Freelancer Freelancer { get; set; }
 	}
 }
