@@ -10,6 +10,8 @@ namespace Freelancing.DTOs.AuthDTOs
 		public string City { set; get; }
 		public string Country { set; get; }
 		public string UserName { set; get; }
+		[MaxLength(500)]
+		public string? Description { set; get; }
 		[DataType(DataType.Date)]
 		[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
 		[myAge]
