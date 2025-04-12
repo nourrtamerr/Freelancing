@@ -20,6 +20,7 @@ namespace Freelancing.Helpers
 	        .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
 			CreateMap<EditProfileDTO, AppUser>()
             .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+            CreateMap<AppUser, UsersRequestingVerificationViewDTO>();
 
 		}
     }

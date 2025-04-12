@@ -30,8 +30,7 @@ namespace Freelancing.Controllers
 		{
 			return Ok(new { str = "hh" });
 		}
-
-
+		
 		[HttpGet]
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUserIdentityPicture(string userid)
@@ -39,8 +38,25 @@ namespace Freelancing.Controllers
 			var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			return Ok(new { user.NationalId });
 		}
+		[HttpGet("getUsersRequestingVerifications")]
+		[Authorize(Roles ="Admin")]
+		public async Task<IActionResult> getUsersRequestingVerifications()
+		{
+			var users = _userManager.Users.Where(u => u.NationalId != null&&!u.IsVerified).ToList();
+			if (users.Count == 0)
+			{
+				return NotFound("No users are requesting verification");
+			}
+			var userDtos = new List<UsersRequestingVerificationViewDTO>();
+			foreach (var user in users)
+			{
+				userDtos.Add(_mapper.Map<UsersRequestingVerificationViewDTO>(user));
+			}
+			return Ok(userDtos);
+		}
+		
 		[HttpPost("RequestIdentityVerification")]
-		[Authorize]
+		[Authorize(Roles ="Freelancer,Client")]
 		public async Task<IActionResult> RequestIdentityVerification([FromForm] RequestVerificationDTO dto)
 		{
 			var currentuser =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
