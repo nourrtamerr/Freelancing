@@ -7,102 +7,105 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Freelancing.DTOs;
 using Freelancing.Models;
+using AutoMapper;
+using Humanizer;
+using System.Threading.Channels;
 
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PortofolioProjectDTOesController : ControllerBase
+    public class PortofolioProjectController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPortofolioProject portofolioProject;
+        private readonly IMapper mapper;
 
-        public PortofolioProjectDTOesController(ApplicationDbContext context)
+        public PortofolioProjectController(IPortofolioProject portofolioProject, IMapper mapper)
         {
-            _context = context;
+            this.mapper = mapper;
+            this.portofolioProject = portofolioProject;
         }
 
-        // GET: api/PortofolioProjectDTOes
+        // GET: api/PortofolioProject
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PortofolioProjectDTO>>> GetPortofolioProjectDTO()
+        public async Task<ActionResult<PortofolioProjectDTO>> GetPortofolioProject(int id)
         {
-            return await _context.PortofolioProjectDTO.ToListAsync();
+            var p = await portofolioProject.GetByIdAsync(id);
+            if (p == null)
+            {
+                return NotFound();
+            }
+            var DTO = mapper.Map<PortofolioProjectDTO>(p); 
+            return Ok(DTO);
         }
 
-        // GET: api/PortofolioProjectDTOes/5
+        // GET: api/PortofolioProject/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PortofolioProjectDTO>> GetPortofolioProjectDTO(int id)
+        public async Task<ActionResult<PortofolioProjectDTO>> GetPortofolioProjecBytId(int id)
         {
-            var portofolioProjectDTO = await _context.PortofolioProjectDTO.FindAsync(id);
+            var p = await portofolioProject.GetByIdAsync(id); 
 
-            if (portofolioProjectDTO == null)
+            if (p == null)
             {
                 return NotFound();
             }
 
-            return portofolioProjectDTO;
+            var DTO = mapper.Map<PortofolioProjectDTO>(p);
+            return Ok(DTO);
         }
 
-        // PUT: api/PortofolioProjectDTOes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/PortofolioProject/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPortofolioProjectDTO(int id, PortofolioProjectDTO portofolioProjectDTO)
+        public async Task<IActionResult> Update(int id, [FromBody] PortofolioProjectDTO portofolioProjectDTO)
         {
             if (id != portofolioProjectDTO.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(portofolioProjectDTO).State = EntityState.Modified;
-
-            try
+            var existingProject = await portofolioProject.GetByIdAsync(id);
+            if (existingProject == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PortofolioProjectDTOExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound($"No project found with ID = {id}");
             }
 
-            return NoContent();
+
+            //existingProject.Title = portofolioProjectDTO.Title;
+            //existingProject.Description=portofolioProjectDTO.Description;
+            //existingProject.CreatedAt = DateTime.UtcNow;  
+            //existingProject.FreelancerId=portofolioProjectDTO.FreelancerId;
+
+            mapper.Map(portofolioProjectDTO,existingProject);
+
+            await portofolioProject.UpdateAsync(portofolioProjectDTO);
+            return Ok(portofolioProjectDTO);
+
+            
         }
 
         // POST: api/PortofolioProjectDTOes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<PortofolioProjectDTO>> PostPortofolioProjectDTO(PortofolioProjectDTO portofolioProjectDTO)
-        {
-            _context.PortofolioProjectDTO.Add(portofolioProjectDTO);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<PortofolioProjectDTO>> Create(PortofolioProjectDTO portofolioProjectDTO)
+        //{
+        //    _context.PortofolioProjectDTO.Add(portofolioProjectDTO);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPortofolioProjectDTO", new { id = portofolioProjectDTO.Id }, portofolioProjectDTO);
-        }
+        //    return CreatedAtAction("GetPortofolioProjectDTO", new { id = portofolioProjectDTO.Id }, portofolioProjectDTO);
+        //}
 
-        // DELETE: api/PortofolioProjectDTOes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePortofolioProjectDTO(int id)
-        {
-            var portofolioProjectDTO = await _context.PortofolioProjectDTO.FindAsync(id);
-            if (portofolioProjectDTO == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/PortofolioProjectDTOes/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeletePortofolioProject(int id)
+        //{
+        //    var portofolioProjectDTO = await _context.PortofolioProjectDTO.FindAsync(id);
+        //    if (portofolioProjectDTO == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.PortofolioProjectDTO.Remove(portofolioProjectDTO);
-            await _context.SaveChangesAsync();
+        //    _context.PortofolioProjectDTO.Remove(portofolioProjectDTO);
+        //    await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
-
-        private bool PortofolioProjectDTOExists(int id)
-        {
-            return _context.PortofolioProjectDTO.Any(e => e.Id == id);
-        }
+        //    return NoContent();
+        //}
     }
 }
