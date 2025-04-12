@@ -92,5 +92,15 @@ namespace Freelancing.RepositoryService
 
 
         }
+
+        //Task<List<Freelancer>> IFreelancerService.GetAllAsync()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //Task<Freelancer> IFreelancerService.GetByIDAsync(string id)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
