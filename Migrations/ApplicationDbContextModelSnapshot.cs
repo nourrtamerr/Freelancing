@@ -548,6 +548,13 @@ namespace Freelancing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
                     b.Property<string>("RevieweeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -884,6 +891,9 @@ namespace Freelancing.Migrations
                     b.Property<string>("FreelancerId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("SubcategoryId")
                         .HasColumnType("int");
 
@@ -1000,7 +1010,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-                            ConcurrencyStamp = "d441af2f-e419-4cd2-937c-5a9dbb33c963",
+                            ConcurrencyStamp = "b0c485c4-0d15-48f6-b4ed-bba6565370f0",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1009,11 +1019,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAQnMYN61Og7JqM1IpZT5c88svkV1AWHjyacYpOh6x0j1WPByjgSuO78oJB6wYXKPw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIwtusojaPCcv1JIdszQMS5mfLtu2QSOV6xqSKExp0zKN81y94aP9hc3ODoV4ZFrSw==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 12, 2, 31, 36, 703, DateTimeKind.Local).AddTicks(6884),
-                            SecurityStamp = "d90a4313-a087-4ba9-b3d1-72e1ae1ce163",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 12, 18, 47, 53, 940, DateTimeKind.Local).AddTicks(3813),
+                            SecurityStamp = "210eec2c-9760-4a37-9e38-12ad834de519",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1026,6 +1036,9 @@ namespace Freelancing.Migrations
                 {
                     b.HasBaseType("AppUser");
 
+                    b.Property<bool>("PaymentVerified")
+                        .HasColumnType("bit");
+
                     b.ToTable("clients", (string)null);
                 });
 
@@ -1035,9 +1048,6 @@ namespace Freelancing.Migrations
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("isAvailable")
                         .HasColumnType("bit");

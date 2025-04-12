@@ -1,11 +1,12 @@
-﻿using Freelancing.DTOs;
+﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class PortofolioProjectService(ApplicationDbContext context) : IPortofolioProject
+    public class PortofolioProjectService(ApplicationDbContext context, IMapper _mapper) : IPortofolioProject
     {
 
         public async Task<List<PortofolioProject>> GetAllAync()
@@ -13,7 +14,7 @@ namespace Freelancing.RepositoryService
             return await context.PortofolioProjects.Where(p => !p.IsDeleted).ToListAsync();
         }
 
-        public async Task<PortofolioProject> GetById(int id)
+        public async Task<PortofolioProject> GetByIdAsync(int id)
         {
             return await context.PortofolioProjects.FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -66,12 +67,13 @@ namespace Freelancing.RepositoryService
         public async Task<PortofolioProject> UpdateAsync(PortofolioProjectDTO portofolioProject)
         {
             var p = context.PortofolioProjects.SingleOrDefault(p => p.Id == portofolioProject.Id);
-            if(p is not null)
+            if (p is not null)
             {
-                p.Title = portofolioProject.Title;
-                p.Description = portofolioProject.Description;
-                p.CreatedAt = portofolioProject.CreatedAt;
-                p.Images = portofolioProject.Images;
+                //p.Title = portofolioProject.Title;
+                //p.Description = portofolioProject.Description;
+                //p.CreatedAt = portofolioProject.CreatedAt;
+                //p.Images = portofolioProject.Images;
+                _mapper.Map(portofolioProject, p);
 
                 await context.SaveChangesAsync();
                 return p;
