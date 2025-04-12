@@ -17,7 +17,8 @@ public abstract class AppUser :IdentityUser
 	public bool IsVerified { get; set; } = false;
 
     public string? NationalId { get; set; }
-
+	public string RefreshToken { set; get; }
+	public DateTime RefreshTokenExpiryDate { set; get; }
 
 	[InverseProperty("Reviewee")]
 	public virtual List<Review> Reviewed { get; set; }

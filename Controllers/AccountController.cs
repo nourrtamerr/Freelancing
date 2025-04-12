@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using PharmaTechBE.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -37,6 +38,42 @@ namespace Freelancing.Controllers
 			return Ok(new { User.Identity.IsAuthenticated, UserName = User.FindFirstValue(ClaimTypes.Name) });
 		}
 
+		[HttpPost("login")]
+		public async Task<IActionResult> Login(LoginDTO LoginUser)
+		{
+			
+
+			var user = await _userManager.FindByEmailAsync(LoginUser.Usernameoremail) ??
+					   await _userManager.FindByNameAsync(LoginUser.Usernameoremail);
+
+			if (user == null || !await _userManager.CheckPasswordAsync(user, LoginUser.loginPassword))
+			{
+				return Unauthorized("Invalid email or password.");
+			}
+			if (!await _userManager.IsEmailConfirmedAsync(user))
+			{
+				return BadRequest("You must confirm your email before logging in");
+			}
+
+
+			var token = await GenerateToken(user);
+			return Ok(new { token, user.RefreshToken });
+		}
+
+		[Route("Refresh-Token")]
+		[HttpPost]
+		public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO dto)
+		{
+			var user = (await _userManager.FindByNameAsync(dto.UserName));
+			if (user is null || dto.RefreshToken != user.RefreshToken || user.RefreshTokenExpiryDate < DateTime.UtcNow)
+			{
+				return BadRequest("Ineligible for refresh token");
+			}
+			user.RefreshToken = JWTHelpers.CreateRefreshToken();
+			user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+			var token = GenerateToken(user);
+			return Ok(new { token, user.RefreshToken });
+		}
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromForm] RegisterDTO dto)
 		{
@@ -106,6 +143,8 @@ namespace Freelancing.Controllers
 				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
 			}
 			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
+			newuser.RefreshToken = JWTHelpers.CreateRefreshToken();
+			newuser.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
 			await _userManager.UpdateAsync(newuser);
 
 
@@ -208,7 +247,7 @@ namespace Freelancing.Controllers
 				{
 					user = new Client
 					{
-						UserName = name.Replace(" ", ""),
+						UserName = Regex.Replace(name, "[^a-zA-Z0-9]", ""),
 						Email = email,
 						firstname = name,
 						lastname = "",
@@ -221,7 +260,7 @@ namespace Freelancing.Controllers
 				{
 					user = new Freelancer
 					{
-						UserName = name.Replace(" ",""),
+						UserName = Regex.Replace(name, "[^a-zA-Z0-9]", ""),
 						Email = email,
 						firstname = name,
 						lastname = "",
@@ -281,7 +320,7 @@ namespace Freelancing.Controllers
 			}.Union(userClaims).Union(roleClaims);
 
 
-			var expiry = DateTime.UtcNow.AddMinutes(25);
+			var expiry = DateTime.UtcNow.AddMinutes(2);
 
 			var token =
 				new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]
