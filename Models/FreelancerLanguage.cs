@@ -6,6 +6,7 @@ namespace Freelancing.Models
 	{
 		public int id { set; get; }
 		public Language Language { get; set; }
+		public bool IsDeleted { get; set; }=false;
 
 		[ForeignKey("freelancer")]
 		public string freelancerId { set; get; }
