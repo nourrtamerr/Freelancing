@@ -7,7 +7,7 @@ namespace Freelancing.IRepositoryService
     {
         Task<List<PortofolioProject>> GetAllAync();
 
-        Task<PortofolioProject> GetById(int id);
+        Task<PortofolioProject> GetByIdAsync(int id);
 
         Task<List<PortofolioProject>> GetByFreelancerId(string id);
 
