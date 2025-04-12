@@ -5,9 +5,7 @@ namespace Freelancing.Models
 	public class Review
 	{
 		public int id { set; get; }
-
 		public int Rating { get; set; }
-
 		public string Comment { get; set; }
 
 
@@ -20,8 +18,6 @@ namespace Freelancing.Models
 		[ForeignKey("Reviewer")]
 		public string ReviewerId { set; get; }
 		public AppUser Reviewer { set; get; }
-
-
 
 	}
 }

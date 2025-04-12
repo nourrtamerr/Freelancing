@@ -49,7 +49,6 @@ namespace Freelancing.RepositoryService
 				_context.Admins.Update(Admin);
 				return await _context.SaveChangesAsync() > 0;
 			}
-
 		}
 	}
 }

@@ -13,8 +13,8 @@
         public ExperienceLevel experienceLevel { get; set; }
         public List<string> ProjectSkills { get; set; } = new List<string>();
         public int? PostedFrom { get; set; }
-        public int ClientTotalNumberOfReviews { get; set; }
-        public int ClientRating { get; set; }
+        //public int ClientTotalNumberOfReviews { get; set; }
+        //public int ClientRating { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +23,7 @@ namespace Freelancing.Models
 		public DbSet<Chat> Chats { set; get; }
 		public DbSet<Education> Educations { set; get; }
 		public DbSet<Experience> Experiences { set; get; }
+		public DbSet<Freelancer> freelancerLanguages { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<SuggestedMilestone> suggestedMilestones { get; set; }
 
@@ -77,10 +79,12 @@ namespace Freelancing.Models
 				Country = "Admin Country",
 				firstname = "Admin",
 				lastname = "User",
-
+				RefreshToken = "",
+				RefreshTokenExpiryDate = DateTime.Now
 			};
 
 			modelBuilder.Entity<Admin>().HasData(admin);
+
 
 			modelBuilder.Entity<MilestonePayment>()
 				.HasOne(mp => mp.Milestone)

@@ -30,6 +30,9 @@ namespace Freelancing.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("AccountCreationDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -41,6 +44,9 @@ namespace Freelancing.Migrations
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -80,6 +86,13 @@ namespace Freelancing.Migrations
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RefreshTokenExpiryDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -323,6 +336,28 @@ namespace Freelancing.Migrations
                     b.ToTable("Experiences");
                 });
 
+            modelBuilder.Entity("Freelancing.Models.FreelancerLanguage", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<string>("freelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("freelancerId");
+
+                    b.ToTable("FreelancerLanguage");
+                });
+
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>
                 {
                     b.Property<int>("Id")
@@ -528,6 +563,31 @@ namespace Freelancing.Migrations
                     b.HasIndex("ReviewerId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.Subcategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Subcategories");
                 });
 
             modelBuilder.Entity("Freelancing.Models.SubscriptionPayment", b =>
@@ -873,31 +933,6 @@ namespace Freelancing.Migrations
                     b.ToTable("Skills");
                 });
 
-            modelBuilder.Entity("Subcategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("Subcategories");
-                });
-
             modelBuilder.Entity("SubscriptionPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -966,9 +1001,11 @@ namespace Freelancing.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
+                            AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
                             ConcurrencyStamp = "68e0dec4-e6d6-48d3-ac78-df6ed959f1f0",
                             Country = "Admin Country",
+                            DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             IsVerified = false,
@@ -1102,6 +1139,17 @@ namespace Freelancing.Migrations
                     b.Navigation("Freelancer");
                 });
 
+            modelBuilder.Entity("Freelancing.Models.FreelancerLanguage", b =>
+                {
+                    b.HasOne("Freelancing.Models.Freelancer", "freelancer")
+                        .WithMany("Languages")
+                        .HasForeignKey("freelancerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("freelancer");
+                });
+
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>
                 {
                     b.HasOne("Milestone", "Milestone")
@@ -1201,6 +1249,17 @@ namespace Freelancing.Migrations
                     b.Navigation("Reviewee");
 
                     b.Navigation("Reviewer");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.Subcategory", b =>
+                {
+                    b.HasOne("Category", "Category")
+                        .WithMany("Subcategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Freelancing.Models.SuggestedMilestone", b =>
@@ -1316,7 +1375,7 @@ namespace Freelancing.Migrations
                         .HasForeignKey("FreelancerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Subcategory", "Subcategory")
+                    b.HasOne("Freelancing.Models.Subcategory", "Subcategory")
                         .WithMany("Projects")
                         .HasForeignKey("SubcategoryId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1327,17 +1386,6 @@ namespace Freelancing.Migrations
                     b.Navigation("Freelancer");
 
                     b.Navigation("Subcategory");
-                });
-
-            modelBuilder.Entity("Subcategory", b =>
-                {
-                    b.HasOne("Category", "Category")
-                        .WithMany("Subcategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("UserSkill", b =>
@@ -1434,6 +1482,11 @@ namespace Freelancing.Migrations
                     b.Navigation("suggestedMilestones");
                 });
 
+            modelBuilder.Entity("Freelancing.Models.Subcategory", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
             modelBuilder.Entity("Milestone", b =>
                 {
                     b.Navigation("MilestonePayment")
@@ -1449,11 +1502,6 @@ namespace Freelancing.Migrations
                     b.Navigation("Proposals");
                 });
 
-            modelBuilder.Entity("Subcategory", b =>
-                {
-                    b.Navigation("Projects");
-                });
-
             modelBuilder.Entity("Freelancing.Models.Freelancer", b =>
                 {
                     b.Navigation("Certificates");
@@ -1462,6 +1510,8 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Experiences");
+
+                    b.Navigation("Languages");
 
                     b.Navigation("Portofolio");
 

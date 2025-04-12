@@ -66,7 +66,7 @@ namespace Freelancing.RepositoryService
                     dto.BidAveragePrice = 0;
                 }
 
-                dto.ClientRating= original.Client.Reviews.Select(r=>r.)
+                //dto.ClientRating= original.Client.Reviews.Select(r=>r.)
 
             }
 
