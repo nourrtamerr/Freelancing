@@ -1,11 +1,14 @@
-﻿namespace Freelancing.IRepositoryService
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Freelancing.IRepositoryService
 {
     public interface ICertificatesService
     {
-        Task<List<Certificate>> GetAllUserSkillAsync();
+        Task<IEnumerable<Certificate>> GetAllUserCertificatesAsync();
+        Task<IEnumerable<Certificate>> GetAllCertificatesByFreelancerUserName(string username);
         Task<Certificate> GetCertificateByIDAsync(int id);
-        Task<Certificate> UpdateCertificateAsync(Certificate certificate);
-        Task<Certificate> CreateCertificateAsync(Certificate certificate);
+        Task<bool> UpdateCertificateAsync(Certificate certificate);
+        Task<bool> CreateCertificateAsync(Certificate certificate);
         Task<bool> DeleteCertificateAsync(int id);
     }
 }

@@ -69,6 +69,7 @@ namespace Freelancing
             builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
             builder.Services.AddScoped<IEducationService, EducationService>();
             builder.Services.AddScoped<IExperienceService, ExperienceService>();
+            builder.Services.AddScoped<ICertificatesService, CertificateService>();
 
             #endregion
 

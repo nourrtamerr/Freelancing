@@ -6,7 +6,7 @@
 		Task<bool> UpdateExperience(Experience Experience);
 		Task<bool> DeleteExperience(int id);
 		Task<Experience> GetExperienceById(int id);
-		Task<IEnumerable<Experience>> GetExperienceByFreelancerId(string id);
+		Task<IEnumerable<Experience>> GetExperienceByFreelancerUserName(string username);
 		Task<IEnumerable<Experience>> GetExperienceByCompanyName(string name);
 		Task<IEnumerable<Experience>> GetAllExperiences();
 		Task<bool> ExperienceExists(int id);
