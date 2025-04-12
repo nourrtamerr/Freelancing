@@ -12,7 +12,7 @@ namespace Freelancing.Models
 		public List<Experience> Experiences { get; set; }
 		public List<Language> Languages { get; set; }
 		public List<PortofolioProject> Portofolio { get; set; }
-        public bool IsDeleted { get; set; } = false;
+        //public bool IsDeleted { get; set; } = false;
 
     }
 	public enum Language

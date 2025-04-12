@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250411150539_ProjectIsDeleted")]
+    partial class ProjectIsDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -967,7 +970,7 @@ namespace Freelancing.Migrations
                             Id = "1",
                             AccessFailedCount = 0,
                             City = "Admin City",
-                            ConcurrencyStamp = "68e0dec4-e6d6-48d3-ac78-df6ed959f1f0",
+                            ConcurrencyStamp = "005302f8-e0e2-4cfd-9ae5-3b4926e849dd",
                             Country = "Admin Country",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
@@ -975,9 +978,9 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDvKER6qOy8suiofsPcQsmG8QzELogWubbwOCqqQbB4lm9EaA/VQHbycs4UfiNOyug==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG7yQjKZvBauJrnkeO0OYLxC+u/Z4/l2prBrM2ZA0H+x4Wdp21wC9Jyu/w1UhTDvEw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "58ceeb36-b76a-4bda-bf45-7a5c7c627d35",
+                            SecurityStamp = "be9660f5-9268-4a4f-9904-da24a68209e7",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -999,6 +1002,9 @@ namespace Freelancing.Migrations
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Languages")
                         .IsRequired()

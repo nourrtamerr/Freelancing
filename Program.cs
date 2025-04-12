@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 //using AutoMapper
 
 using AutoMapper;
+using System.Text.Json.Serialization;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -27,6 +28,7 @@ namespace Freelancing
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
             builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
             builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 
 
             //builder.Services.AddAutoMapper(typeof(MappingProfiles));
@@ -61,23 +63,31 @@ namespace Freelancing
             //		};
             //	})
             //	;
+
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-			using (var scope = app.Services.CreateScope())
-			{
-				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-				await RoleSeeder.SeedRolesAsync(roleManager);
-			}
-			#region Services
+                await RoleSeeder.SeedRolesAsync(roleManager);
+            }
+            #region Services
 
-			#endregion
-			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
+            #endregion
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

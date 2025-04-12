@@ -10,6 +10,13 @@ namespace Freelancing.Helpers
             CreateMap<Milestone, MilestoneDTO>();
             CreateMap<MilestoneDTO, Milestone>();
 
+            CreateMap<BiddingProjectDTO, BiddingProject>();
+            CreateMap<BiddingProject, BiddingProjectDTO>();
+
+            CreateMap<BiddingProjectGetAllDTO, BiddingProject>();
+            CreateMap<BiddingProject, BiddingProjectGetAllDTO>();
+
+
         }
     }
 }

@@ -46,6 +46,8 @@ public abstract class Project
 	public ExperienceLevel experienceLevel { get; set; }
 	public virtual List<Proposal> Proposals { get; set; } = new List<Proposal>();
 	public virtual List<ProjectSkill> ProjectSkills { get; set; }
+
+	public bool IsDeleted { get; set; } = false;
 }
 
 
