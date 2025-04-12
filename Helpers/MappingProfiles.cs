@@ -45,7 +45,10 @@ namespace Freelancing.Helpers
 			   opt.MapFrom(src => src.UserSkills.Select(us => us.Skill.Name).ToList()))
 			   .ForMember(dest => dest.Languages, opt =>
 			   opt.MapFrom(src => src.Languages.Select(us => us.Language.ToString()).ToList()));
-			
+
+			CreateMap<Client, ViewClientDTO>();
+			CreateMap<ViewClientDTO, Client>();
+
 
 			#endregion
 
