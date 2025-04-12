@@ -7,7 +7,7 @@
 		public static readonly string admin= "Admin";
 
 		public static string[] roles = { admin, client, freelancer };
-		public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+		public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager, UserManager<AppUser> userManager)
 		{
 
 			foreach (var role in roles)
@@ -16,6 +16,14 @@
 				{
 					await roleManager.CreateAsync(new IdentityRole(role));
 				}
+			}
+			
+
+			var admin = await userManager.FindByNameAsync("admin");
+			if (admin != null)
+			{
+				// Assign the Admin role to the user
+				await userManager.AddToRoleAsync(admin, "Admin");
 			}
 		}
 	}

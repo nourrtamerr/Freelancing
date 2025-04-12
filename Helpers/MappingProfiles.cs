@@ -15,7 +15,11 @@ namespace Freelancing.Helpers
 			CreateMap<Client, RegisterDTO>();
             CreateMap<Freelancer, RegisterDTO>();
             CreateMap<RegisterDTO, Freelancer>()
-                .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore()); 
+                .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+			CreateMap<CreateAdminDTO, Admin>()
+	        .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+			CreateMap<EditProfileDTO, AppUser>()
+            .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
 
 		}
     }

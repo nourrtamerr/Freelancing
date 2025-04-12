@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -80,10 +81,10 @@ namespace Freelancing.Models
 				lastname = "User",
 				RefreshToken = "",
 				RefreshTokenExpiryDate = DateTime.Now
-
 			};
 
 			modelBuilder.Entity<Admin>().HasData(admin);
+
 
 			modelBuilder.Entity<MilestonePayment>()
 				.HasOne(mp => mp.Milestone)

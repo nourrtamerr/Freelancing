@@ -110,6 +110,7 @@ namespace Freelancing
             builder.Services.AddScoped<IExperienceService, ExperienceService>();
 			builder.Services.AddScoped<IEmailSettings, EmailSettings>();
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 			#endregion
 
 			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
@@ -150,7 +151,7 @@ namespace Freelancing
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-			var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "MyPrivateUploads");
+			var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), ImageSettings.ImagesPath);
 			if (!Directory.Exists(uploadsPath))
 			{
 				Directory.CreateDirectory(uploadsPath); // Ensure the directory exists
@@ -166,8 +167,9 @@ namespace Freelancing
 			using (var scope = app.Services.CreateScope())
 			{
 				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-				await RoleSeeder.SeedRolesAsync(roleManager);
+				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
 			}
 			#region Services
 
