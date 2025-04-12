@@ -112,7 +112,7 @@ namespace Freelancing.Controllers
 				freelancer.RefreshToken = JWTHelpers.CreateRefreshToken();
 				freelancer.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
 				result = await _userManager.CreateAsync(freelancer, dto.Password);
-				await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
+				//await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
 			}
 			else
@@ -121,7 +121,7 @@ namespace Freelancing.Controllers
 				client.RefreshToken = JWTHelpers.CreateRefreshToken();
 				client.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
 				result = await _userManager.CreateAsync(client, dto.Password);
-				await _userManager.AddToRoleAsync(client, RoleSeeder.client);
+				//await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
 			}
 			if (!result.Succeeded)
@@ -131,11 +131,11 @@ namespace Freelancing.Controllers
 					ModelState.AddModelError("", error.Description);
 				}
 				var validationErrors = ModelState
-		.Where(ms => ms.Value.Errors.Count > 0)  // Only include fields with errors
-		.ToDictionary(
-			kv => kv.Key, // Field name
-			kv => kv.Value.Errors.Select(e => new { errorMessage = e.ErrorMessage }).ToList() // List of error messages
-		);
+									.Where(ms => ms.Value.Errors.Count > 0)  // Only include fields with errors
+									.ToDictionary(
+										kv => kv.Key, // Field name
+										kv => kv.Value.Errors.Select(e => new { errorMessage = e.ErrorMessage }).ToList() // List of error messages
+									);
 
 				var errorResponse = new
 				{
@@ -144,6 +144,10 @@ namespace Freelancing.Controllers
 					errors = validationErrors,
 				};
 				return BadRequest(errorResponse);
+			}
+			else
+			{
+				await _userManager.AddToRoleAsync(newuser, dto.Role==userRole.Client? RoleSeeder.client:RoleSeeder.freelancer);
 			}
 			if (dto.ProfilePicture is not null)
 			{
@@ -181,7 +185,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest("Email is not registered");
 			}
-			if(newuser.EmailConfirmed)
+			if (newuser.EmailConfirmed)
 			{
 				return BadRequest("Email is already confirmed");
 			}
