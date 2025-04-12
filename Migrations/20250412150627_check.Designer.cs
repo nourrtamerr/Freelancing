@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250412150627_check")]
+    partial class check
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1010,7 +1013,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-                            ConcurrencyStamp = "b0c485c4-0d15-48f6-b4ed-bba6565370f0",
+                            ConcurrencyStamp = "914c185c-c152-4852-8f77-8cc0db53968a",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1019,11 +1022,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIwtusojaPCcv1JIdszQMS5mfLtu2QSOV6xqSKExp0zKN81y94aP9hc3ODoV4ZFrSw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKU3nUZwIOPyxoHAE88BUhqtaxx2id8pja1Yas4PrnW+rlhgRNGR7TupM3mKXscFPA==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 12, 18, 47, 53, 940, DateTimeKind.Local).AddTicks(3813),
-                            SecurityStamp = "210eec2c-9760-4a37-9e38-12ad834de519",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 12, 17, 6, 25, 535, DateTimeKind.Local).AddTicks(8880),
+                            SecurityStamp = "3b1440c0-5f89-4b9e-a7d8-ff0b50837ffd",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1035,9 +1038,6 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Freelancing.Models.Client", b =>
                 {
                     b.HasBaseType("AppUser");
-
-                    b.Property<bool>("PaymentVerified")
-                        .HasColumnType("bit");
 
                     b.ToTable("clients", (string)null);
                 });

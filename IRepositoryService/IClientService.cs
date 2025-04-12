@@ -1,4 +1,5 @@
-﻿using Freelancing.Models;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.Models;
 
 namespace Freelancing.IRepositoryService
 {
@@ -7,8 +8,11 @@ namespace Freelancing.IRepositoryService
 		Task<bool> AddClient(Client Client);
 		Task<bool> UpdateClient(Client Client);
 		Task<bool> DeleteClient(string id);
-		Task<Client> GetClientById(string id);
-		Task<IEnumerable<Client>> GetAllClients();
+		Task<ViewClientDTO> GetClientById(string id);
+
+		//Task<IEnumerable<Client>> GetAllClients();
+		Task<IEnumerable<ViewClientDTO>> GetAllClients();
+
 		Task<bool> ClientExists(string id);
 
 	}

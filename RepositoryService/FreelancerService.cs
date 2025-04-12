@@ -1,11 +1,13 @@
-﻿using Freelancing.IRepositoryService;
+﻿using AutoMapper;
+using Freelancing.DTOs.AuthDTOs;
+using Freelancing.IRepositoryService;
 using Freelancing.Migrations;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class FreelancerService(ApplicationDbContext context) : IFreelancerService
+    public class FreelancerService(ApplicationDbContext context,IMapper _mapper) : IFreelancerService
     {
         public async Task<Freelancer> CreateFreelancerAsync(Freelancer freelancer)
         {
@@ -19,7 +21,7 @@ namespace Freelancing.RepositoryService
                 Experiences = freelancer.Experiences,
                 Languages = freelancer.Languages,
                 Portofolio = freelancer.Portofolio,
-                IsDeleted = false
+                //IsDeleted = false
             };
 
             context.Add(f);
@@ -29,24 +31,35 @@ namespace Freelancing.RepositoryService
 
         public async Task<bool> DeleteFreelancerAsync(string id)
         {
-           var freelancer= await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+           var freelancer= await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.isDeleted);
             if (freelancer == null)
                 return false;
 
-            freelancer.IsDeleted = true;
+            freelancer.isDeleted = true;
             await context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<Freelancer>> GetAllAsync()
+        public async Task<List<ViewFreelancersDTO>> GetAllAsync()
         {
-            return await context.freelancers.Where(f=>!f.IsDeleted).ToListAsync();
-        }
 
-        public async Task<Freelancer> GetByIDAsync(string id)
+            var freelancers= await context.freelancers.Include(f=>f.UserSkills).ThenInclude(S=>S.Skill).Where(f=>!f.isDeleted).ToListAsync();
+            List<ViewFreelancersDTO> freelancerdtos = new();
+            foreach(var freelancer in freelancers)
+			{
+                freelancerdtos.Add(_mapper.Map<ViewFreelancersDTO>(freelancer));
+			}
+            return freelancerdtos;
+		}
+
+        public async Task<ViewFreelancerPageDTO> GetByIDAsync(string id)
         {
-            var freelancer = await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
-            return freelancer;
+            var freelancer=await context.freelancers.Include(f => f.UserSkills).ThenInclude(S => S.Skill)
+                .Include(f=>f.Languages).Where(f => !f.isDeleted).FirstOrDefaultAsync(F=>F.Id==id);
+
+			return _mapper.Map<ViewFreelancerPageDTO>(freelancer);
+
+			
         }
 
         public async Task<Freelancer> UpdateFreelancerAsync(Freelancer freelancer)

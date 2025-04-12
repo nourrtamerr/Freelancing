@@ -22,15 +22,64 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
+
 		[HttpGet("test")]
 		[Authorize]
 		public async Task<IActionResult> test()
 		{
 			return Ok(new { str = "hh" });
 		}
-		
+		[HttpGet("FreeAgents")]
+		public async Task<IActionResult> getAllFreelancers()
+		{
+			return Ok(await _freelancersmanager.GetAllAsync());
+		}
+		[HttpGet("FreeAgent/{username}")]
+		public async Task<IActionResult> getFreelancerById(string username)
+		{
+			var user = (await _userManager.FindByNameAsync(username));
+
+			if (user==null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(await _freelancersmanager.GetByIDAsync(user.Id));
+		}
+		[HttpGet("Clients/{username}")]
+		public async Task<IActionResult> getClientsById(string username)
+		{
+			var user = (await _userManager.FindByNameAsync(username));
+			if (user == null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(await _clientsmanager.GetClientById(user.Id));
+		}
+		[HttpGet("Clients")]
+		public async Task<IActionResult> getAllClients()
+		{
+			return Ok(await _clientsmanager.GetAllClients());
+		}
+
+		[HttpGet("GetAllUsers")]
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> AllUsers()
+		{
+			var users = await _userManager.Users.ToListAsync();
+			if (users.Count == 0)
+			{
+				return NotFound("No users found");
+			}
+			var userDtos = new List<UsersViewDTO>();
+			foreach (var user in users)
+			{
+				userDtos.Add(_mapper.Map<UsersViewDTO>(user));
+			}
+			return Ok(userDtos);
+		}
+
 		[HttpGet]
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUserIdentityPicture(string userid)

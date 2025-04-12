@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Freelancing.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json.Serialization;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -112,14 +113,18 @@ namespace Freelancing
 			builder.Services.AddScoped<ICertificatesService, CertificateService>();
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
+			builder.Services.AddScoped<IFreelancerService, FreelancerService>();
+			builder.Services.AddScoped<IClientService, ClientService>();
 			#endregion
+            builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
+
 
 			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
 			//        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
 			//builder.Services, typeof(MappingProfile));
 
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
@@ -146,6 +151,14 @@ namespace Freelancing
             //		};
             //	})
             //	;
+
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -165,18 +178,21 @@ namespace Freelancing
 			}); //enabling wwwroot with the localhost/files url 
 
 
-			using (var scope = app.Services.CreateScope())
-			{
-				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
-			}
-			#region Services
+                await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+            }
+
+
+
+            #region Services
 
 			#endregion
 			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
+				if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

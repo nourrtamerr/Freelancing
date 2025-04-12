@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Freelancing.DTOs.AuthDTOs
+﻿namespace Freelancing.DTOs.AuthDTOs
 {
-	public class ViewFreelancersDTO
+	public class ViewClientDTO
 	{
 		public string Id { set; get; }
 		public DateOnly AccountCreationDate { set; get; }
@@ -11,11 +9,9 @@ namespace Freelancing.DTOs.AuthDTOs
 		public string UserName { set; get; }
 		public string Country { get; set; }
 		public string Email { set; get; }
-
 		public string? ProfilePicture { get; set; }
-		public bool IsVerified { get; set; } 
-		public bool isAvailable { get; set; }
-		public List<string> UserSkills { get; set; }
+		public bool IsVerified { get; set; }
+		public bool PaymentVerified { get; set; } 
 
 	}
 }
