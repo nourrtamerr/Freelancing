@@ -34,15 +34,15 @@ namespace Freelancing.Controllers
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 Description = e.Description,
-                FreelancerId = e.FreelancerId
+                FreelancerName = e.Freelancer.UserName
             });
             return Ok (experienceDtolist);
         }
 
-        [HttpGet("freelancer/{id}")]
-        public async Task<IActionResult> GetAllExperiencesByFreelancerId( string id)
+        [HttpGet("freelancer/{username}")]
+        public async Task<IActionResult> GetAllExperiencesByFreelancerUserName( string username)
         {
-            var experienceslist = await _experienceService.GetExperienceByFreelancerId(id);
+            var experienceslist = await _experienceService.GetExperienceByFreelancerUserName(username);
             if (experienceslist == null || !experienceslist.Any())
             {
                 return NotFound(new { msg = "No experiences found." });
@@ -57,7 +57,7 @@ namespace Freelancing.Controllers
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 Description = e.Description,
-                FreelancerId = e.FreelancerId
+                FreelancerName = e.Freelancer.UserName
             });
             return Ok (experienceDtolist);
         }
@@ -80,7 +80,7 @@ namespace Freelancing.Controllers
                 StartDate = experience.StartDate,
                 EndDate = experience.EndDate,
                 Description = experience.Description,
-                FreelancerId = experience.FreelancerId
+                FreelancerName = experience.Freelancer.UserName
             };
             return Ok(experienceDto);
         }
@@ -160,7 +160,6 @@ namespace Freelancing.Controllers
                 return BadRequest(new { msg = "failed to delete experience"});
             }
             return Ok(new { msg = "experience marked as deleted successfully" });
-        }        
-                                        
+        }               
     }
 }

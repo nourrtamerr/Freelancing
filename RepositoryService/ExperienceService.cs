@@ -31,7 +31,7 @@ namespace Freelancing.RepositoryService
 		public async Task<IEnumerable<Experience>> GetAllExperiences()
 		{
 			var exp = await _context.Experiences
-                .Include(e => e.Freelancer)                
+                //.Include(e => e.Freelancer)                
                 .OrderByDescending(e => e.StartDate)
 				.ToListAsync();			
                 return exp;            
@@ -47,11 +47,11 @@ namespace Freelancing.RepositoryService
             return exp;            
 		}
 
-		public async Task<IEnumerable<Experience>> GetExperienceByFreelancerId(string id)
+		public async Task<IEnumerable<Experience>> GetExperienceByFreelancerUserName(string username)
 		{
             var exp = await _context.Experiences
                 .Include(e => e.Freelancer)
-				.Where(e => e.FreelancerId == id)
+				.Where(e => e.Freelancer.UserName == username)
 				.OrderByDescending(e => e.StartDate)
                 .ToListAsync();
             return exp;            
@@ -75,7 +75,6 @@ namespace Freelancing.RepositoryService
 			}
 			_context.Experiences.Update(Experience);
 			return await _context.SaveChangesAsync() > 0;
-
 		}
 	}
 }
