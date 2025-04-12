@@ -1,6 +1,7 @@
 ﻿using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Tls;
 
 namespace Freelancing.RepositoryService
 {
@@ -12,29 +13,52 @@ namespace Freelancing.RepositoryService
             return await _context.SaveChangesAsync()>0;
         }
 
-        public Task<bool> DeleteLanguageAsync(int id)
+        public async Task<bool> DeleteLanguageAsync(int id)
         {
-            throw new NotImplementedException();
+            var language = await GetLanguageById(id);
+            if (language == null)
+            {
+                return false;
+            }
+            language.IsDeleted = true;
+            _context.Update(language);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<IEnumerable<Language>> GetAllLanguagesAsync()
+        public async Task<IEnumerable<FreelancerLanguage>> GetAllLanguagesAsync()
         {
-            throw new NotImplementedException();
+            return await _context.freelancerLanguages
+                .Include(c => c.freelancer)
+                .Where(c => !c.IsDeleted)
+                .ToListAsync();
         }
 
-        public Task<Language> GetLanguageById(int id)
+        public async Task<FreelancerLanguage> GetLanguageById(int id)
         {
-            throw new NotImplementedException();
+            var lang = await _context.freelancerLanguages
+                .Include(c => c.freelancer)
+                .FirstOrDefaultAsync(c => c.id == id && !c.IsDeleted);
+            return lang;
         }
 
-        public Task<IEnumerable<Language>> GetLanguagesByFreelancerUserNameAsync(string username)
+        public async Task<IEnumerable<FreelancerLanguage>> GetLanguagesByFreelancerUserNameAsync(string username)
         {
-            throw new NotImplementedException();
+            var languages = await _context.freelancerLanguages
+                .Include(c => c.freelancer)
+                .Where(c => c.freelancer.UserName == username)
+                .ToListAsync();
+            return languages;
         }
 
-        public Task<bool> UpdateLanguageAsync(FreelancerLanguage language)
+        public async Task<bool> UpdateLanguageAsync(FreelancerLanguage language)
         {
-            throw new NotImplementedException();
+            var existinglanguage = await GetLanguageById(language.id);
+            if (existinglanguage == null)
+            {
+                return false;
+            }
+            _context.freelancerLanguages.Update(language);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

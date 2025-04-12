@@ -116,6 +116,7 @@ namespace Freelancing
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 			builder.Services.AddScoped<IFreelancerService, FreelancerService>();
 			builder.Services.AddScoped<IClientService, ClientService>();
+			builder.Services.AddScoped<IFreelancerLanguageService, FreelancerLanguageService>();
 			#endregion
             builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 
