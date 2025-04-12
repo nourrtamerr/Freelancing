@@ -8,7 +8,7 @@ namespace Freelancing.Models
 
 
         [ForeignKey("subscriptionPlan")]
-        public int? subscriptionPlanId { get; set; };
+        public int? subscriptionPlanId { get; set; }
         public virtual SubscriptionPlan? subscriptionPlan { get; set; }
 
 
