@@ -124,7 +124,7 @@ namespace Freelancing
 			//        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
 			//builder.Services, typeof(MappingProfile));
 
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
