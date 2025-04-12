@@ -22,13 +22,13 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IWebHostEnvironment _env,SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
 		[HttpGet("test")]
 		[Authorize]
 		public async Task<IActionResult> test()
 		{
-			return Ok(new {str= "hh" });
+			return Ok(new { str = "hh" });
 		}
 
 
@@ -41,7 +41,7 @@ namespace Freelancing.Controllers
 		[HttpPost("login")]
 		public async Task<IActionResult> Login(LoginDTO LoginUser)
 		{
-			
+
 
 			var user = await _userManager.FindByEmailAsync(LoginUser.Usernameoremail) ??
 					   await _userManager.FindByNameAsync(LoginUser.Usernameoremail);
@@ -55,7 +55,8 @@ namespace Freelancing.Controllers
 				return BadRequest("You must confirm your email before logging in");
 			}
 
-
+			user.RefreshToken = JWTHelpers.CreateRefreshToken();
+			user.RefreshTokenExpiryDate = DateTime.Now.AddDays(7);
 			var token = await GenerateToken(user);
 			return Ok(new { token, user.RefreshToken });
 		}
@@ -71,7 +72,8 @@ namespace Freelancing.Controllers
 			}
 			user.RefreshToken = JWTHelpers.CreateRefreshToken();
 			user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
-			var token = GenerateToken(user);
+			await _userManager.UpdateAsync(user);
+			var token = await GenerateToken(user);
 			return Ok(new { token, user.RefreshToken });
 		}
 		[HttpPost("Register")]
@@ -80,17 +82,18 @@ namespace Freelancing.Controllers
 
 			#region ExistingAccount
 
-			if ((await _userManager.FindByEmailAsync(dto.Email) ) is AppUser myuser )
+			if ((await _userManager.FindByEmailAsync(dto.Email)) is AppUser myuser)
 			{
-				if(myuser is not null) { 
-				if (myuser.EmailConfirmed == true)
+				if (myuser is not null)
 				{
-					return BadRequest("Email already exists");
-				}
-				else
-				{
-					return BadRequest("Email already exists but not confirmed");
-				}
+					if (myuser.EmailConfirmed == true)
+					{
+						return BadRequest("Email already exists");
+					}
+					else
+					{
+						return BadRequest("Email already exists but not confirmed");
+					}
 				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
@@ -99,20 +102,24 @@ namespace Freelancing.Controllers
 			}
 
 			#endregion
-			
+
 
 			IdentityResult result;
 			AppUser newuser;
-			if(dto.Role==userRole.Freelancer)
+			if (dto.Role == userRole.Freelancer)
 			{
 				Freelancer freelancer = _mapper.Map<Freelancer>(dto);
-				result =await _userManager.CreateAsync(freelancer, dto.Password);
+				freelancer.RefreshToken = JWTHelpers.CreateRefreshToken();
+				freelancer.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				result = await _userManager.CreateAsync(freelancer, dto.Password);
 				await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
 			}
 			else
 			{
 				Client client = _mapper.Map<Client>(dto);
+				client.RefreshToken = JWTHelpers.CreateRefreshToken();
+				client.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
 				result = await _userManager.CreateAsync(client, dto.Password);
 				await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
@@ -143,13 +150,12 @@ namespace Freelancing.Controllers
 				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
 			}
 			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
-			newuser.RefreshToken = JWTHelpers.CreateRefreshToken();
-			newuser.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+
 			await _userManager.UpdateAsync(newuser);
 
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(newuser);
-			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token}, Request.Scheme);
+			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token }, Request.Scheme);
 
 			// Send confirmation email
 			var email = new Email2
@@ -159,16 +165,43 @@ namespace Freelancing.Controllers
 				Body = $"Please confirm your email by clicking on this link: {confirmationLink}"
 			};
 			_emailSettings.SendEmail(email);
-			return Ok(new { message = "Account Created Successfully" +
-					". Please check your email to confirm your account." });
-			
-			
+			return Ok(new
+			{
+				message = "Account Created Successfully" +
+					". Please check your email to confirm your account."
+			});
+
+
 		}
-
-
+		[HttpGet("ResendEmailConfirmation")]
+		public async Task<IActionResult> ResendEmailConfirmation(string emailToBeCONFIRMED)
+		{
+			var newuser = await _userManager.FindByEmailAsync(emailToBeCONFIRMED);
+			if (newuser is null)
+			{
+				return BadRequest("Email is not registered");
+			}
+			if(newuser.EmailConfirmed)
+			{
+				return BadRequest("Email is already confirmed");
+			}
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(newuser);
+			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token }, Request.Scheme);
+			var email = new Email2
+			{
+				To = newuser.Email,
+				Subject = "Confirm Email",
+				Body = $"Please confirm your email by clicking on this link: {confirmationLink}"
+			};
+			_emailSettings.SendEmail(email);
+			return Ok(new
+			{
+				message = "New confirmation email was sent"
+			});
+		}
 		[HttpGet("ConfirmEmail")]
 		public async Task<IActionResult> ConfirmEmail(string userId, string token)
-		{ 
+		{
 			if (userId == null || token == null)
 			{
 				return BadRequest("Invalid email confirmation request.");
@@ -198,10 +231,10 @@ namespace Freelancing.Controllers
 
 		[HttpGet("External-login")]
 		[AllowAnonymous]
-		public IActionResult ExternalLogin(string provider,userRole role, string returnUrl = null,string errorurl=null)
+		public IActionResult ExternalLogin(string provider, userRole role, string returnUrl = null, string errorurl = null)
 		{
 
-			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl,role });
+			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl, role });
 			var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 			properties.Items["LoginProvider"] = provider;
 			return Challenge(properties, provider);
@@ -209,13 +242,13 @@ namespace Freelancing.Controllers
 
 		[HttpGet("external-login-callback")]
 		[AllowAnonymous]
-		public async Task<IActionResult> ExternalLoginCallback(userRole role,string returnUrl = null, string remoteError = null, string errorurl = null)
+		public async Task<IActionResult> ExternalLoginCallback(userRole role, string returnUrl = null, string remoteError = null, string errorurl = null)
 		{
 
 			if (remoteError != null)
 			{
 				return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
-				
+
 
 
 			}
@@ -235,8 +268,8 @@ namespace Freelancing.Controllers
 				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
 			}
 			var userbyname = await _userManager.FindByNameAsync(name);
-			var userbyemail = await _userManager.FindByEmailAsync(email);	
-			if ((userbyname!=null && userbyemail !=null)&&( userbyemail.UserName!=userbyname.UserName ||userbyname.Email!=userbyemail.Email) )
+			var userbyemail = await _userManager.FindByEmailAsync(email);
+			if ((userbyname != null && userbyemail != null) && (userbyemail.UserName != userbyname.UserName || userbyname.Email != userbyemail.Email))
 			{
 				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email is already associated with another account.")}");
 			}
@@ -252,7 +285,7 @@ namespace Freelancing.Controllers
 						firstname = name,
 						lastname = "",
 						City = "",
-						Country = "",	
+						Country = "",
 						EmailConfirmed = true
 					};
 				}
@@ -299,7 +332,7 @@ namespace Freelancing.Controllers
 
 		private async Task<string> GenerateToken(AppUser user)
 		{
-			
+
 			var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 			var signcred = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 			//var _userfromdb = _context.AppUsers.iNCL.FirstOrDefault(u => u.Id == user.Id);
