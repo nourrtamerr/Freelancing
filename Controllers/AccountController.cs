@@ -32,7 +32,13 @@ namespace Freelancing.Controllers
 		}
 
 
-
+		[HttpGet]
+		[Authorize(Roles ="Admin")]
+		public async Task<IActionResult> getUserIdentityPicture(string userid)
+		{
+			var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			return Ok(new { user.NationalId });
+		}
 		[HttpPost("RequestIdentityVerification")]
 		[Authorize]
 		public async Task<IActionResult> RequestIdentityVerification([FromForm] RequestVerificationDTO dto)
@@ -424,7 +430,7 @@ namespace Freelancing.Controllers
 				{
 					Subject = "Reset Password",
 					To = user.Email,
-					Body = ResetPasswordLink
+					Body = "kitablah3lek"
 				};
 				_emailSettings.SendEmail(email);
 				return Ok(new { Message= "Forgetpassword link was sent to your email"});
