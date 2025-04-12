@@ -1003,7 +1003,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-                            ConcurrencyStamp = "68e0dec4-e6d6-48d3-ac78-df6ed959f1f0",
+                            ConcurrencyStamp = "d441af2f-e419-4cd2-937c-5a9dbb33c963",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1012,9 +1012,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDvKER6qOy8suiofsPcQsmG8QzELogWubbwOCqqQbB4lm9EaA/VQHbycs4UfiNOyug==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAQnMYN61Og7JqM1IpZT5c88svkV1AWHjyacYpOh6x0j1WPByjgSuO78oJB6wYXKPw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "58ceeb36-b76a-4bda-bf45-7a5c7c627d35",
+                            RefreshToken = "",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 12, 2, 31, 36, 703, DateTimeKind.Local).AddTicks(6884),
+                            SecurityStamp = "d90a4313-a087-4ba9-b3d1-72e1ae1ce163",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1037,7 +1039,9 @@ namespace Freelancing.Migrations
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Languages")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
