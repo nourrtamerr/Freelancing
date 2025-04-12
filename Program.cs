@@ -113,6 +113,8 @@ namespace Freelancing
 			builder.Services.AddScoped<ICertificatesService, CertificateService>();
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
+			builder.Services.AddScoped<IFreelancerService, FreelancerService>();
+			builder.Services.AddScoped<IClientService, ClientService>();
 			#endregion
             builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 
