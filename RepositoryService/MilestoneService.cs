@@ -37,7 +37,7 @@ namespace Freelancing.RepositoryService
 
             Milestone ms = mapper.Map<Milestone>(milestone);
 
-            await context.AddAsync(ms);
+            await context.Milestones.AddAsync(ms);
             await context.SaveChangesAsync();
 
             return ms;
@@ -64,7 +64,7 @@ namespace Freelancing.RepositoryService
             var ms = context.Milestones.SingleOrDefault(m => m.Id == milestone.Id);
             if(ms is not null)
             {
-                mapper.Map(milestone, ms); // ✅ Map into existing entity
+                mapper.Map(milestone, ms);
                 await context.SaveChangesAsync();
 
             }

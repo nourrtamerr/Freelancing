@@ -19,7 +19,7 @@ namespace Freelancing.RepositoryService
                 Experiences = freelancer.Experiences,
                 Languages = freelancer.Languages,
                 Portofolio = freelancer.Portofolio,
-                IsDeleted = false
+                //IsDeleted = false
             };
 
             context.Add(f);
@@ -29,23 +29,23 @@ namespace Freelancing.RepositoryService
 
         public async Task<bool> DeleteFreelancerAsync(string id)
         {
-           var freelancer= await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+           var freelancer= await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.isDeleted);
             if (freelancer == null)
                 return false;
 
-            freelancer.IsDeleted = true;
+            freelancer.isDeleted = true;
             await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<List<Freelancer>> GetAllAsync()
         {
-            return await context.freelancers.Where(f=>!f.IsDeleted).ToListAsync();
+            return await context.freelancers.Where(f=>!f.isDeleted).ToListAsync();
         }
 
         public async Task<Freelancer> GetByIDAsync(string id)
         {
-            var freelancer = await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+            var freelancer = await context.freelancers.FirstOrDefaultAsync(f => f.Id == id && !f.isDeleted);
             return freelancer;
         }
 

@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Freelancing.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json.Serialization;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -113,6 +114,8 @@ namespace Freelancing
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 			#endregion
+            builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
+
 
 			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
@@ -146,6 +149,14 @@ namespace Freelancing
             //		};
             //	})
             //	;
+
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -165,14 +176,17 @@ namespace Freelancing
 			}); //enabling wwwroot with the localhost/files url 
 
 
-			using (var scope = app.Services.CreateScope())
-			{
-				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
-			}
-			#region Services
+                await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+            }
+
+
+
+            #region Services
 
 			#endregion
 			// Configure the HTTP request pipeline.
