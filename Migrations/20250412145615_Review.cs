@@ -15,19 +15,19 @@ namespace Freelancing.Migrations
             //    name: "IsDeleted",
             //    table: "freelancers");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Comment",
-                table: "Reviews",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            //migrationBuilder.AddColumn<string>(
+            //    name: "Comment",
+            //    table: "Reviews",
+            //    type: "nvarchar(max)",
+            //    nullable: false,
+            //    defaultValue: "");
 
-            migrationBuilder.AddColumn<int>(
-                name: "Rating",
-                table: "Reviews",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "Rating",
+            //    table: "Reviews",
+            //    type: "int",
+            //    nullable: false,
+            //    defaultValue: 0);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
@@ -40,13 +40,13 @@ namespace Freelancing.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Comment",
-                table: "Reviews");
+            //migrationBuilder.DropColumn(
+            //    name: "Comment",
+            //    table: "Reviews");
 
-            migrationBuilder.DropColumn(
-                name: "Rating",
-                table: "Reviews");
+            //migrationBuilder.DropColumn(
+            //    name: "Rating",
+            //    table: "Reviews");
 
             //migrationBuilder.AddColumn<string>(
             //    name: "IsDeleted",

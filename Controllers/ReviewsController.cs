@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
+using Freelancing.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ReviewsController:ControllerBase
     {
         private readonly IReviewRepositoryService reviewService;
@@ -66,6 +69,7 @@ namespace Freelancing.Controllers
             return CreatedAtAction(nameof(GetReview), new { id = createdReview.id }, createdReviewDto);
         }
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ReviewAuthorizationFilter))]
         public async Task<ActionResult> UpdateReview(int id, [FromBody] ReviewDto reviewDto)
         {
             if (id != reviewDto.Id)
@@ -82,7 +86,9 @@ namespace Freelancing.Controllers
             return NoContent();
         }
 
+
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(ReviewAuthorizationFilter))]
         public async Task<ActionResult> DeleteReview(int id)
         {
             var review = await reviewService.GetReviewByIdAsync(id);

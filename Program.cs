@@ -16,6 +16,7 @@ using System.Text;
 using Freelancing.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json.Serialization;
+using Freelancing.Filters;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -115,16 +116,19 @@ namespace Freelancing
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
 			builder.Services.AddScoped<IFreelancerService, FreelancerService>();
 			builder.Services.AddScoped<IClientService, ClientService>();
+			builder.Services.AddScoped<IFreelancerLanguageService, FreelancerLanguageService>();
 			#endregion
             builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 
+            #region Filters
+            builder.Services.AddScoped<ReviewAuthorizationFilter>();
+            #endregion
+            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
-			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
+            //builder.Services, typeof(MappingProfile));
 
-			//        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
-			//builder.Services, typeof(MappingProfile));
-
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile));
+            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 

@@ -39,27 +39,45 @@ namespace Freelancing.Controllers
 		[HttpGet("FreeAgent/{username}")]
 		public async Task<IActionResult> getFreelancerById(string username)
 		{
-			string userid = (await _userManager.FindByNameAsync(username)).Id;
-			if(userid==null)
+			var user = (await _userManager.FindByNameAsync(username));
+
+			if (user==null)
 			{
 				return BadRequest("not found");
 			}
-			return Ok(await _freelancersmanager.GetByIDAsync(userid));
+			return Ok(await _freelancersmanager.GetByIDAsync(user.Id));
 		}
 		[HttpGet("Clients/{username}")]
 		public async Task<IActionResult> getClientsById(string username)
 		{
-			string userid = (await _userManager.FindByNameAsync(username)).Id;
-			if (userid == null)
+			var user = (await _userManager.FindByNameAsync(username));
+			if (user == null)
 			{
 				return BadRequest("not found");
 			}
-			return Ok(await _freelancersmanager.GetByIDAsync(userid));
+			return Ok(await _clientsmanager.GetClientById(user.Id));
 		}
 		[HttpGet("Clients")]
 		public async Task<IActionResult> getAllClients()
 		{
-			return Ok(await _freelancersmanager.GetAllAsync());
+			return Ok(await _clientsmanager.GetAllClients());
+		}
+
+		[HttpGet("GetAllUsers")]
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> AllUsers()
+		{
+			var users = await _userManager.Users.ToListAsync();
+			if (users.Count == 0)
+			{
+				return NotFound("No users found");
+			}
+			var userDtos = new List<UsersViewDTO>();
+			foreach (var user in users)
+			{
+				userDtos.Add(_mapper.Map<UsersViewDTO>(user));
+			}
+			return Ok(userDtos);
 		}
 
 		[HttpGet]

@@ -1,9 +1,11 @@
 ﻿
+using AutoMapper;
+using Freelancing.DTOs.AuthDTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-	public class ClientService(ApplicationDbContext _context) : IClientService
+	public class ClientService(ApplicationDbContext _context,IMapper _mapper) : IClientService
 	{
 		public async Task<bool> AddClient(Client Client)
 		{
@@ -30,19 +32,29 @@ namespace Freelancing.RepositoryService
 			return await _context.SaveChangesAsync() > 0;
 		}
 
-		public async Task<IEnumerable<Client>> GetAllClients()
+		public async Task<IEnumerable<ViewClientDTO>> GetAllClients()
 		{
-			return await _context.clients.ToListAsync();
+			
+			var clients = await _context.clients.Where(f => !f.isDeleted).ToListAsync();
+			List<ViewClientDTO> clientsdtos = new();
+			foreach (var client in clients)
+			{
+				clientsdtos.Add(_mapper.Map<ViewClientDTO>(client));
+			}
+			return clientsdtos;
+
 		}
 
-		public async Task<Client> GetClientById(string id)
+		public async Task<ViewClientDTO> GetClientById(string id)
 		{
-			return await _context.clients.FirstOrDefaultAsync(c=>c.Id==id);
+			var CLIENT = await _context.clients.Where(f => !f.isDeleted).FirstOrDefaultAsync(F => F.Id == id);
+
+			return _mapper.Map<ViewClientDTO>(CLIENT);
 		}
 
 		public async Task<bool> UpdateClient(Client Client)
 		{
-			var client = await GetClientById(Client.Id);
+			var client = _mapper.Map<Client>(await GetClientById(Client.Id));
 			if (client == null)
 			{
 				return false;
