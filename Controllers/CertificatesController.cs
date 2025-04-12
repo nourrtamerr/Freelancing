@@ -22,9 +22,9 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllCertificates()
         {
             var certificateslist = await _certificatesService.GetAllUserCertificatesAsync();
-            if (certificateslist == null)
+            if (certificateslist == null || certificateslist.Count() == 0)
             {
-                return NotFound();
+                return BadRequest(new { msg = "there is no certificates found" });
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {
@@ -43,7 +43,7 @@ namespace Freelancing.Controllers
             var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerUserName(username);
             if (certificateslist == null)
             {
-                return NotFound();
+                return BadRequest(new {msg = "there is no certificates for this freelancer"});
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {

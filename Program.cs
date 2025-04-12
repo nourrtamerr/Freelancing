@@ -109,6 +109,7 @@ namespace Freelancing
             builder.Services.AddScoped<IEducationService, EducationService>();
             builder.Services.AddScoped<IExperienceService, ExperienceService>();
 			builder.Services.AddScoped<IEmailSettings, EmailSettings>();
+			builder.Services.AddScoped<ICertificatesService, CertificateService>();
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 			#endregion
 
@@ -150,7 +151,7 @@ namespace Freelancing
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-			var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "MyPrivateUploads");
+			var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), ImageSettings.ImagesPath);
 			if (!Directory.Exists(uploadsPath))
 			{
 				Directory.CreateDirectory(uploadsPath); // Ensure the directory exists
