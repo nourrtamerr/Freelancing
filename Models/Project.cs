@@ -42,6 +42,9 @@ public abstract class Project
 	[ForeignKey("Subcategory")]
     public int SubcategoryId { get; set; }
 	public virtual Subcategory Subcategory { set; get; }
+
+
+
 	public virtual List<Milestone> Milestones { get; set; } = new List<Milestone>();
 	public ExperienceLevel experienceLevel { get; set; }
 	public virtual List<Proposal> Proposals { get; set; } = new List<Proposal>();

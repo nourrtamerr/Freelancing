@@ -8,7 +8,7 @@ public class SubscriptionPlan
 
 
     public int? DurationInDays { get; set; } //nullable 34n lw fi plans mlha4 duration
-    public int TotalNumber { get; set; } //of bids for freelancer - of prsting projects for client
+    public int TotalNumber { get; set; } = 6; //of bids for freelancer - of prsting projects for client
     
 
 }

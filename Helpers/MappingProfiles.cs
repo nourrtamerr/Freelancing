@@ -91,6 +91,52 @@ namespace Freelancing.Helpers
                 ))
                 .ForMember(dest => dest.ClientRating, opt => opt.Ignore()) // to be set manually
                 .ForMember(dest => dest.ClientTotalNumberOfReviews, opt => opt.Ignore()); // to be set manually;
-                    }
-                }
+
+
+            CreateMap<BiddingProjectGetByIdDTO, BiddingProject>();
+            CreateMap<BiddingProject, BiddingProjectGetByIdDTO>()
+                .ForMember(dest => dest.BidAveragePrice, opt => opt.MapFrom(src =>
+                src.Proposals != null && src.Proposals.Any()
+                ? (int)src.Proposals.Average(p => p.Price)
+                : 0
+                ))
+                
+                .ForMember(dest=>dest.ProjectSkills, opt=>opt.MapFrom(src=>src.ProjectSkills.Select(ps=>ps.Skill.Name)))
+                
+                .ForMember(dest=>dest.PostedFrom, opt=>opt.MapFrom(src=>
+                (DateTime.Now-src.BiddingStartDate).Days))
+
+                .ForMember(dest=>dest.ClientTotalNumberOfReviews, opt=>opt.MapFrom(src=>src.Client.Reviewed.Count()))
+                
+                .ForMember(dest=>dest.ClientRating, opt=>opt.MapFrom(src=>src.Client.Reviewed.Average(r=>r.Rating)))
+                
+                //.ForMember(dest=>dest.subscriptionPlan, opt=>opt.MapFrom(src=>src.Freelancer.s))
+
+                //.ForMember(dest=>dest.FreelancerTotalNumber, opt=>opt.MapFrom(src=>src.Freelancer.subscriptionPlan.TotalNumber))
+                
+                //.ForMember(dest=>dest.FreelancerRemainingNumberOfBids, opt=>opt.MapFrom(src=>src.Freelancer.RemainingNumberOfBids))
+                ;
+
+
+
+                //.ForMember(dest=>dest.projectSkills, opt=>opt.Ignore())
+                //.ForMember(dest=>dest.Subcategory, opt=>opt.MapFrom(src=>src.Subcategory.Name.ToString()))
+
+            CreateMap<BiddingProjectCreateDTO, BiddingProject>()
+                .ForMember(dest => dest.Subcategory, opt => opt.Ignore())
+                 .ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
+                 .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => src.ExperienceLevel.ToString()));
+
+            CreateMap<BiddingProject, BiddingProjectCreateDTO>()
+                .ForMember(dest=>dest.ExperienceLevel, opt=>opt.MapFrom(src=>src.experienceLevel.ToString()))
+                .ForMember(dest=>dest.SubCategoryName, opt=>opt.Ignore())
+                 .ForMember(dest => dest.projectSkills, opt => opt.Ignore())
+                ;
+
+
+
+
+
+        }
+    }
 }
