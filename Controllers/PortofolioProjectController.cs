@@ -17,33 +17,33 @@ namespace Freelancing.Controllers
     [ApiController]
     public class PortofolioProjectController : ControllerBase
     {
-        private readonly IPortofolioProject portofolioProject;
+        private readonly IPortofolioProject portofolioProjectContext;
         private readonly IMapper mapper;
 
         public PortofolioProjectController(IPortofolioProject portofolioProject, IMapper mapper)
         {
             this.mapper = mapper;
-            this.portofolioProject = portofolioProject;
+            this.portofolioProjectContext = portofolioProject;
         }
 
         // GET: api/PortofolioProject
         [HttpGet]
-        public async Task<ActionResult<PortofolioProjectDTO>> GetPortofolioProject(int id)
+        public async Task<IActionResult> GetPortofolioProject()
         {
-            var p = await portofolioProject.GetByIdAsync(id);
+            var p = await portofolioProjectContext.GetAllAync();
             if (p == null)
             {
                 return NotFound();
             }
-            var DTO = mapper.Map<PortofolioProjectDTO>(p); 
+            var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
             return Ok(DTO);
         }
 
         // GET: api/PortofolioProject/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PortofolioProjectDTO>> GetPortofolioProjecBytId(int id)
+        public async Task<IActionResult> GetPortofolioProjecBytId(int id)
         {
-            var p = await portofolioProject.GetByIdAsync(id); 
+            var p = await portofolioProjectContext.GetByIdAsync(id);
 
             if (p == null)
             {
@@ -62,7 +62,9 @@ namespace Freelancing.Controllers
             {
                 return BadRequest();
             }
-            var existingProject = await portofolioProject.GetByIdAsync(id);
+
+            //find the project
+            var existingProject = await portofolioProjectContext.GetByIdAsync(id);
             if (existingProject == null)
             {
                 return NotFound($"No project found with ID = {id}");
@@ -74,38 +76,43 @@ namespace Freelancing.Controllers
             //existingProject.CreatedAt = DateTime.UtcNow;  
             //existingProject.FreelancerId=portofolioProjectDTO.FreelancerId;
 
-            mapper.Map(portofolioProjectDTO,existingProject);
+            //prepare it to be updated (mapped it)
+            mapper.Map<PortofolioProjectDTO>(existingProject);
 
-            await portofolioProject.UpdateAsync(portofolioProjectDTO);
-            return Ok(portofolioProjectDTO);
+            //update it
+            var updatedProject = await portofolioProjectContext.UpdateAsync(portofolioProjectDTO);
 
-            
+            //to be sent back to respone as dto
+            var updatedDTO = mapper.Map<PortofolioProjectDTO>(updatedProject);
+
+            return Ok();
+
+
         }
 
-        // POST: api/PortofolioProjectDTOes
-        //[HttpPost]
-        //public async Task<ActionResult<PortofolioProjectDTO>> Create(PortofolioProjectDTO portofolioProjectDTO)
-        //{
-        //    _context.PortofolioProjectDTO.Add(portofolioProjectDTO);
-        //    await _context.SaveChangesAsync();
+        //  POST: api/PortofolioProject
+        [HttpPost]
+        public async Task<ActionResult<PortofolioProjectDTO>> Create(PortofolioProjectDTO portofolioProjectDTO)
+        {
+            var createdProject = await portofolioProjectContext.AddAsync(portofolioProjectDTO);
 
-        //    return CreatedAtAction("GetPortofolioProjectDTO", new { id = portofolioProjectDTO.Id }, portofolioProjectDTO);
-        //}
+            var dto = mapper.Map<PortofolioProjectDTO>(createdProject);
 
-        //// DELETE: api/PortofolioProjectDTOes/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeletePortofolioProject(int id)
-        //{
-        //    var portofolioProjectDTO = await _context.PortofolioProjectDTO.FindAsync(id);
-        //    if (portofolioProjectDTO == null)
-        //    {
-        //        return NotFound();
-        //    }
+            return CreatedAtAction("GetPortofolioProjectDTO", new { id = dto.Id }, dto);
+        }
 
-        //    _context.PortofolioProjectDTO.Remove(portofolioProjectDTO);
-        //    await _context.SaveChangesAsync();
+        // DELETE: api/PortofolioProject/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePortofolioProject(int id)
+        {
+            var success = await portofolioProjectContext.DeleteAsync(id);
+            if (!success)
+            {
+                return NotFound($"No project found with ID = {id}");
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
+
     }
 }

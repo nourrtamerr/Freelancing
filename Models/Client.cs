@@ -2,7 +2,7 @@
 
 namespace Freelancing.Models
 {
-	public class Client:AppUser
+	public class Client : AppUser
 	{
 		public bool PaymentVerified { get; set; } = false;
 
@@ -12,7 +12,41 @@ namespace Freelancing.Models
         public virtual SubscriptionPlan? subscriptionPlan { get; set; }
 
 
-        public int? RemainingNumberOfProjects { get; set; } = 6;
+		public int? RemainingNumberOfProjects { get; set; } = 6;
 
-    }
+		[NotMapped]
+		public Rank Rank
+		{
+			get
+			{
+				int count = Reviews.Count;
+				if (count == 0)
+					return Rank.Veteran;
+
+				double average = Reviews.Average(r => r.Rating);
+
+				if (count < 5 && average >= 3.5)
+					return Rank.RisingStar;
+				else if (count < 15 && average >= 4)
+					return Rank.Established;
+				else if (count < 30 && average >= 4.2)
+					return Rank.Pro;
+				else if (count >= 30 && average >= 4.5)
+					return Rank.Elite;
+
+				return Rank.RisingStar;
+			}
+		}
+
+	}
+    public enum Rank
+    {
+	
+		Veteran,       
+		RisingStar,    
+		Established,   
+		Pro,           
+		Elite          
+	
+	}
 }

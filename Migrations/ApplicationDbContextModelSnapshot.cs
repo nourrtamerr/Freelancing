@@ -657,6 +657,35 @@ namespace Freelancing.Migrations
                     b.ToTable("suggestedMilestones", (string)null);
                 });
 
+            modelBuilder.Entity("Freelancing.Models.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ConnectedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ConnectionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserConnections", (string)null);
+                });
+
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>
                 {
                     b.Property<int>("Id")
@@ -1016,7 +1045,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-                            ConcurrencyStamp = "6c32f321-6714-47ef-a439-f0cb8f88250e",
+                            ConcurrencyStamp = "278ddb38-e885-46ff-a5d5-4fe5950c743b",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1025,11 +1054,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIIv/lEAgGpc6q/LHadZu41nYliuoXZmvVXU+s1ho+u9DJ1RzmHj/CCaNcFXDkog/A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIzeTWTfc2PBM2D3dKru7eD7m4P/Q36CYcTIU20hr+7q4L7i4hmNHBrbnPYvzDGboQ==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 0, 38, 58, 116, DateTimeKind.Local).AddTicks(8331),
-                            SecurityStamp = "e88bd599-9368-4e44-8ad0-18acb0a9a742",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 16, 46, 21, 217, DateTimeKind.Local).AddTicks(7392),
+                            SecurityStamp = "131ac5f3-ea70-425d-847d-8b68f8438fdc",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1102,6 +1131,9 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Freelancing.Models.FixedPriceProject", b =>
                 {
                     b.HasBaseType("Project");
+
+                    b.Property<int>("fixedPrice")
+                        .HasColumnType("int");
 
                     b.ToTable("fixedPriceProjects", (string)null);
                 });
@@ -1301,6 +1333,17 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Proposal");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.UserConnection", b =>
+                {
+                    b.HasOne("AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>

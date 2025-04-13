@@ -1,42 +1,40 @@
-
-using Freelancing.IRepositoryService;
-using Freelancing.Models;
-using Freelancing.Helpers;
-using Freelancing.RepositoryService;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-//using AutoMapper
-
-using AutoMapper;
 using Freelancing.Middlewares;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Freelancing.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json.Serialization;
 using Freelancing.Filters;
-//using AutoMapper.Extensions.Microsoft.DependencyInjection;
+using Freelancing.SignalR;
 
 
 namespace Freelancing
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+	public class Program
+	{
+		public static async Task Main(string[] args)
+		{
+			var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-			//builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-			// Configure Identity
+			builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddSignalR();
+			#region AddCors
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("ChatPolicy", builder =>
+				{
+					builder.WithOrigins("http://127.0.0.1:5500")
+						   .AllowAnyMethod()
+						   .AllowAnyHeader()
+						   .AllowCredentials();
+				});
+			});
+			#endregion
+			#region Configuring identity
 			builder.Services.AddIdentity<AppUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
-			//JWT
 			builder.Services.AddAuthentication((options) =>
 			{
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,24 +63,19 @@ namespace Freelancing
 					{
 						if (context.Request.Path.StartsWithSegments("/api"))
 						{
-							// For API requests, return a 401 Unauthorized response instead of a redirect
 							context.Response.StatusCode = 401;
 							context.Response.ContentType = "application/json";
 							return Task.CompletedTask;
 						}
 
-						// For non-API requests, perform the default behavior (redirect to login page)
 						context.Response.Redirect(context.RedirectUri);
 						return Task.CompletedTask;
 					}
-				}
-
-
-
-				).AddGoogle(OP =>
+				})
+				.AddGoogle(OP =>
 				{
-					OP.ClientId = builder.Configuration["Authentication:Google:ClientId"];  // Your Client ID
-					OP.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];  // Your Client Secret
+					OP.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+					OP.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
 				}).AddFacebook(op =>
 				{
@@ -94,22 +87,21 @@ namespace Freelancing
 
 			builder.Services.Configure<IdentityOptions>(options =>
 			{
-				options.SignIn.RequireConfirmedEmail = true; // Prevent login without email confirmation
+				options.SignIn.RequireConfirmedEmail = true; 
 			});
-			// Add services to the container.
 			builder.Services.AddAuthorization();
+			#endregion
+			#region services
 
-
-            #region services
-            builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
-            builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
-            builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
-            builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
-            builder.Services.AddScoped<IMilestoneService, MilestoneService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
-            builder.Services.AddScoped<IEducationService, EducationService>();
-            builder.Services.AddScoped<IExperienceService, ExperienceService>();
+			builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+			builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
+			builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
+			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
+			builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+			builder.Services.AddScoped<ICategoryService, CategoryService>();
+			builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
+			builder.Services.AddScoped<IEducationService, EducationService>();
+			builder.Services.AddScoped<IExperienceService, ExperienceService>();
 			builder.Services.AddScoped<IEmailSettings, EmailSettings>();
 			builder.Services.AddScoped<ICertificatesService, CertificateService>();
 			builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
@@ -117,58 +109,33 @@ namespace Freelancing
 			builder.Services.AddScoped<IFreelancerService, FreelancerService>();
 			builder.Services.AddScoped<IClientService, ClientService>();
 			builder.Services.AddScoped<IFreelancerLanguageService, FreelancerLanguageService>();
+			builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
+			builder.Services.AddScoped<IproposalService, ProposalService>();
+			builder.Services.AddScoped<IProjectService, ProjectService>();
 			#endregion
-            builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 
-            #region Filters
-            builder.Services.AddScoped<ReviewAuthorizationFilter>();
-            #endregion
-            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
+			#region Filters
+			builder.Services.AddScoped<AuthorFilter>();
+			builder.Services.AddScoped<AuthorAndAdminFilter>();
 
-            //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
-            //builder.Services, typeof(MappingProfile));
-
-            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile));
-
-            //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
+			builder.Services.AddScoped<ReviewAuthorizationFilter>();
+			#endregion
 
 
-            //builder.Services.AddAuthentication(op => {
-            //	op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //	op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //	op.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile));
+			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+			builder.Services.AddControllers()
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+			});
 
+			builder.Services.AddControllers();
+			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddSwaggerGen();
 
-            //})
-            //	.AddJwtBearer(op =>
-            //	{
-            //		op.TokenValidationParameters = new()
-            //		{
-            //			ValidateIssuer = true,
-            //			ValidateAudience = true,
-            //			ValidateLifetime = true,
-            //			ValidateIssuerSigningKey = true,
-            //			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            //			ValidAudience = builder.Configuration["Jwt:Audience"],
-            //			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            //			ClockSkew = TimeSpan.Zero
-            //		};
-            //	})
-            //	;
-
-
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            var app = builder.Build();
+			var app = builder.Build();
 			var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), ImageSettings.ImagesPath);
 			if (!Directory.Exists(uploadsPath))
 			{
@@ -182,34 +149,31 @@ namespace Freelancing
 			}); //enabling wwwroot with the localhost/files url 
 
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+			using (var scope = app.Services.CreateScope())//seeding roles and a user
+			{
+				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-                await RoleSeeder.SeedRolesAsync(roleManager, userManager);
-            }
+				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+			}
 
 
-
-            #region Services
-
-			#endregion
 			// Configure the HTTP request pipeline.
-				if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseAuthorization();
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseSwagger();
+				app.UseSwaggerUI();
+			}
+			app.UseHttpsRedirection();
+			app.UseCors("ChatPolicy");
+			app.UseAuthentication();
+			app.UseAuthorization();
 
 
-            app.UseMiddleware<BanCheckMiddleware>();
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+			app.UseMiddleware<BanCheckMiddleware>();
+			app.MapControllers();
+			app.MapHub<ChatHub>("/chathub");
+			app.Run();
+		}
+	}
 }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
+using Freelancing.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -107,6 +109,20 @@ namespace Freelancing.Controllers
                 return NotFound("No active ban found for this user.");
             }
             return Ok(mapper.Map<BanDto>(ban));
+        }
+
+
+        [HttpGet("banned-users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<UsersViewDTO>>> GetBannedUsers()
+        {
+            var bannedUsers = await banService.GetBannedUsersAsync();
+            if (bannedUsers == null || !bannedUsers.Any())
+            {
+                return NotFound("No banned users found.");
+            }
+            var bannedUserDtos = mapper.Map<List<UsersViewDTO>>(bannedUsers);
+            return Ok(bannedUserDtos);
         }
     }
 }

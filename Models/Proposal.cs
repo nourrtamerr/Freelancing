@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Freelancing.Models
 {
@@ -17,7 +18,6 @@ namespace Freelancing.Models
 
 		public int SuggestedDuration { get; set; } //in days
 		public bool IsDeleted { get; set; } = false;
-
 		public List<SuggestedMilestone> suggestedMilestones { get; set; }
 
 	}

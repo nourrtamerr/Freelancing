@@ -51,6 +51,21 @@ namespace Freelancing.RepositoryService
                 .OrderBy(c => c.SentAt)
                 .ToListAsync();
         }
+        //public async Task<Chat> CreateChatAsync(Chat chat)
+        //{
+        //    var senderExists = await _context.Users.AnyAsync(u => u.Id == chat.SenderId);
+        //    var receiverExists = await _context.Users.AnyAsync(u => u.Id == chat.ReceiverId);
+        //    if (!senderExists || !receiverExists)
+        //    {
+        //        throw new ArgumentException("Sender or Receiver does not exist.");
+        //    }
+
+        //    chat.SentAt = DateTime.UtcNow;
+        //    chat.isRead = false;
+        //    _context.Chats.Add(chat);
+        //    await _context.SaveChangesAsync();
+        //    return chat;
+        //}
 
         public async Task<Chat> CreateChatAsync(Chat chat)
         {
@@ -58,9 +73,12 @@ namespace Freelancing.RepositoryService
             chat.isRead = false;
             _context.Chats.Add(chat);
             await _context.SaveChangesAsync();
-            return chat;
-        }
 
+            return await _context.Chats
+                .Include(c => c.Sender)
+                .Include(c => c.Receiver)
+                .FirstOrDefaultAsync(c => c.Id == chat.Id);
+        }
         public async Task UpdateChatAsync(Chat chat)
         {
             _context.Chats.Update(chat);

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
+using Freelancing.DTOs.ProposalDTOS;
 
 namespace Freelancing.Helpers
 {
@@ -73,7 +74,40 @@ namespace Freelancing.Helpers
 
             #endregion
 
-            CreateMap<BiddingProjectDTO, BiddingProject>();
+
+            #region Proposal mappings
+
+            CreateMap<CreateProposalSuggestedMilestoneDTO, SuggestedMilestone>();
+            CreateMap<CreateProposalDTO, Proposal>()
+            .ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+            .ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration));
+
+
+			CreateMap<EditProposalDTO, Proposal>()
+			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration));
+
+			CreateMap<SuggestedMilestone, MilestoneViewDTO>();
+
+			CreateMap<Proposal, ProposalViewDTO>()
+			.ForMember(dest => dest.FreelancerName, opt => opt.MapFrom(src => src.Freelancer.UserName))
+			.ForMember(dest => dest.FreelancerProfilePicture, opt => opt.MapFrom(src => src.Freelancer.ProfilePicture))
+			.ForMember(dest => dest.Freelancerskills, opt => opt.MapFrom(src =>
+				src.Freelancer.UserSkills
+					.Where(us => !us.IsDelete)
+					.Select(us => us.Skill.Name).ToList()))
+			.ForMember(dest => dest.FreelancerLanguages, opt => opt.MapFrom(src =>
+				src.Freelancer.Languages
+					.Where(fl => !fl.IsDeleted)
+					.Select(fl => fl.Language.ToString()).ToList()))
+			.ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => src.Freelancer.EmailConfirmed))
+			.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.Country))
+			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration))
+			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+			.ForMember(dest => dest.rank, opt => opt.MapFrom(src => src.Freelancer.Rank));
+
+			#endregion
+			CreateMap<BiddingProjectDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectDTO>();
 
 

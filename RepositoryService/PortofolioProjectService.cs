@@ -82,5 +82,10 @@ namespace Freelancing.RepositoryService
             throw new KeyNotFoundException("Invalid Portfolio Project");
            
         }
+
+        public Task<PortofolioProject> GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
