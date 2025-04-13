@@ -1,4 +1,6 @@
-﻿namespace Freelancing.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Freelancing.Models
 {
 	public class Freelancer : AppUser
 	{
@@ -11,7 +13,16 @@
 		public List<Experience> Experiences { get; set; }
 		public List<FreelancerLanguage> Languages { get; set; }
 		public List<PortofolioProject> Portofolio { get; set; }
-        //public bool IsDeleted { get; set; } = false;
+		//public bool IsDeleted { get; set; } = false;
+
+
+		[ForeignKey("subscriptionPlan")]
+		public int? subscriptionPlanId { get; set; }
+		public virtual SubscriptionPlan? subscriptionPlan { get; set; }
+
+
+
+		public int? RemainingNumberOfBids { get; set; } = 6;
 
     }
 	public enum Language
