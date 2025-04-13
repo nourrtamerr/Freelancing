@@ -6,15 +6,17 @@ namespace Freelancing.IRepositoryService
     public interface IproposalService
     {
 
-        Task<List<Proposal>> GetAllProposalsAsync();
-        Task<Proposal> GetProposalByIdAsync(int id);
-        Task<List<Proposal>> GetProposalsByProjectIdAsync(int projectId);
-        Task<List<Proposal>> GetProposalsByFreelancerIdAsync(string freelancerId);
+		Task<List<ProposalViewDTO>> GetAllProposalsAsync();
+
+		Task<ProposalViewDTO> GetProposalByIdAsync(int id);
+
+		Task<List<ProposalViewDTO>> GetProposalsByProjectIdAsync(int projectId);
+        Task<List<ProposalViewDTO>> GetProposalsByFreelancerIdAsync(string freelancerId);
 
 
-        Task<Proposal> UpdateProposalAsync(Proposal proposal);
+        Task<ProposalViewDTO> UpdateProposalAsync(int id, EditProposalDTO proposaldto);
 
-        Task<Proposal> CreateProposalAsync(CreateProposalDTO proposaldto, string freelancerId);
+		Task<ProposalViewDTO> CreateProposalAsync(CreateProposalDTO proposaldto, string freelancerId);
 
 		Task<bool> DeleteProposalAsync(int id);
 

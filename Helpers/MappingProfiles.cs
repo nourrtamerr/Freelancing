@@ -75,15 +75,39 @@ namespace Freelancing.Helpers
             #endregion
 
 
-            #region MyRegion
+            #region Proposal mappings
 
             CreateMap<CreateProposalSuggestedMilestoneDTO, SuggestedMilestone>();
             CreateMap<CreateProposalDTO, Proposal>()
             .ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
             .ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration));
-            
-            #endregion
-            CreateMap<BiddingProjectDTO, BiddingProject>();
+
+
+			CreateMap<EditProposalDTO, Proposal>()
+			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration));
+
+			CreateMap<SuggestedMilestone, MilestoneViewDTO>();
+
+			CreateMap<Proposal, ProposalViewDTO>()
+			.ForMember(dest => dest.FreelancerName, opt => opt.MapFrom(src => src.Freelancer.UserName))
+			.ForMember(dest => dest.FreelancerProfilePicture, opt => opt.MapFrom(src => src.Freelancer.ProfilePicture))
+			.ForMember(dest => dest.Freelancerskills, opt => opt.MapFrom(src =>
+				src.Freelancer.UserSkills
+					.Where(us => !us.IsDelete)
+					.Select(us => us.Skill.Name).ToList()))
+			.ForMember(dest => dest.FreelancerLanguages, opt => opt.MapFrom(src =>
+				src.Freelancer.Languages
+					.Where(fl => !fl.IsDeleted)
+					.Select(fl => fl.Language.ToString()).ToList()))
+			.ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => src.Freelancer.EmailConfirmed))
+			.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.Country))
+			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration))
+			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+			.ForMember(dest => dest.rank, opt => opt.MapFrom(src => src.Freelancer.Rank));
+
+			#endregion
+			CreateMap<BiddingProjectDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectDTO>();
 
             CreateMap<PortofolioProject, PortofolioProjectDTO>();
@@ -104,6 +128,52 @@ namespace Freelancing.Helpers
                 ))
                 .ForMember(dest => dest.ClientRating, opt => opt.Ignore()) // to be set manually
                 .ForMember(dest => dest.ClientTotalNumberOfReviews, opt => opt.Ignore()); // to be set manually;
-                    }
-                }
+
+
+            CreateMap<BiddingProjectGetByIdDTO, BiddingProject>();
+            CreateMap<BiddingProject, BiddingProjectGetByIdDTO>()
+                .ForMember(dest => dest.BidAveragePrice, opt => opt.MapFrom(src =>
+                src.Proposals != null && src.Proposals.Any()
+                ? (int)src.Proposals.Average(p => p.Price)
+                : 0
+                ))
+                
+                .ForMember(dest=>dest.ProjectSkills, opt=>opt.MapFrom(src=>src.ProjectSkills.Select(ps=>ps.Skill.Name)))
+                
+                .ForMember(dest=>dest.PostedFrom, opt=>opt.MapFrom(src=>
+                (DateTime.Now-src.BiddingStartDate).Days))
+
+                .ForMember(dest=>dest.ClientTotalNumberOfReviews, opt=>opt.MapFrom(src=>src.Client.Reviewed.Count()))
+                
+                .ForMember(dest=>dest.ClientRating, opt=>opt.MapFrom(src=>src.Client.Reviewed.Average(r=>r.Rating)))
+                
+                //.ForMember(dest=>dest.subscriptionPlan, opt=>opt.MapFrom(src=>src.Freelancer.s))
+
+                //.ForMember(dest=>dest.FreelancerTotalNumber, opt=>opt.MapFrom(src=>src.Freelancer.subscriptionPlan.TotalNumber))
+                
+                //.ForMember(dest=>dest.FreelancerRemainingNumberOfBids, opt=>opt.MapFrom(src=>src.Freelancer.RemainingNumberOfBids))
+                ;
+
+
+
+                //.ForMember(dest=>dest.projectSkills, opt=>opt.Ignore())
+                //.ForMember(dest=>dest.Subcategory, opt=>opt.MapFrom(src=>src.Subcategory.Name.ToString()))
+
+            CreateMap<BiddingProjectCreateDTO, BiddingProject>()
+                .ForMember(dest => dest.Subcategory, opt => opt.Ignore())
+                 .ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
+                 .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => src.ExperienceLevel.ToString()));
+
+            CreateMap<BiddingProject, BiddingProjectCreateDTO>()
+                .ForMember(dest=>dest.ExperienceLevel, opt=>opt.MapFrom(src=>src.experienceLevel.ToString()))
+                .ForMember(dest=>dest.SubCategoryName, opt=>opt.Ignore())
+                 .ForMember(dest => dest.projectSkills, opt => opt.Ignore())
+                ;
+
+
+
+
+
+        }
+    }
 }

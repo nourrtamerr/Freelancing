@@ -56,7 +56,7 @@ namespace Freelancing.RepositoryService
                 var clientReviews = await _context.Reviews.Where(r => r.RevieweeId == original.ClientId).ToListAsync();
 
                 dto.ClientRating = clientReviews.Any()
-                    ? Math.Round(clientReviews.Average(r => r.Rating))
+                    ? (clientReviews.Average(r => r.Rating))
                     : 0;
 
                 dto.ClientTotalNumberOfReviews = clientReviews.Count;
@@ -70,22 +70,54 @@ namespace Freelancing.RepositoryService
 
         //----------------------------------------------------------------------------------------------------
 
-        public async Task<BiddingProject> GetBiddingProjectByIdAsync(int id)
+        public async Task<BiddingProjectGetByIdDTO> GetBiddingProjectByIdAsync(int id)
         {
-            return await _context.biddingProjects.FirstOrDefaultAsync(p => p.Id == id);
+            var project = await _context.biddingProjects
+                                        .Include(b=>b.Proposals)
+                                        .Include(b=>b.ProjectSkills).ThenInclude(ps=>ps.Skill)
+                                        .Include(b=>b.Client).ThenInclude(c=>c.Reviewed)                             
+                                        .FirstOrDefaultAsync(b => b.Id == id);
+
+            var projectDto = _mapper.Map<BiddingProjectGetByIdDTO>(project);
+
+            return projectDto;
+
         }
 
 
         //----------------------------------------------------------------------------------------------------
 
 
-        public async Task<BiddingProject> CreateBiddingProjectAsync(BiddingProjectDTO project)
-        {
-            BiddingProject p = _mapper.Map<BiddingProject>(project);
+            //var projectskills= await _context.ProjectSkills.Include(ps=>ps.Skill.Name).Where(p=>p.Skill.Name.)
 
-            await _context.biddingProjects.AddAsync(p);
+            // List<string> ps = new List<string>();
+            //foreach(var skill in project.projectSkills)
+            //{
+            //    ps.Add(skill);
+            //}
+        public async Task<BiddingProject> CreateBiddingProjectAsync(BiddingProjectCreateDTO project)
+        {
+            var subcategory = await _context.Subcategories.FirstOrDefaultAsync(s => s.Name == project.SubCategoryName);
+
+            var skillEntities = await _context.Skills.Where(s => project.projectSkills.Contains(s.Name)).ToListAsync();
+
+            if (subcategory == null)
+                throw new Exception("Subcategory not found");
+
+            
+            var CreatedProject= _mapper.Map<BiddingProject>(project);
+
+            CreatedProject.Subcategory = subcategory;
+            CreatedProject.ProjectSkills = skillEntities.Select(skill => new ProjectSkill
+            {
+                SkillId = skill.Id,
+                Skill = skill
+            }).ToList();
+
+            await _context.biddingProjects.AddAsync(CreatedProject);
             await _context.SaveChangesAsync();
-            return p;
+
+            return CreatedProject;
         }
 
 

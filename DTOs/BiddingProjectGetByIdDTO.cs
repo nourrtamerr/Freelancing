@@ -22,8 +22,8 @@
         public string ClientCity { get; set; }
         public DateTime ClinetAccCreationDate { get; set; }
 
-        public int subscriptionPlanId { get; set; }
-        public int TotalNumber { get; set; }
-        public int RemainingNumberOfBids { get; set; } 
+        public string FreelancersubscriptionPlan { get; set; }
+        public int FreelancerTotalNumber { get; set; }
+        public int FreelancerRemainingNumberOfBids { get; set; } 
     }
 }
