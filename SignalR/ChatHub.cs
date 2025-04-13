@@ -11,13 +11,23 @@ namespace Freelancing.SignalR
                 await Clients.Users(chatDto.SenderId,chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
         }
 
-        //public async override Task OnConnectedAsync()
-        //{
+        public async override Task OnConnectedAsync()
+        {
+            var userId = Context.UserIdentifier;
+            var connectionId = Context.ConnectionId;
 
-        //    var userId = Context.UserIdentifier;
-        //    await Groups.AddToGroupAsync(Context.ConnectionId, userId);
-        //    await base.OnConnectedAsync();
-        //}
+            var userConnection = new UserConnection
+            {
+                UserId = userId,
+                ConnectionId = connectionId,
+                ConnectedAt = DateTime.UtcNow,
+                IsConnected = true
+
+            };
+
+        }
+
+        
     }
     
 }
