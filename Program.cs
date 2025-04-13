@@ -92,6 +92,7 @@ namespace Freelancing
 			builder.Services.AddAuthorization();
 			#endregion
 			#region services
+
 			builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
 			builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
 			builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
@@ -114,6 +115,9 @@ namespace Freelancing
 			#endregion
 
 			#region Filters
+			builder.Services.AddScoped<AuthorFilter>();
+			builder.Services.AddScoped<AuthorAndAdminFilter>();
+
 			builder.Services.AddScoped<ReviewAuthorizationFilter>();
 			#endregion
 

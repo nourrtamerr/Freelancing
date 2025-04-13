@@ -11,7 +11,7 @@ namespace Freelancing.Models
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
 		{
-			this.ChangeTracker.LazyLoadingEnabled = true;
+			//this.ChangeTracker.LazyLoadingEnabled = true;
 		}
 		public DbSet<Admin> Admins { get; set; }
 		public DbSet<Client> clients { get; set; }
@@ -20,7 +20,7 @@ namespace Freelancing.Models
 		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
 		[NotMapped]
-		//public DbSet<Project> project { get; set; }
+		public DbSet<Project> project { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<Certificate> certificates { get; set; }
@@ -39,6 +39,7 @@ namespace Freelancing.Models
 		public DbSet<PortofolioProject> PortofolioProjects { get; set; }
 		public DbSet<PortofolioProjectImage> PortofolioProjectImages { get; set; }
 		public DbSet<Proposal> Proposals { get; set; }
+
 		public DbSet<Review> Reviews { get; set; }
 		public DbSet<Skill> Skills { get; set; }
 		public DbSet<Subcategory> Subcategories { get; set; }

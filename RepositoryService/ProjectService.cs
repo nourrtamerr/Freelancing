@@ -24,15 +24,12 @@ namespace Freelancing.RepositoryService
 
 		public async Task<List<Project>> GetAllProjectsAsync()
 		{
-			//return await _context.project.ToListAsync();
-			throw new Exception();
+			return await _context.Set<Project>().ToListAsync();
 		}
 
 		public async Task<Project> GetProjectByIdAsync(int id)
 		{
-			//return await _context.project.FindAsync(id);
-			throw new Exception();
-
+			return await _context.Set<Project>().FindAsync(id);
 		}
 
 		public async Task<Project> UpdateProjectAsync(Project project)
