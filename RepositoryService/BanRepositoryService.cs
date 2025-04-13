@@ -1,4 +1,5 @@
-﻿using Freelancing.IRepositoryService;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,5 +66,17 @@ namespace Freelancing.RepositoryService
                 b.BanEndDate >= currentDate);
 
         }
+
+        public Task<List<AppUser>> GetBannedUsersAsync()
+        {
+            var currentDate = DateTime.UtcNow;
+            return _context.Bans.Include(b => b.BannedUser)
+                .Where(b => b.BanDate <= currentDate &&
+                       b.BanEndDate >= currentDate)
+                .Select(b => b.BannedUser)
+                .ToListAsync();
+        }
+
+      
     }
 }

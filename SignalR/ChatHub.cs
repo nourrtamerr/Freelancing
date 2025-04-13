@@ -15,7 +15,8 @@ namespace Freelancing.SignalR
         }
         public async Task SendMessage(ChatDto chatDto)
         {
-                await Clients.Users(chatDto.SenderId,chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
+   
+            await Clients.Users(chatDto.SenderId,chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
         }
 
         public async override Task OnConnectedAsync()
@@ -40,9 +41,6 @@ namespace Freelancing.SignalR
             await context.SaveChangesAsync();
             }
 
-            // Add to group for user-specific messaging
-            await Groups.AddToGroupAsync(connectionId, userId); //userId == groupName
-
             // Notify clients about online status
             await Clients.All.SendAsync("UserStatus", userId, true);
             await base.OnConnectedAsync();
@@ -66,7 +64,6 @@ namespace Freelancing.SignalR
             }
 
             await Clients.All.SendAsync("UserStatus", userId, false);
-            await Groups.RemoveFromGroupAsync(connectionId, userId);
 
             await base.OnDisconnectedAsync(exception);
         }
