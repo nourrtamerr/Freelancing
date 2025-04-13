@@ -86,6 +86,9 @@ namespace Freelancing.Helpers
             CreateMap<BiddingProjectDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectDTO>();
 
+            CreateMap<PortofolioProject, PortofolioProjectDTO>();
+            CreateMap<PortofolioProjectDTO, PortofolioProject>();
+
 
             CreateMap<BiddingProjectGetAllDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectGetAllDTO>()

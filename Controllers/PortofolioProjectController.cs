@@ -85,7 +85,7 @@ namespace Freelancing.Controllers
             //to be sent back to respone as dto
             var updatedDTO = mapper.Map<PortofolioProjectDTO>(updatedProject);
 
-            return Ok();
+            return Ok(portofolioProjectDTO);
 
 
         }

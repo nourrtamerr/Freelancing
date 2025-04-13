@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Freelancing.Models
 {
@@ -14,7 +15,8 @@ namespace Freelancing.Models
 
 		[ForeignKey("Freelancer")]
 		public string FreelancerId { get; set; }
-		public virtual Freelancer? Freelancer { get; set; }
+        [JsonIgnore]
+        public virtual Freelancer? Freelancer { get; set; }
 
 
 	}

@@ -111,6 +111,7 @@ namespace Freelancing
 			builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
 			builder.Services.AddScoped<IproposalService, ProposalService>();
 			builder.Services.AddScoped<IProjectService, ProjectService>();
+			builder.Services.AddScoped<IPortofolioProject,PortofolioProjectService>();
 			#endregion
 
 			#region Filters

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations.Schema;
+using Freelancing.DTOs;
 
 namespace Freelancing.Models
 {
@@ -106,5 +107,6 @@ namespace Freelancing.Models
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
+	    public DbSet<Freelancing.DTOs.PortofolioProjectImageDTO> PortofolioProjectImageDTO { get; set; } = default!;
 	}
 }
