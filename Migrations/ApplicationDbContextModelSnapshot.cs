@@ -147,7 +147,7 @@ namespace Freelancing.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories");
                 });
 
             modelBuilder.Entity("Certificate", b =>
@@ -176,7 +176,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("FreelancerId");
 
-                    b.ToTable("certificates", (string)null);
+                    b.ToTable("certificates");
                 });
 
             modelBuilder.Entity("Chat", b =>
@@ -211,7 +211,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Ban", b =>
@@ -240,7 +240,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("BannedUserId");
 
-                    b.ToTable("Bans", (string)null);
+                    b.ToTable("Bans");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -289,7 +289,7 @@ namespace Freelancing.Migrations
                     b.HasIndex("FreelancerId")
                         .IsUnique();
 
-                    b.ToTable("Educations", (string)null);
+                    b.ToTable("Educations");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Experience", b =>
@@ -333,7 +333,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("FreelancerId");
 
-                    b.ToTable("Experiences", (string)null);
+                    b.ToTable("Experiences");
                 });
 
             modelBuilder.Entity("Freelancing.Models.FreelancerLanguage", b =>
@@ -358,7 +358,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("freelancerId");
 
-                    b.ToTable("freelancerLanguages", (string)null);
+                    b.ToTable("freelancerLanguages");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>
@@ -419,7 +419,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Freelancing.Models.PortofolioProject", b =>
@@ -452,7 +452,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("FreelancerId");
 
-                    b.ToTable("PortofolioProjects", (string)null);
+                    b.ToTable("PortofolioProjects");
                 });
 
             modelBuilder.Entity("Freelancing.Models.PortofolioProjectImage", b =>
@@ -477,7 +477,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("PreviousProjectId");
 
-                    b.ToTable("PortofolioProjectImages", (string)null);
+                    b.ToTable("PortofolioProjectImages");
                 });
 
             modelBuilder.Entity("Freelancing.Models.ProjectSkill", b =>
@@ -503,7 +503,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("ProjectSkills", (string)null);
+                    b.ToTable("ProjectSkills");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Proposal", b =>
@@ -540,7 +540,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Proposals", (string)null);
+                    b.ToTable("Proposals");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Review", b =>
@@ -572,7 +572,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Subcategory", b =>
@@ -597,7 +597,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Subcategories", (string)null);
+                    b.ToTable("Subcategories");
                 });
 
             modelBuilder.Entity("Freelancing.Models.SubscriptionPayment", b =>
@@ -654,7 +654,36 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("ProposalId");
 
-                    b.ToTable("suggestedMilestones", (string)null);
+                    b.ToTable("suggestedMilestones");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ConnectedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ConnectionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserConnections");
                 });
 
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>
@@ -686,7 +715,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserSubscriptionPlanPayments", (string)null);
+                    b.ToTable("UserSubscriptionPlanPayments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -863,7 +892,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Milestones", (string)null);
+                    b.ToTable("Milestones");
                 });
 
             modelBuilder.Entity("Project", b =>
@@ -918,7 +947,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("SubcategoryId");
 
-                    b.ToTable("Project", (string)null);
+                    b.ToTable("Project");
 
                     b.UseTptMappingStrategy();
                 });
@@ -940,7 +969,7 @@ namespace Freelancing.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Skills", (string)null);
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("SubscriptionPlan", b =>
@@ -973,7 +1002,7 @@ namespace Freelancing.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubscriptionPlans", (string)null);
+                    b.ToTable("SubscriptionPlans");
                 });
 
             modelBuilder.Entity("UserSkill", b =>
@@ -1000,7 +1029,7 @@ namespace Freelancing.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("UserSkills", (string)null);
+                    b.ToTable("UserSkills");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Admin", b =>
@@ -1016,8 +1045,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-
-                            ConcurrencyStamp = "6c32f321-6714-47ef-a439-f0cb8f88250e",
+                            ConcurrencyStamp = "d68dd655-561a-4add-9bfd-9c55fdf87bca",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1026,12 +1054,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEIIv/lEAgGpc6q/LHadZu41nYliuoXZmvVXU+s1ho+u9DJ1RzmHj/CCaNcFXDkog/A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELUag73Ev0rjQmrEG5/ib8vhDkn4oPOCgdgjaNWUIvWN/S1XnbAcZwXyU1E9mwx/sw==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 0, 38, 58, 116, DateTimeKind.Local).AddTicks(8331),
-                            SecurityStamp = "e88bd599-9368-4e44-8ad0-18acb0a9a742",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 15, 52, 45, 686, DateTimeKind.Local).AddTicks(3498),
+                            SecurityStamp = "8528c7fd-3805-451d-90ec-813b8dba578b",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1303,6 +1330,17 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Proposal");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.UserConnection", b =>
+                {
+                    b.HasOne("AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Freelancing.Models.UserSubscriptionPlanPayment", b =>
