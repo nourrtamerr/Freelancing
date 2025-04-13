@@ -32,7 +32,7 @@ namespace Freelancing.Filters
             var action = context.ActionDescriptor.RouteValues["action"];
             var id = context.RouteData.Values["id"]?.ToString();
 
-            if (action == "Delete" || action == "Update")
+            if (action == "UpdateReview" || action == "DeleteReview")
             {
                 var review = await _reviewService.GetReviewByIdAsync(int.Parse(id));
                 if (review == null)

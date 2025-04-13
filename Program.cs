@@ -17,6 +17,7 @@ using Freelancing.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json.Serialization;
 using Freelancing.Filters;
+using Freelancing.SignalR;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -30,10 +31,22 @@ namespace Freelancing
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-			//builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-			// Configure Identity
-			builder.Services.AddIdentity<AppUser, IdentityRole>()
+            //builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddSignalR();
+            #region AddCors
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("ChatPolicy", builder =>
+                {
+                    builder.WithOrigins("http://127.0.0.1:5500")
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials();
+                });
+            });
+            #endregion
+            // Configure Identity
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 			//JWT
@@ -128,7 +141,7 @@ namespace Freelancing
             //        AutoMapper.Extensions.Microsoft.DependencyInjection.ServiceCollectionExtensions.AddAutoMapper(
             //builder.Services, typeof(MappingProfile));
 
-            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile));
+            builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile));
 
             //AutoMapperServiceCollectionExtensions.AddAutoMapper(builder.Services, typeof(MappingProfiles));
 
@@ -202,13 +215,14 @@ namespace Freelancing
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
+            app.UseCors("ChatPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.UseMiddleware<BanCheckMiddleware>();
             app.MapControllers();
-
+            app.MapHub<ChatHub>("/chathub");
             app.Run();
         }
     }

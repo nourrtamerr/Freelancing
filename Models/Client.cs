@@ -7,9 +7,9 @@ namespace Freelancing.Models
 		public bool PaymentVerified { get; set; } = false;
 
 
-		[ForeignKey("subscriptionPlan")]
-		public int? subscriptionPlanId { get; set; } = 2;
-		public virtual SubscriptionPlan? subscriptionPlan { get; set; }
+        [ForeignKey("subscriptionPlan")]
+        public int? subscriptionPlanId { get; set; }
+        public virtual SubscriptionPlan? subscriptionPlan { get; set; }
 
 
 		public int? RemainingNumberOfProjects { get; set; } = 6;

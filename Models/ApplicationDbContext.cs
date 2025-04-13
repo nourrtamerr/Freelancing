@@ -90,6 +90,9 @@ namespace Freelancing.Models
 				.HasOne(mp => mp.Milestone)
 				.WithOne(m => m.MilestonePayment)
 				.HasForeignKey<MilestonePayment>(mp => mp.MilestoneId);
+
+
+
 		}
 	}
 }
