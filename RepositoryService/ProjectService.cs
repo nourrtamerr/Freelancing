@@ -6,7 +6,7 @@ namespace Freelancing.RepositoryService
 	{
 		public async Task<Project> CreateProjectAsync(Project project)
 		{
-			await _context.project.AddAsync(project);
+			//await _context.project.AddAsync(project);
 			await _context.SaveChangesAsync();
 			return project;
 		}
@@ -24,12 +24,15 @@ namespace Freelancing.RepositoryService
 
 		public async Task<List<Project>> GetAllProjectsAsync()
 		{
-			return await _context.project.ToListAsync();
+			//return await _context.project.ToListAsync();
+			throw new Exception();
 		}
 
 		public async Task<Project> GetProjectByIdAsync(int id)
 		{
-			return await _context.project.FindAsync(id);
+			//return await _context.project.FindAsync(id);
+			throw new Exception();
+
 		}
 
 		public async Task<Project> UpdateProjectAsync(Project project)
