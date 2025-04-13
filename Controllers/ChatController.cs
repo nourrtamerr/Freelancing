@@ -4,6 +4,7 @@ using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.Controllers
 {
@@ -15,12 +16,14 @@ namespace Freelancing.Controllers
         private readonly IChatRepositoryService chatRepository;
         private readonly IMapper mapper;
         private readonly IHubContext<ChatHub> hubContext;
+        private readonly ApplicationDbContext context;
 
-        public ChatController(IChatRepositoryService chatRepository,IMapper mapper ,IHubContext<ChatHub> hubContext)
+        public ChatController(IChatRepositoryService chatRepository,IMapper mapper ,IHubContext<ChatHub> hubContext , ApplicationDbContext context)
         {
             this.chatRepository = chatRepository;
             this.mapper = mapper;
             this.hubContext = hubContext;
+            this.context = context;
         }
 
         [HttpGet("{id}")]
@@ -101,6 +104,23 @@ namespace Freelancing.Controllers
             }
             await chatRepository.DeleteChatAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("online-users")]
+        public async Task<IActionResult> GetOnlineUsers()
+        {
+            var onlineUsers = await context.UserConnections
+                .Where(uc => uc.IsConnected)
+                .Include(uc => uc.User)
+                .Select(uc => new
+                {
+                    UserId = uc.UserId,
+                    UserName = uc.User.UserName
+                })
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(onlineUsers);
         }
     }
 }
