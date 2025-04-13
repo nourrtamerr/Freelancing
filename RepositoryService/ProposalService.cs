@@ -1,18 +1,20 @@
-﻿using Freelancing.IRepositoryService;
+﻿using AutoMapper;
+using Freelancing.DTOs.ProposalDTOS;
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class ProposalService : IproposalService
+    public class ProposalService(IMapper _mapper, ApplicationDbContext _context) : IproposalService
     {
      
-        private readonly ApplicationDbContext _context;
+        //private readonly ApplicationDbContext _context;
 
-        public ProposalService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        ////public ProposalService(ApplicationDbContext context)
+        ////{
+        ////    _context = context;
+        ////}
 
         public async Task<List<Proposal>> GetAllProposalsAsync()
         {
@@ -56,9 +58,11 @@ namespace Freelancing.RepositoryService
 
 
 
-        public async Task<Proposal> CreateProposalAsync(Proposal proposal)
+        public async Task<Proposal> CreateProposalAsync(CreateProposalDTO proposaldto,string freelancerId)
         {
-            await _context.Proposals.AddAsync(proposal);
+            var proposal=_mapper.Map<Proposal>(proposaldto);
+            proposal.FreelancerId = freelancerId;
+			await _context.Proposals.AddAsync(proposal);
             await _context.SaveChangesAsync();
             return proposal;
         }

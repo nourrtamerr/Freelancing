@@ -1,4 +1,5 @@
-﻿using Freelancing.Models;
+﻿using Freelancing.DTOs.ProposalDTOS;
+using Freelancing.Models;
 
 namespace Freelancing.IRepositoryService
 {
@@ -13,8 +14,9 @@ namespace Freelancing.IRepositoryService
 
         Task<Proposal> UpdateProposalAsync(Proposal proposal);
 
-        Task<Proposal> CreateProposalAsync(Proposal proposal);
-        Task<bool> DeleteProposalAsync(int id);
+        Task<Proposal> CreateProposalAsync(CreateProposalDTO proposaldto, string freelancerId);
+
+		Task<bool> DeleteProposalAsync(int id);
 
 
     }

@@ -1016,11 +1016,8 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-<<<<<<< HEAD
-                            ConcurrencyStamp = "e50f0f1b-9981-405e-9363-8f7dc19e9d9b",
-=======
+
                             ConcurrencyStamp = "6c32f321-6714-47ef-a439-f0cb8f88250e",
->>>>>>> 2409e39e9f0697893c6358cba159050f336b9442
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1029,19 +1026,12 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-<<<<<<< HEAD
-                            PasswordHash = "AQAAAAIAAYagAAAAELH7G/AC071QdGNEn26c7fQB2nbyM9oTnicSVaivWXy5Z8UiQYXg9fHoUQGIv40MXw==",
-                            PhoneNumberConfirmed = false,
-                            RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 2, 17, 8, 418, DateTimeKind.Local).AddTicks(3673),
-                            SecurityStamp = "12cc85b5-b054-4a34-a03c-7efcaac5ada2",
-=======
+
                             PasswordHash = "AQAAAAIAAYagAAAAEIIv/lEAgGpc6q/LHadZu41nYliuoXZmvVXU+s1ho+u9DJ1RzmHj/CCaNcFXDkog/A==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
                             RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 0, 38, 58, 116, DateTimeKind.Local).AddTicks(8331),
                             SecurityStamp = "e88bd599-9368-4e44-8ad0-18acb0a9a742",
->>>>>>> 2409e39e9f0697893c6358cba159050f336b9442
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",

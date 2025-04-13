@@ -109,6 +109,8 @@ namespace Freelancing
 			builder.Services.AddScoped<IClientService, ClientService>();
 			builder.Services.AddScoped<IFreelancerLanguageService, FreelancerLanguageService>();
 			builder.Services.AddScoped<IBiddingProjectService, BiddingProjectService>();
+			builder.Services.AddScoped<IproposalService, ProposalService>();
+			builder.Services.AddScoped<IProjectService, ProjectService>();
 			#endregion
 
 			#region Filters
@@ -117,7 +119,7 @@ namespace Freelancing
 
 
 			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile));
-
+			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			builder.Services.AddControllers()
 			.AddJsonOptions(options =>
 			{

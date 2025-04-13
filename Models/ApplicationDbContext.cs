@@ -17,6 +17,7 @@ namespace Freelancing.Models
 		public DbSet<Ban> Bans { get; set; }
 		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
+		public DbSet<Project> project { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<Certificate> certificates { get; set; }
