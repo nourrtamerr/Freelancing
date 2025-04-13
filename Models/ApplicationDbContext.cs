@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,7 +18,6 @@ namespace Freelancing.Models
 		public DbSet<Ban> Bans { get; set; }
 		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
-		//public DbSet<Project> project { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<Certificate> certificates { get; set; }
@@ -27,8 +27,7 @@ namespace Freelancing.Models
 		public DbSet<FreelancerLanguage> freelancerLanguages { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<SuggestedMilestone> suggestedMilestones { get; set; }
-
-        public DbSet<Notification> Notifications { set; get; }
+		public DbSet<Notification> Notifications { set; get; }
 
 		//public DbSet<Payment> Payments { get; set; }
 		public DbSet<MilestonePayment> MilestonePayments { get; set; }
@@ -64,6 +63,9 @@ namespace Freelancing.Models
 			modelBuilder.Entity<Admin>().ToTable("Admins");
 			modelBuilder.Entity<Client>().ToTable("clients");
 			modelBuilder.Entity<Freelancer>().ToTable("freelancers");
+			modelBuilder.Ignore<Project>();
+
+			
 
 			var hasher = new PasswordHasher<Admin>();
 			var admin = new Admin

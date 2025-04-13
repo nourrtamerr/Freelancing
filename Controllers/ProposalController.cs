@@ -50,7 +50,21 @@ namespace Freelancing.Controllers
                     return BadRequest("not matching the price");
                 }
             }
-			await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier));
+            else
+            {
+                if(project is BiddingProject prjct)
+				{
+					if (prjct.minimumPrice > dto.Price || prjct.maximumprice <dto.Price)
+					{
+						return BadRequest("not within bid limits");
+					}
+					if (prjct.BiddingEndDate < DateTime.Now )
+					{
+						return BadRequest("bid is over");
+					}
+				}
+			}
+                await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier));
 			return Ok();
         }
 
