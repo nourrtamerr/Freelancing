@@ -2,31 +2,47 @@
 
 namespace Freelancing.RepositoryService
 {
-	public class ProjectService : IProjectService
+	public class ProjectService(ApplicationDbContext _context) : IProjectService
 	{
-		public Task<Project> CreateProjectAsync(Project project)
+		public async Task<Project> CreateProjectAsync(Project project)
 		{
-			throw new NotImplementedException();
+			//await _context.project.AddAsync(project);
+			await _context.SaveChangesAsync();
+			return project;
 		}
 
-		public Task<bool> DeleteProjectAsync(int id)
+		public async Task<bool> DeleteProjectAsync(int id)
 		{
-			throw new NotImplementedException();
+			var project = await GetProjectByIdAsync(id);
+			if(project is not null)
+			{
+				project.IsDeleted = true;
+				_context.Update(project);
+			}
+			return await _context.SaveChangesAsync() > 0;
 		}
 
-		public Task<List<Project>> GetAllProjectsAsync()
+		public async Task<List<Project>> GetAllProjectsAsync()
 		{
-			throw new NotImplementedException();
+			//return await _context.project.ToListAsync();
+			throw new Exception();
 		}
 
-		public Task<Project> GetProjectByIdAsync(int id)
+		public async Task<Project> GetProjectByIdAsync(int id)
 		{
-			throw new NotImplementedException();
+			//return await _context.project.FindAsync(id);
+			throw new Exception();
+
 		}
 
-		public Task<Project> UpdateProjectAsync(Project project)
+		public async Task<Project> UpdateProjectAsync(Project project)
 		{
-			throw new NotImplementedException();
+			var proj = await GetProjectByIdAsync(project.Id);
+			if (proj is not null)
+			{
+				_context.Update(project);
+			}
+			return proj;
 		}
 	}
 }

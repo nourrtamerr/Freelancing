@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
+using Freelancing.DTOs.ProposalDTOS;
 
 namespace Freelancing.Helpers
 {
@@ -73,6 +74,15 @@ namespace Freelancing.Helpers
 
             #endregion
 
+
+            #region MyRegion
+
+            CreateMap<CreateProposalSuggestedMilestoneDTO, SuggestedMilestone>();
+            CreateMap<CreateProposalDTO, Proposal>()
+            .ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+            .ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration));
+            
+            #endregion
             CreateMap<BiddingProjectDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectDTO>();
 
