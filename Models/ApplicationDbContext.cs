@@ -3,6 +3,7 @@ using Freelancing.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Freelancing.Models
 {
@@ -18,6 +19,8 @@ namespace Freelancing.Models
 		public DbSet<Ban> Bans { get; set; }
 		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
+		[NotMapped]
+		//public DbSet<Project> project { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<Certificate> certificates { get; set; }
@@ -64,7 +67,6 @@ namespace Freelancing.Models
 			modelBuilder.Entity<Admin>().ToTable("Admins");
 			modelBuilder.Entity<Client>().ToTable("clients");
 			modelBuilder.Entity<Freelancer>().ToTable("freelancers");
-			modelBuilder.Ignore<Project>();
 
 			
 
@@ -96,7 +98,7 @@ namespace Freelancing.Models
 				.HasForeignKey<MilestonePayment>(mp => mp.MilestoneId);
 
 
-            modelBuilder.Entity<UserConnection>(entity =>
+			modelBuilder.Entity<UserConnection>(entity =>
             {
                 entity.HasOne(uc => uc.User)
                     .WithMany()
