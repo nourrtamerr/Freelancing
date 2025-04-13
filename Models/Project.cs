@@ -23,13 +23,13 @@ public abstract class Project
 
 	[ForeignKey("Client")]
     public string ClientId { get; set; } //not in dto
-    public virtual AppUser Client { get; set; }
+    public virtual Client Client { get; set; }
 
 
 
 	[ForeignKey("Freelancer")]
     public string? FreelancerId { get; set; } //not in dto
-	public virtual AppUser? Freelancer { get; set; }
+	public virtual Freelancer? Freelancer { get; set; }
 	
 
 
