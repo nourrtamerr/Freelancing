@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250412233913_Chat")]
+    partial class Chat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1013,7 +1016,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             City = "Admin City",
-                            ConcurrencyStamp = "e50f0f1b-9981-405e-9363-8f7dc19e9d9b",
+                            ConcurrencyStamp = "d6c68b5a-0ffd-4851-bdc2-cc2dacc2e3e0",
                             Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
@@ -1022,11 +1025,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELH7G/AC071QdGNEn26c7fQB2nbyM9oTnicSVaivWXy5Z8UiQYXg9fHoUQGIv40MXw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHZp7S1CBBAnjJmQFoSSQtaMt6pacMTrhUYjF9ho2EbqA3RBWxh29gMrzyEA+FbDKg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 2, 17, 8, 418, DateTimeKind.Local).AddTicks(3673),
-                            SecurityStamp = "12cc85b5-b054-4a34-a03c-7efcaac5ada2",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 13, 1, 39, 5, 504, DateTimeKind.Local).AddTicks(2714),
+                            SecurityStamp = "c8486e60-a53e-4742-b76a-c11f49641865",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
