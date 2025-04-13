@@ -43,7 +43,8 @@ namespace Freelancing.Models
 		public DbSet<ProjectSkill> ProjectSkills { get; set; }
         public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<UserConnection> UserConnections { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 
@@ -92,7 +93,13 @@ namespace Freelancing.Models
 				.HasForeignKey<MilestonePayment>(mp => mp.MilestoneId);
 
 
-
-		}
+            modelBuilder.Entity<UserConnection>(entity =>
+            {
+                entity.HasOne(uc => uc.User)
+                    .WithMany()
+                    .HasForeignKey(uc => uc.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
 	}
 }
