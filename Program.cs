@@ -113,17 +113,18 @@ namespace Freelancing
 			builder.Services.AddScoped<IproposalService, ProposalService>();
 			builder.Services.AddScoped<IProjectService, ProjectService>();
 			builder.Services.AddScoped<IPortofolioProject,PortofolioProjectService>();
-			#endregion
+            builder.Services.AddScoped<ISkillService, SkillService>();
+            #endregion
 
-			#region Filters
-			builder.Services.AddScoped<AuthorFilter>();
+            #region Filters
+            builder.Services.AddScoped<AuthorFilter>();
 			builder.Services.AddScoped<AuthorAndAdminFilter>();
 
 			builder.Services.AddScoped<ReviewAuthorizationFilter>();
 			#endregion
 
 
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile));
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile) ,typeof(SkillProfile));
 			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			builder.Services.AddControllers()
 			.AddJsonOptions(options =>

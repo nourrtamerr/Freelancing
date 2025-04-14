@@ -1,6 +1,7 @@
 ﻿using Freelancing.IRepositoryService;
 using Freelancing.Migrations;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
@@ -34,7 +35,7 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<Skill>> GetAllSkillsAsync()
         {
-            return await context.Skills.Where(s=>s.IsDeleted).ToListAsync();
+            return await context.Skills.Where(s=>!s.IsDeleted).ToListAsync();
         }
 
         public async Task<Skill> GetSkillByIDAsync(int skillId)
@@ -43,19 +44,29 @@ namespace Freelancing.RepositoryService
             return skill;
         }
 
+        
+       
         public async Task<Skill> UpdateSkillAsync(Skill skill)
         {
-            var updSkill = await context.Skills.FirstOrDefaultAsync(s => s.Id == skill.Id);
-
-            if (updSkill == null)
+            var existingSkill = await context.Skills.FirstOrDefaultAsync(s => s.Id == skill.Id && !s.IsDeleted);
+            if (existingSkill == null)
             {
                 return null;
-
             }
-            updSkill.Name = skill.Name;
-            updSkill.IsDeleted = skill.IsDeleted;
+            existingSkill.Name = skill.Name;
+            await context.SaveChangesAsync();
+            return existingSkill;
+        }
 
-            return updSkill;
+        [HttpGet("{id}")]
+        public async Task<Skill> GetSkillById(int id)
+        {
+            var skill = await context.Skills.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
+            if (skill == null)
+            {
+                return null;
+            }
+            return skill;
         }
     }
 }
