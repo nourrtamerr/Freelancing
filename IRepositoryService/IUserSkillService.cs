@@ -9,5 +9,7 @@ namespace Freelancing.IRepositoryService
         Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill);
         Task<UserSkill> CreateUserSkillAsync(UserSkill userskill);
         Task<bool> DeleteUserSkillAsync(int id);
+
+        Task<List<UserSkill>> GetUserSkillByUserIdAsync(string userId);
     }
 }
