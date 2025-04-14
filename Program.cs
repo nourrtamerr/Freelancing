@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json.Serialization;
 using Freelancing.Filters;
 using Freelancing.SignalR;
+using Microsoft.OpenApi.Models;
 
 
 namespace Freelancing
@@ -90,10 +91,25 @@ namespace Freelancing
 				options.SignIn.RequireConfirmedEmail = true; 
 			});
 			builder.Services.AddAuthorization();
-			#endregion
-			#region services
+            #endregion
+            #region services
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.MapType<IFormFile>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "binary"
+                });
+            });
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+            builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
 
-			builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+
+            builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
 			builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
 			builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
