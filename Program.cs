@@ -131,6 +131,7 @@ namespace Freelancing
 			builder.Services.AddScoped<IPortofolioProject,PortofolioProjectService>();
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IUserSkillService, UserSkillService>();
+            builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
             #endregion
 
             #region Filters
@@ -141,7 +142,9 @@ namespace Freelancing
 			#endregion
 
 
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile) ,typeof(SkillProfile) ,typeof(UserSkillProfile));
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile) ,typeof(SkillProfile) ,typeof(UserSkillProfile),typeof(ProjectSkillProfile));
+
+
 			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			builder.Services.AddControllers()
 			.AddJsonOptions(options =>
