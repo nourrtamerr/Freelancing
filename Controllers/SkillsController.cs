@@ -28,8 +28,7 @@ namespace Freelancing.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public async Task<ActionResult<SkillDto>> GetSkillById(int id)
         {
             if (id <= 0)
@@ -43,8 +42,7 @@ namespace Freelancing.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
         public async Task<ActionResult<SkillDto>> CreateSkill([FromBody] SkillDto skillCreateDto)
         {
             if (skillCreateDto == null || !ModelState.IsValid)
@@ -58,9 +56,6 @@ namespace Freelancing.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SkillDto>> UpdateSkill(int id, [FromBody] SkillDto skillUpdateDto)
         {
             if (skillUpdateDto == null || id != skillUpdateDto.Id || !ModelState.IsValid)
@@ -76,8 +71,6 @@ namespace Freelancing.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteSkill(int id)
         {
             if (id <= 0)
