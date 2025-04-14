@@ -1,4 +1,5 @@
-﻿using Freelancing.DTOs;
+﻿using System.Security.Claims;
+using Freelancing.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,11 @@ namespace Freelancing.SignalR
         }
         public async Task SendMessage(ChatDto chatDto)
         {
-   
-            await Clients.Users(chatDto.SenderId,chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
+
+        //    var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        //?? Context.User.FindFirst("sub")?.Value;
+
+            await Clients.Users(chatDto.SenderId, chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
         }
 
         public async override Task OnConnectedAsync()
