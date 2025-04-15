@@ -136,6 +136,8 @@ namespace Freelancing
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IUserSkillService, UserSkillService>();
             builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
+            builder.Services.AddScoped<ICountryService, CountryService>();
+            builder.Services.AddScoped<ICityService, CityService>();
 			builder.Services.AddHttpContextAccessor();
 
 			#endregion
