@@ -10,7 +10,7 @@ namespace Freelancing.DTOs
         public string ReceiverId { get; set; }
         public string ReceiverName { get; set; }
         public string Message { get; set; }
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } 
         public DateTime SentAt { get; set; }
         public bool IsRead { get; set; }
     }
@@ -20,10 +20,9 @@ namespace Freelancing.DTOs
         [Required(ErrorMessage = "Receiver ID is required")]
         public string ReceiverId { get; set; }
 
-        [MaxLength(1000, ErrorMessage = "Message cannot exceed 1000 characters")]
-        public string Message { get; set; }
+        [MaxLength(1000)]
+        public string? Message { get; set; } 
 
-        [FileValidation(MaxFileSizeMb = 5, AllowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" })]
-        public IFormFile Image { get; set; }
+        public string? Image { get; set; } 
     }
 }

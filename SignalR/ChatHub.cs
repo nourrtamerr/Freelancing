@@ -1,4 +1,5 @@
-﻿using Freelancing.DTOs;
+﻿using System.Security.Claims;
+using Freelancing.DTOs;
 using Freelancing.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -20,15 +21,15 @@ namespace Freelancing.SignalR
 
         public async Task SendMessage(ChatDto chatDto)
         {
-            //    var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            //?? Context.User.FindFirst("sub")?.Value;
+            var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        ?? Context.User.FindFirst("sub")?.Value;
 
             if (chatDto == null || string.IsNullOrEmpty(chatDto.ReceiverId))
             {
                 throw new HubException("Invalid message data");
             }
 
-            await Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
+            await Clients.Users(senderId, chatDto.ReceiverId)
                 .SendAsync("ReceiveMessage", chatDto);
         }
 

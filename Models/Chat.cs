@@ -16,8 +16,8 @@ public class Chat
     public AppUser Receiver { get; set; }
 
     [MaxLength(2048)]
-    public string ImageUrl { get; set; }
-    public string Message { get; set; } //contains(".com") 
+    public string? ImageUrl { get; set; }
+    public string? Message { get; set; } //contains(".com") 
     public DateTime SentAt { get; set; }
     public bool isRead { set; get; }
 }
