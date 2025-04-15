@@ -17,20 +17,16 @@ namespace Freelancing.Controllers
     public class PortofolioProjectImageController(IPortofolioProjectImage context, IMapper mapper, IPortofolioProject projectRepository) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetImageById(int id)
+        public async Task<IActionResult> GetImageByProjectId(int id)
         {
-            var image = await context.GetByPortfolioProjectIdAsync(id);
-            if (image == null)
+            var images = await context.GetByPortfolioProjectIdAsync(id);
+            if (images == null)
             {
                 return NotFound($"Image with ID {id} not found.");
             }
 
-            var dto = mapper.Map<List<PortofolioProjectImageDTO>>(image);
+            var dto = mapper.Map<List<PortofolioProjectImageDTO>>(images);
             return Ok(dto);
-
-
-
- 
         }
 
 
@@ -41,10 +37,13 @@ namespace Freelancing.Controllers
             if (request.ImageFile == null || request.ImageFile.Length == 0)
                 return BadRequest("No image uploaded");
 
-            // Ensure the project exists first
             var project = await projectRepository.GetByIdAsync(request.ProjectId);
             if (project == null)
+            {
                 return NotFound($"Project with ID {request.ProjectId} not found.");
+
+            }
+               
 
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.ImageFile.FileName);
             var filePath = Path.Combine("wwwroot/images", fileName);
@@ -59,7 +58,7 @@ namespace Freelancing.Controllers
             var image = new PortofolioProjectImage
             {
                 Image = "/images/" + fileName,
-                PreviousProjectId = request.ProjectId
+                //PreviousProjectId = request.ProjectId
             };
 
             await context.AddAsync(new PortofolioProjectImageDTO
@@ -93,9 +92,6 @@ namespace Freelancing.Controllers
             {
                 return NotFound();
             }
-
-           
-
             return NoContent();
         }
 

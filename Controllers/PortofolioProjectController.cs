@@ -28,7 +28,7 @@ namespace Freelancing.Controllers
 
         // GET: api/PortofolioProject
         [HttpGet]
-        public async Task<IActionResult> GetPortofolioProject()
+        public async Task<IActionResult> GetPortofolioProjects()
         {
             var p = await portofolioProjectContext.GetAllAync();
             if (p == null)

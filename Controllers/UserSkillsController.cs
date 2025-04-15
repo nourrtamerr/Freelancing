@@ -49,29 +49,29 @@ namespace Freelancing.Controllers
             return CreatedAtAction(nameof(GetUserSkillById), new { id = userSkillDto.SkillId }, userSkillDto);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<SkillDto>>  UpdateUserSkill(int id, [FromBody] UserSkillDto userSkillUpdateDto)
-        {
-            if (id <= 0 || userSkillUpdateDto == null || !ModelState.IsValid)
-                return BadRequest(ModelState);
-            var userSkill = mapper.Map<UserSkill>(userSkillUpdateDto);
-            userSkill.id = id;
-            var updatedUserSkill = await skillService.UpdateUserSkillAsync(userSkill);
-            if (updatedUserSkill == null)
-                return NotFound($"User skill with ID {id} not found");
-            return Ok(mapper.Map<UserSkillDto>(updatedUserSkill));
-        }
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult<SkillDto>>  UpdateUserSkill(int id, [FromBody] UserSkillDto userSkillUpdateDto)
+        //{
+        //    if (id <= 0 || userSkillUpdateDto == null || !ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    var userSkill = mapper.Map<UserSkill>(userSkillUpdateDto);
+        //    userSkill.id = id;
+        //    var updatedUserSkill = await skillService.UpdateUserSkillAsync(userSkill);
+        //    if (updatedUserSkill == null)
+        //        return NotFound($"User skill with ID {id} not found");
+        //    return Ok(mapper.Map<UserSkillDto>(updatedUserSkill));
+        //}
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserSkill(int id)
-        {
-            if (id <= 0)
-                return BadRequest("Invalid user skill ID");
-            var isDeleted = await skillService.DeleteUserSkillAsync(id);
-            if (!isDeleted)
-                return NotFound($"User skill with ID {id} not found");
-            return NoContent();
-        }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUserSkill(int id)
+        //{
+        //    if (id <= 0)
+        //        return BadRequest("Invalid user skill ID");
+        //    var isDeleted = await skillService.DeleteUserSkillAsync(id);
+        //    if (!isDeleted)
+        //        return NotFound($"User skill with ID {id} not found");
+        //    return NoContent();
+        //}
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserSkillByUserId(string userId)
         {

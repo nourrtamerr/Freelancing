@@ -23,9 +23,9 @@ namespace Freelancing.RepositoryService
             return NewUserSkill;
         }
 
-        public async Task<bool> DeleteUserSkillAsync(int id)
+        public async Task<bool> DeleteUserSkillAsync(int id, string freelancerId)
         {
-            var userSkill = await context.UserSkills.FirstOrDefaultAsync(u => u.id == id);
+            var userSkill = await context.UserSkills.FirstOrDefaultAsync(u => u.id == id && u.FreelancerId == freelancerId && !u.IsDelete);
             if (userSkill == null) 
             { 
                 return false;
@@ -47,9 +47,9 @@ namespace Freelancing.RepositoryService
 
      
 
-        public async Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill)
+        public async Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill, string freelancerId)
         {
-            var existingUserSkill = await context.UserSkills.Include(s=>s.Skill).FirstOrDefaultAsync(u => u.id == userskill.id && !u.IsDelete);
+            var existingUserSkill = await context.UserSkills.Include(s=>s.Skill).FirstOrDefaultAsync(u => u.id == userskill.id && u.FreelancerId == freelancerId && !u.IsDelete);
             if (existingUserSkill == null)
             {
                 return null;
