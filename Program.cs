@@ -91,9 +91,10 @@ namespace Freelancing
 				options.SignIn.RequireConfirmedEmail = true; 
 			});
 			builder.Services.AddAuthorization();
-            #endregion
-            #region services
-            builder.Services.AddEndpointsApiExplorer();
+			#endregion
+			#region services
+
+			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.MapType<IFormFile>(() => new OpenApiSchema
@@ -135,10 +136,12 @@ namespace Freelancing
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IUserSkillService, UserSkillService>();
             builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
-            #endregion
+			builder.Services.AddHttpContextAccessor();
 
-            #region Filters
-            builder.Services.AddScoped<AuthorFilter>();
+			#endregion
+
+			#region Filters
+			builder.Services.AddScoped<AuthorFilter>();
 			builder.Services.AddScoped<AuthorAndAdminFilter>();
 
 			builder.Services.AddScoped<ReviewAuthorizationFilter>();

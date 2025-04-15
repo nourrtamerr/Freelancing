@@ -7,6 +7,51 @@ namespace Freelancing.RepositoryService
 {
 	public class ClientService(ApplicationDbContext _context,IMapper _mapper) : IClientService
 	{
+
+
+		public async Task<List<ViewClientDTO>> GetAllFiltered(ClientFilterationDTO dto)
+		{
+			var Clients = _context.clients.Include(f => f.Reviewed).Include(f => f.subscriptionPlan).Where(f => !f.isDeleted);
+			if (!string.IsNullOrEmpty(dto.Country))
+			{
+				Clients = Clients
+					.Where(f => f.Country.ToLower().Contains(dto.Country.ToLower())
+					|| dto.Country.ToLower().Contains(f.Country.ToLower()));
+			}
+			if (dto.AccountCreationDate != default)
+			{
+				Clients = Clients.Where(f => f.AccountCreationDate <= dto.AccountCreationDate);
+			}
+			if (!string.IsNullOrEmpty(dto.name))
+			{
+				Clients = Clients.Where(f =>
+				f.firstname.ToLower().Contains(dto.name.ToLower()) ||
+				f.lastname.ToLower().Contains(dto.name.ToLower()) ||
+				f.UserName.ToLower().Contains(dto.name.ToLower())
+				);
+			}
+			if (dto.IsVerified == true)
+			{
+				Clients = Clients.Where(f => f.IsVerified); // id verification
+			}
+			if (dto.Paymentverified==true)
+			{
+				Clients = Clients.Where(f => f.PaymentVerified); 
+			}
+
+			var Clientsslist = await Clients.ToListAsync();
+
+			if (dto.ranks != null && dto.ranks.Count > 0)
+			{
+				Clientsslist = Clientsslist.AsEnumerable().Where(f => dto.ranks.Contains(f.Rank)).ToList();
+			}
+			dto.numofpages = dto.pagesize > 0
+								? (int)Math.Ceiling((double)Clientsslist.Count() / dto.pagesize)
+								: 0;
+			List<ViewClientDTO> clientsdtos = _mapper.Map<List<ViewClientDTO>>((Clientsslist.Skip(dto.pageNum * dto.pagesize).Take(dto.pagesize)));
+
+			return clientsdtos;
+		}
 		public async Task<bool> AddClient(Client Client)
 		{
 
