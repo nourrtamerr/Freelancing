@@ -121,7 +121,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest("Please wait till you get response for the first verification request");
 			}
-			currentuser.NationalId = dto.IdPicture.Save(_env);
+			currentuser.NationalId = dto.IdPicture.Save();
 			await _userManager.UpdateAsync(currentuser);
 			foreach (var admin in _userManager.Users.OfType<Admin>().ToList())
 			{
@@ -205,7 +205,11 @@ namespace Freelancing.Controllers
 			_mapper.Map(dto, newuser);
 			if (dto.ProfilePicture is not null)
 			{
-				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
+				if (newuser.ProfilePicture != null)
+				{
+					SaveImage.Delete(newuser.ProfilePicture);
+				}
+				newuser.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			result = await _userManager.UpdateAsync(newuser);
 			if (!result.Succeeded)
@@ -332,7 +336,7 @@ namespace Freelancing.Controllers
 			
 			if (dto.ProfilePicture is not null)
 			{
-				admin.ProfilePicture = dto.ProfilePicture.Save(_env);
+				admin.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			admin.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
 			admin.EmailConfirmed = true;
@@ -417,7 +421,7 @@ namespace Freelancing.Controllers
 			}
 			if (dto.ProfilePicture is not null)
 			{
-				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
+				newuser.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
 

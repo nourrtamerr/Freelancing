@@ -2,7 +2,7 @@
 {
 	public static class SaveImage
 	{
-		public static string Save(this IFormFile file, IWebHostEnvironment _webHostEnvironment)
+		public static string Save(this IFormFile file)
 		{
 			var covername = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 			string folderPath = Path.Combine(Directory.GetCurrentDirectory(), ImageSettings.ImagesPath); 
@@ -13,6 +13,16 @@
 				file.CopyTo(stream);
 			}
 			return covername;
+		}
+		public static void Delete(string fileName)
+		{
+			string folderPath = Path.Combine(Directory.GetCurrentDirectory(), ImageSettings.ImagesPath);
+			string filePath = Path.Combine(folderPath, fileName);
+
+			if (System.IO.File.Exists(filePath))
+			{
+				System.IO.File.Delete(filePath);
+			}
 		}
 	}
 }
