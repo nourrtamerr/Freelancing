@@ -12,6 +12,7 @@ namespace Freelancing.RepositoryService
             {
                 FreelancerId = userskill.FreelancerId,
                 SkillId = userskill.SkillId,
+               
                 IsDelete = false,
 
             };
@@ -22,9 +23,9 @@ namespace Freelancing.RepositoryService
             return NewUserSkill;
         }
 
-        public async Task<bool> DeleteUserSkillAsync(int id)
+        public async Task<bool> DeleteUserSkillAsync(int id, string freelancerId)
         {
-            var userSkill = await context.UserSkills.FirstOrDefaultAsync(u => u.id == id);
+            var userSkill = await context.UserSkills.FirstOrDefaultAsync(u => u.id == id && u.FreelancerId == freelancerId && !u.IsDelete);
             if (userSkill == null) 
             { 
                 return false;
@@ -36,17 +37,19 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<UserSkill>> GetAllUserSkillAsync()
         {
-           return await context.UserSkills.Where(u=>!u.IsDelete).ToListAsync();
+           return await context.UserSkills.Include(s =>s.Skill).Where(u=>!u.IsDelete).ToListAsync();
         }
 
         public async Task<UserSkill> GetUserSkillByIDAsync(int id)
         {
-            return await context.UserSkills.FirstOrDefaultAsync(u => u.id == id && !u.IsDelete);
+            return await context.UserSkills.Include(s=> s.Skill).FirstOrDefaultAsync(u => u.id == id && !u.IsDelete);
         }
 
-        public async Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill)
+     
+
+        public async Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill, string freelancerId)
         {
-            var existingUserSkill = await context.UserSkills.FirstOrDefaultAsync(u => u.id == userskill.id && !u.IsDelete);
+            var existingUserSkill = await context.UserSkills.Include(s=>s.Skill).FirstOrDefaultAsync(u => u.id == userskill.id && u.FreelancerId == freelancerId && !u.IsDelete);
             if (existingUserSkill == null)
             {
                 return null;
@@ -57,6 +60,11 @@ namespace Freelancing.RepositoryService
             await context.SaveChangesAsync();
             return existingUserSkill;
 
+        }
+
+        public async Task<List<UserSkill>> GetUserSkillByUserIdAsync(string userId)
+        {
+            return await context.UserSkills.Include(s =>s.Skill).Where(u => u.FreelancerId == userId && !u.IsDelete).ToListAsync();
         }
     }
 }

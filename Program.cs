@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json.Serialization;
 using Freelancing.Filters;
 using Freelancing.SignalR;
+using Microsoft.OpenApi.Models;
 
 
 namespace Freelancing
@@ -90,10 +91,28 @@ namespace Freelancing
 				options.SignIn.RequireConfirmedEmail = true; 
 			});
 			builder.Services.AddAuthorization();
-			#endregion
-			#region services
+            #endregion
+            #region services
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.MapType<IFormFile>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "binary"
+                });
+            });
+            builder.Services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-			builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+            builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
+
+
+            builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
 			builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
 			builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
@@ -113,17 +132,22 @@ namespace Freelancing
 			builder.Services.AddScoped<IproposalService, ProposalService>();
 			builder.Services.AddScoped<IProjectService, ProjectService>();
 			builder.Services.AddScoped<IPortofolioProject,PortofolioProjectService>();
-			#endregion
+            builder.Services.AddScoped<ISkillService, SkillService>();
+            builder.Services.AddScoped<IUserSkillService, UserSkillService>();
+            builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
+            #endregion
 
-			#region Filters
-			builder.Services.AddScoped<AuthorFilter>();
+            #region Filters
+            builder.Services.AddScoped<AuthorFilter>();
 			builder.Services.AddScoped<AuthorAndAdminFilter>();
 
 			builder.Services.AddScoped<ReviewAuthorizationFilter>();
 			#endregion
 
 
-			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile));
+			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile) ,typeof(SkillProfile) ,typeof(UserSkillProfile),typeof(ProjectSkillProfile));
+
+
 			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			builder.Services.AddControllers()
 			.AddJsonOptions(options =>

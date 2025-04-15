@@ -109,5 +109,6 @@ namespace Freelancing.Models
             });
         }
 	    public DbSet<Freelancing.DTOs.PortofolioProjectImageDTO> PortofolioProjectImageDTO { get; set; } = default!;
+	    public DbSet<Freelancing.DTOs.UserSkillDto> UserSkillDto { get; set; } = default!;
 	}
 }

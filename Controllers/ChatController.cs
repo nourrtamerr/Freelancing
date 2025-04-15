@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Freelancing.DTOs;
 using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +63,24 @@ namespace Freelancing.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+
+
+                //var senderId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                //    ?? User.FindFirst("sub")?.Value;
+
+                //if (string.IsNullOrEmpty(senderId))
+                //{
+                //    return Unauthorized("User ID could not be determined from token.");
+                //}
+
+                //var chat = new Chat
+                //{
+                //    SenderId = senderId,
+                //    ReceiverId = createChatDto.ReceiverId,
+                //    Message = createChatDto.Message,
+                //    SentAt = DateTime.UtcNow,
+                //    isRead = false
+                //};
 
                 var chat = mapper.Map<Chat>(createChatDto);
                 var createdChat = await chatRepository.CreateChatAsync(chat);

@@ -110,8 +110,19 @@ namespace Freelancing.Helpers
 			CreateMap<BiddingProjectDTO, BiddingProject>();
             CreateMap<BiddingProject, BiddingProjectDTO>();
 
-            CreateMap<PortofolioProject, PortofolioProjectDTO>();
+            CreateMap<UserSkill, UserSkillDto>();
+            CreateMap<UserSkillDto, UserSkill>();
+
+            //CreateMap<PortofolioProject, PortofolioProjectDTO>();
             CreateMap<PortofolioProjectDTO, PortofolioProject>();
+
+            CreateMap<PortofolioProjectImage, PortofolioProjectImageDTO>();
+            CreateMap<PortofolioProjectImageDTO, PortofolioProjectImage>();
+
+
+
+            CreateMap<PortofolioProject, PortofolioProjectDTO>()
+    .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
 
 
             CreateMap<BiddingProjectGetAllDTO, BiddingProject>();
