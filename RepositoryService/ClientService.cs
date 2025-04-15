@@ -11,12 +11,11 @@ namespace Freelancing.RepositoryService
 
 		public async Task<List<ViewClientDTO>> GetAllFiltered(ClientFilterationDTO dto)
 		{
-			var Clients = _context.clients.Include(f => f.Reviewed).Include(f => f.subscriptionPlan).Where(f => !f.isDeleted);
-			if (!string.IsNullOrEmpty(dto.Country))
+			var Clients = _context.clients.Include(c=>c.City).ThenInclude(C=>C.Country).Include(f => f.Reviewed).Include(f => f.subscriptionPlan).Where(f => !f.isDeleted);
+			if (dto.CountryIDs is { Count: >0})
 			{
 				Clients = Clients
-					.Where(f => f.Country.ToLower().Contains(dto.Country.ToLower())
-					|| dto.Country.ToLower().Contains(f.Country.ToLower()));
+					.Where(f => dto.CountryIDs.Contains(f.City.CountryId));
 			}
 			if (dto.AccountCreationDate != default)
 			{
@@ -80,7 +79,7 @@ namespace Freelancing.RepositoryService
 		public async Task<IEnumerable<ViewClientDTO>> GetAllClients()
 		{
 			
-			var clients = await _context.clients.Where(f => !f.isDeleted).ToListAsync();
+			var clients = await _context.clients.Include(c => c.City).ThenInclude(c => c.Country).Where(f => !f.isDeleted).ToListAsync();
 			List<ViewClientDTO> clientsdtos = new();
 			foreach (var client in clients)
 			{
@@ -92,7 +91,7 @@ namespace Freelancing.RepositoryService
 
 		public async Task<ViewClientDTO> GetClientById(string id)
 		{
-			var CLIENT = await _context.clients.Where(f => !f.isDeleted).FirstOrDefaultAsync(F => F.Id == id);
+			var CLIENT = await _context.clients.Include(c => c.City).ThenInclude(c => c.Country).Where(f => !f.isDeleted).FirstOrDefaultAsync(F => F.Id == id);
 
 			return _mapper.Map<ViewClientDTO>(CLIENT);
 		}

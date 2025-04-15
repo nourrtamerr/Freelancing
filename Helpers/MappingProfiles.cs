@@ -101,7 +101,7 @@ namespace Freelancing.Helpers
 					.Where(fl => !fl.IsDeleted)
 					.Select(fl => fl.Language.ToString()).ToList()))
 			.ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => src.Freelancer.EmailConfirmed))
-			.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.Country))
+			.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.City.Country.Name))
 			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration))
 			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
 			.ForMember(dest => dest.rank, opt => opt.MapFrom(src => src.Freelancer.Rank));

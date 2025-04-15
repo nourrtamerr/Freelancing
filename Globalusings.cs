@@ -5,5 +5,6 @@ global using Freelancing.RepositoryService;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
 using Freelancing.Attributes;
+using Freelancing.DTOs;
 
 

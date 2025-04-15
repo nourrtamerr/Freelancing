@@ -82,38 +82,47 @@ namespace Freelancing.Controllers
 
 		private string GeneratePageLink(int pageNum, FilterationDTO dto)
 		{
-			var queryString = new Dictionary<string, string>
+			var queryString = new List<string>
 	{
-		{ "pageNum", pageNum.ToString() },
-		{ "pagesize", dto.pagesize.ToString() }
+		$"pageNum={pageNum}",
+		$"pagesize={dto.pagesize}"
 	};
 
+	
+
 			if (!string.IsNullOrEmpty(dto.name))
-				queryString.Add("name", dto.name);
+				queryString.Add($"name={dto.name}");
 
 			if (dto.AccountCreationDate.HasValue)
-				queryString.Add("AccountCreationDate", dto.AccountCreationDate.Value.ToString());
+				queryString.Add($"AccountCreationDate={dto.AccountCreationDate.Value}");
 
-			if (!string.IsNullOrEmpty(dto.Country))
-				queryString.Add("Country", dto.Country);
+			
 
 			if (dto.IsVerified.HasValue)
-				queryString.Add("IsVerified", dto.IsVerified.Value.ToString());
+				queryString.Add($"IsVerified={dto.IsVerified.Value}");
 
 			if (dto.Paymentverified.HasValue)
-				queryString.Add("Paymentverified", dto.Paymentverified.Value.ToString());
+				queryString.Add($"Paymentverified={dto.Paymentverified.Value}");
+
+			if (dto.CountryIDs is { Count: > 0 })
+			{
+				foreach (var countryId in dto.CountryIDs)
+				{
+					queryString.Add($"CountryIDs={countryId}");
+				}
+			}
 
 			// Check if it's a FreelancerFilterationDTO and add freelancer-specific filters
 			if (dto is FreelancerFilterationDTO freelancerDto)
 			{
 				if (freelancerDto.isAvailable.HasValue)
-					queryString.Add("isAvailable", freelancerDto.isAvailable.Value.ToString());
+					queryString.Add($"isAvailable={freelancerDto.isAvailable.Value}");
 
 				if (freelancerDto.Languages != null && freelancerDto.Languages.Count > 0)
 				{
 					foreach (var language in freelancerDto.Languages)
 					{
-						queryString.Add("Languages", language.ToString());
+						queryString.Add($"Languages={language}");
 					}
 				}
 
@@ -121,7 +130,7 @@ namespace Freelancing.Controllers
 				{
 					foreach (var rank in freelancerDto.ranks)
 					{
-						queryString.Add("ranks", rank.ToString());
+						queryString.Add($"ranks={rank}");
 					}
 				}
 			}
@@ -131,11 +140,12 @@ namespace Freelancing.Controllers
 				{
 					foreach (var rank in clientDto.ranks)
 					{
-						queryString.Add("ranks", rank.ToString());
+						queryString.Add($"ranks={rank}");
 					}
 				}
 			}
-			var queryStringResult = string.Join("&", queryString.Select(kv => $"{kv.Key}={kv.Value}"));
+
+			var queryStringResult = string.Join("&", queryString);
 			return $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_httpContextAccessor.HttpContext.Request.Path}?{queryStringResult}";
 		}
 		#endregion
@@ -755,8 +765,7 @@ namespace Freelancing.Controllers
 						Email = email,
 						firstname = name,
 						lastname = "",
-						City = "",
-						Country = "",
+						CityId=2,
 						EmailConfirmed = true
 					};
 				}
@@ -768,8 +777,7 @@ namespace Freelancing.Controllers
 						Email = email,
 						firstname = name,
 						lastname = "",
-						City = "",
-						Country = "",
+						CityId = 2,//TEMPCITY ID
 						EmailConfirmed = true
 					};
 				}

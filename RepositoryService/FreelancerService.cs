@@ -24,12 +24,11 @@ namespace Freelancing.RepositoryService
 		public async Task<List<ViewFreelancersDTO>> GetAllFiltered(FreelancerFilterationDTO dto)
 		{
 			var freelancers =  context.freelancers.Include(f => f.UserSkills).ThenInclude(S => S.Skill)
-				.Include(f => f.Languages).Include(f=>f.Reviewed).Include(f=>f.subscriptionPlan).Where(f => !f.isDeleted);
-			if (!string.IsNullOrEmpty(dto.Country))
+				.Include(f => f.Languages).Include(c=>c.City).ThenInclude(c=>c.Country).Include(f=>f.Reviewed).Include(f=>f.subscriptionPlan).Where(f => !f.isDeleted);
+			if (dto.CountryIDs is { Count: > 0 })
 			{
 				freelancers = freelancers
-                    .Where(f => f.Country.ToLower().Contains(dto.Country.ToLower())
-                    || dto.Country.ToLower().Contains(f.Country.ToLower()));
+					.Where(f => dto.CountryIDs.Contains(f.City.CountryId));
 			}
 			if (dto.AccountCreationDate != default)
 			{
@@ -107,7 +106,7 @@ namespace Freelancing.RepositoryService
         public async Task<List<ViewFreelancersDTO>> GetAllAsync()
         {
 
-            var freelancers= await context.freelancers.Include(f=>f.UserSkills).ThenInclude(S=>S.Skill).Where(f=>!f.isDeleted).ToListAsync();
+            var freelancers= await context.freelancers.Include(c => c.City).ThenInclude(c => c.Country).Include(f=>f.UserSkills).ThenInclude(S=>S.Skill).Where(f=>!f.isDeleted).ToListAsync();
             List<ViewFreelancersDTO> freelancerdtos = new();
             foreach(var freelancer in freelancers)
 			{
@@ -118,7 +117,7 @@ namespace Freelancing.RepositoryService
 
         public async Task<ViewFreelancerPageDTO> GetByIDAsync(string id)
         {
-            var freelancer=await context.freelancers.Include(f => f.UserSkills).ThenInclude(S => S.Skill)
+            var freelancer=await context.freelancers.Include(c => c.City).ThenInclude(c => c.Country).Include(f => f.UserSkills).ThenInclude(S => S.Skill)
                 .Include(f=>f.Languages).Where(f => !f.isDeleted).FirstOrDefaultAsync(F=>F.Id==id);
 
 			return _mapper.Map<ViewFreelancerPageDTO>(freelancer);
@@ -128,7 +127,7 @@ namespace Freelancing.RepositoryService
 
         public async Task<Freelancer> UpdateFreelancerAsync(Freelancer freelancer)
         {
-           var fl =  await context.freelancers.FirstOrDefaultAsync(f=>f.Id==freelancer.Id);
+           var fl =  await context.freelancers.Include(c => c.City).ThenInclude(c => c.Country).FirstOrDefaultAsync(f=>f.Id==freelancer.Id);
 
             if (fl == null)
             { 
@@ -139,7 +138,7 @@ namespace Freelancing.RepositoryService
             fl.firstname = freelancer.firstname;
             fl.lastname = freelancer.lastname;
             fl.City=freelancer.City;
-            fl.Country=freelancer.Country;
+            fl.CityId=freelancer.CityId;
             fl.ProfilePicture = freelancer.ProfilePicture;
 
             fl.isAvailable = freelancer.isAvailable;
