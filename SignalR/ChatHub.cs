@@ -1,39 +1,47 @@
-﻿using System.Security.Claims;
-using Freelancing.DTOs;
+﻿using Freelancing.DTOs;
+using Freelancing.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+
 namespace Freelancing.SignalR
 {
     [Authorize]
     public class ChatHub : Hub
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public ChatHub(ApplicationDbContext context)
+        public ChatHub(ApplicationDbContext context, CloudinaryService cloudinaryService)
         {
-            this.context = context;
+            _context = context;
+            _cloudinaryService = cloudinaryService;
         }
+
         public async Task SendMessage(ChatDto chatDto)
         {
+            //    var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            //?? Context.User.FindFirst("sub")?.Value;
 
-        //    var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-        //?? Context.User.FindFirst("sub")?.Value;
+            if (chatDto == null || string.IsNullOrEmpty(chatDto.ReceiverId))
+            {
+                throw new HubException("Invalid message data");
+            }
 
-            await Clients.Users(chatDto.SenderId, chatDto.ReceiverId).SendAsync("ReceiveMessage",chatDto);
+            await Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
+                .SendAsync("ReceiveMessage", chatDto);
         }
 
-        public async override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             var userId = Context.UserIdentifier;
             var connectionId = Context.ConnectionId;
 
+            var existingConnection = await _context.UserConnections
+                .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.ConnectionId == connectionId);
 
-            var existingConnection = await context.UserConnections
-        .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.ConnectionId == connectionId);
-
-
-            if (existingConnection == null) {
+            if (existingConnection == null)
+            {
                 var userConnection = new UserConnection
                 {
                     UserId = userId,
@@ -41,36 +49,35 @@ namespace Freelancing.SignalR
                     ConnectedAt = DateTime.UtcNow,
                     IsConnected = true
                 };
-            context.UserConnections.Add(userConnection);
-            await context.SaveChangesAsync();
+                _context.UserConnections.Add(userConnection);
+                await _context.SaveChangesAsync();
             }
 
-            // Notify clients about online status
             await Clients.All.SendAsync("UserStatus", userId, true);
             await base.OnConnectedAsync();
-
         }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var userId = Context.UserIdentifier;
             var connectionId = Context.ConnectionId;
-    
-            var userConnections = await context.UserConnections
-                .Where(uc => uc.ConnectionId == connectionId && uc.UserId == userId).ToListAsync();
+
+            var userConnections = await _context.UserConnections
+                .Where(uc => uc.ConnectionId == connectionId && uc.UserId == userId)
+                .ToListAsync();
+
             if (userConnections.Any())
             {
                 foreach (var userConnection in userConnections)
                 {
                     userConnection.IsConnected = false;
-                    context.UserConnections.Update(userConnection);
+                    _context.UserConnections.Update(userConnection);
                 }
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
 
             await Clients.All.SendAsync("UserStatus", userId, false);
-
             await base.OnDisconnectedAsync(exception);
         }
     }
-    
 }
