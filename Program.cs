@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Freelancing.Filters;
 using Freelancing.SignalR;
 using Microsoft.OpenApi.Models;
+using Freelancing.Services;
 
 
 namespace Freelancing
@@ -31,9 +32,17 @@ namespace Freelancing
 						   .AllowCredentials();
 				});
 			});
-			#endregion
-			#region Configuring identity
-			builder.Services.AddIdentity<AppUser, IdentityRole>()
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
+            #endregion
+            #region Configuring identity
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 			builder.Services.AddAuthentication((options) =>
@@ -111,6 +120,7 @@ namespace Freelancing
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
+            builder.Services.AddScoped<CloudinaryService>();
 
 
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
@@ -196,7 +206,8 @@ namespace Freelancing
 			}
 			app.UseHttpsRedirection();
 			app.UseCors("ChatPolicy");
-			app.UseAuthentication();
+            app.UseCors("AllowAll");
+            app.UseAuthentication();
 			app.UseAuthorization();
 
 

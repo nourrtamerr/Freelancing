@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using Freelancing.DTOs;
+using Freelancing.Services;
 using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +19,15 @@ namespace Freelancing.Controllers
         private readonly IMapper mapper;
         private readonly IHubContext<ChatHub> hubContext;
         private readonly ApplicationDbContext context;
+        private readonly CloudinaryService cloudinaryService;
 
-        public ChatController(IChatRepositoryService chatRepository,IMapper mapper ,IHubContext<ChatHub> hubContext , ApplicationDbContext context)
+        public ChatController(IChatRepositoryService chatRepository,IMapper mapper ,IHubContext<ChatHub> hubContext , ApplicationDbContext context ,CloudinaryService cloudinaryService)
         {
             this.chatRepository = chatRepository;
             this.mapper = mapper;
             this.hubContext = hubContext;
             this.context = context;
+            this.cloudinaryService = cloudinaryService;
         }
 
         [HttpGet("{id}")]
@@ -55,7 +58,8 @@ namespace Freelancing.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateChat([FromBody] CreateChatDto createChatDto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateChat([FromForm] CreateChatDto createChatDto)
         {
             try
             {
@@ -64,30 +68,30 @@ namespace Freelancing.Controllers
                     return BadRequest(ModelState);
                 }
 
+                var senderId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? User.FindFirst("sub")?.Value;
 
-                //var senderId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                //    ?? User.FindFirst("sub")?.Value;
+                if (string.IsNullOrEmpty(senderId))
+                {
+                    return Unauthorized("User ID could not be determined from token.");
+                }
 
-                //if (string.IsNullOrEmpty(senderId))
-                //{
-                //    return Unauthorized("User ID could not be determined from token.");
-                //}
-
-                //var chat = new Chat
-                //{
-                //    SenderId = senderId,
-                //    ReceiverId = createChatDto.ReceiverId,
-                //    Message = createChatDto.Message,
-                //    SentAt = DateTime.UtcNow,
-                //    isRead = false
-                //};
+                string imageUrl = null;
+                if (createChatDto.Image != null)
+                {
+                    imageUrl = await cloudinaryService.UploadImageAsync(createChatDto.Image);
+                
+                }
 
                 var chat = mapper.Map<Chat>(createChatDto);
-                var createdChat = await chatRepository.CreateChatAsync(chat);
+                chat.SenderId = senderId;
+                chat.SentAt = DateTime.UtcNow;
+                chat.isRead = false;
+                chat.ImageUrl = imageUrl;
 
+                var createdChat = await chatRepository.CreateChatAsync(chat);
                 var chatDto = mapper.Map<ChatDto>(createdChat);
 
-                // Broadcast to SignalR hub
                 await hubContext.Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
                     .SendAsync("ReceiveMessage", chatDto);
 
@@ -95,12 +99,10 @@ namespace Freelancing.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error (use your logging framework, e.g., Serilog or Microsoft.Extensions.Logging)
-                Console.WriteLine($"Error creating chat: {ex.Message}");
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+    
+                return StatusCode(500, "An error occurred while creating the chat");
             }
         }
-
         [HttpPut("mark-as-read/{id}")]
         public async Task<IActionResult> MarkAsRead(int id)
         {
