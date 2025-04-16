@@ -16,3 +16,5 @@ obj/
 
 
 
+/Migrations/20250415233537_add pricecolumn.cs
+/Migrations/20250415233537_add pricecolumn.Designer.cs

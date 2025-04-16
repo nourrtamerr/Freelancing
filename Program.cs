@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using AutoMapper;
 using Freelancing.Middlewares;
+using Microsoft.Extensions.Options;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 
@@ -20,14 +21,20 @@ namespace Freelancing
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+           
             builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
             builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
             builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
             builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<IFixedProjectService, FixedProjectService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
+
 
 
             //builder.Services.AddAutoMapper(typeof(MappingProfiles));

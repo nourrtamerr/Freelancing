@@ -56,17 +56,7 @@ namespace Freelancing.RepositoryService
             }
             return categories;
         }
-        public async Task<Category?> GetCategoryByIdAsync(int id)
-        {
-            var selectedcategory = await _context.categories
-                .Include(c => c.Subcategories)
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (selectedcategory != null)
-            {
-                return selectedcategory;
-            }
-            return null;
-        }
+     
 
         public async Task<bool> IsCategoryExistsAsync(string name)
         {            
@@ -89,6 +79,17 @@ namespace Freelancing.RepositoryService
                 return await _context.SaveChangesAsync() > 0;
             }
             return false;
+        }
+        public async Task<Category?> GetCategoryByIdAsync(int id)
+        {
+            var selectedcategory = await _context.categories
+                .Include(c => c.Subcategories)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (selectedcategory != null)
+            {
+                return selectedcategory;
+            }
+            return null;
         }
     }
 }

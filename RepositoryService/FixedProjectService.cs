@@ -21,7 +21,7 @@ namespace Freelancing.RepositoryService
         {
             await _context.fixedPriceProjects.AddAsync(project);
             await _context.SaveChangesAsync();
-            return project;
+             return await GetFixedPriceProjectByIdAsync(project.Id);
         }
 
 
@@ -30,7 +30,11 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<FixedPriceProject>> GetAllFixedPriceProjectsAsync()
         {
-            return await _context.Set<FixedPriceProject>().ToListAsync();
+            return await _context.fixedPriceProjects.Include(p => p.ProjectSkills)
+            .ThenInclude(ps => ps.Skill)
+        .Include(p => p.Milestones)
+        .Include(p => p.Proposals)
+        .Include(p => p.Subcategory).ToListAsync();
         }
 
 
@@ -38,7 +42,14 @@ namespace Freelancing.RepositoryService
 
         public async Task<FixedPriceProject> GetFixedPriceProjectByIdAsync(int id)
         {
-            return await _context.Set<FixedPriceProject>().FirstOrDefaultAsync(p => p.Id == id);
+            //return await _context.Set<FixedPriceProject>().FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.fixedPriceProjects
+        .Include(p => p.ProjectSkills)
+            .ThenInclude(ps => ps.Skill)
+        .Include(p => p.Milestones)
+        .Include(p => p.Proposals)
+        .Include(p => p.Subcategory)
+        .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<FixedPriceProject> UpdateFixedPriceProjectAsync(FixedPriceProject project)
@@ -48,7 +59,7 @@ namespace Freelancing.RepositoryService
                 throw new ArgumentNullException(nameof(project));
             }
 
-            _context.Set<FixedPriceProject>().Update(project);
+            _context.fixedPriceProjects.Update(project);
             await _context.SaveChangesAsync();
             return project;
 
@@ -59,7 +70,7 @@ namespace Freelancing.RepositoryService
 
         public async Task<bool> DeleteFixedPriceProjectAsync(int id)
         {
-            var project = await _context.Set<FixedPriceProject>().FindAsync(id);
+            var project = await _context.fixedPriceProjects.FindAsync(id);
             if (project == null)
             {
                 return false;
