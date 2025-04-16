@@ -23,12 +23,12 @@ namespace Freelancing.Controllers
         public PortofolioProjectController(IPortofolioProject portofolioProject, IMapper mapper)
         {
             this.mapper = mapper;
-            this.portofolioProjectContext = portofolioProject;
+            portofolioProjectContext = portofolioProject;
         }
 
         // GET: api/PortofolioProject
         [HttpGet]
-        public async Task<IActionResult> GetPortofolioProject()
+        public async Task<IActionResult> GetPortofolioProjects()
         {
             var p = await portofolioProjectContext.GetAllAync();
             if (p == null)
@@ -55,6 +55,7 @@ namespace Freelancing.Controllers
         }
 
         // PUT: api/PortofolioProject/5
+        //needs update bs kman shwaya
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] PortofolioProjectDTO portofolioProjectDTO)
         {
@@ -85,7 +86,7 @@ namespace Freelancing.Controllers
             //to be sent back to respone as dto
             var updatedDTO = mapper.Map<PortofolioProjectDTO>(updatedProject);
 
-            return Ok();
+            return Ok(portofolioProjectDTO);
 
 
         }

@@ -11,12 +11,12 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<PortofolioProject>> GetAllAync()
         {
-            return await context.PortofolioProjects.Where(p => !p.IsDeleted).ToListAsync();
+            return await context.PortofolioProjects.Include(p => p.Images).Where(p => !p.IsDeleted).ToListAsync();
         }
 
         public async Task<PortofolioProject> GetByIdAsync(int id)
         {
-            return await context.PortofolioProjects.FirstOrDefaultAsync(p => p.Id == id);
+            return await context.PortofolioProjects.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<List<PortofolioProject>> GetByFreelancerId(string id)

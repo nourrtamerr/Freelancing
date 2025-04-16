@@ -19,11 +19,11 @@ namespace Freelancing.Models
 		{
 			get
 			{
-				int count = Reviews.Count;
+				int count = Reviewed.Count;
 				if (count == 0)
 					return Rank.Veteran;
 
-				double average = Reviews.Average(r => r.Rating);
+				double average = Reviewed.Average(r => r.Rating);
 
 				if (count < 5 && average >= 3.5)
 					return Rank.RisingStar;

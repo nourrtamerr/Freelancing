@@ -22,7 +22,7 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
 
 		[HttpGet("test")]
@@ -36,6 +36,119 @@ namespace Freelancing.Controllers
 		{
 			return Ok(await _freelancersmanager.GetAllAsync());
 		}
+
+
+		[HttpGet("FilteredFreeAgents")]
+		public async Task<IActionResult> getAllFreelancersFiltered([FromQuery]FreelancerFilterationDTO dto)
+		{
+			FilterationResponseModel response = new FilterationResponseModel();
+			var result = await _freelancersmanager.GetAllFiltered(dto);
+			response.NextPageLink = GetNextPageLink(dto, result.Count());
+			response.PreviousPageLink = GetPreviousPageLink(dto);
+			response.numofpages = dto.numofpages;
+			return Ok(new { result, response });
+		}
+		[HttpGet("FilteredClients")]
+		public async Task<IActionResult> getAllClientsFiltered([FromQuery] ClientFilterationDTO dto)
+		{
+			FilterationResponseModel response = new FilterationResponseModel();
+			var result = await _clientsmanager.GetAllFiltered(dto);
+			response.NextPageLink = GetNextPageLink(dto, result.Count());
+			response.PreviousPageLink = GetPreviousPageLink(dto);
+			response.numofpages = dto.numofpages;
+			return Ok(new {result, response });
+		}
+
+		#region Private Functions
+		private string GetNextPageLink(FilterationDTO dto, int totalItems)
+		{
+			if ( dto.pagesize == totalItems)
+			{
+				var nextPageNum = dto.pageNum + 1;
+				return GeneratePageLink(nextPageNum, dto);
+			}
+			return string.Empty; // No next page
+		}
+
+		private string GetPreviousPageLink(FilterationDTO dto)
+		{
+			if (dto.pageNum > 0)
+			{
+				var prevPageNum = dto.pageNum - 1;
+				return GeneratePageLink(prevPageNum, dto);
+			}
+			return string.Empty; // No previous page
+		}
+
+		private string GeneratePageLink(int pageNum, FilterationDTO dto)
+		{
+			var queryString = new List<string>
+	{
+		$"pageNum={pageNum}",
+		$"pagesize={dto.pagesize}"
+	};
+
+	
+
+			if (!string.IsNullOrEmpty(dto.name))
+				queryString.Add($"name={dto.name}");
+
+			if (dto.AccountCreationDate.HasValue)
+				queryString.Add($"AccountCreationDate={dto.AccountCreationDate.Value}");
+
+			
+
+			if (dto.IsVerified.HasValue)
+				queryString.Add($"IsVerified={dto.IsVerified.Value}");
+
+			if (dto.Paymentverified.HasValue)
+				queryString.Add($"Paymentverified={dto.Paymentverified.Value}");
+
+			if (dto.CountryIDs is { Count: > 0 })
+			{
+				foreach (var countryId in dto.CountryIDs)
+				{
+					queryString.Add($"CountryIDs={countryId}");
+				}
+			}
+
+			// Check if it's a FreelancerFilterationDTO and add freelancer-specific filters
+			if (dto is FreelancerFilterationDTO freelancerDto)
+			{
+				if (freelancerDto.isAvailable.HasValue)
+					queryString.Add($"isAvailable={freelancerDto.isAvailable.Value}");
+
+				if (freelancerDto.Languages != null && freelancerDto.Languages.Count > 0)
+				{
+					foreach (var language in freelancerDto.Languages)
+					{
+						queryString.Add($"Languages={language}");
+					}
+				}
+
+				if (freelancerDto.ranks != null && freelancerDto.ranks.Count > 0)
+				{
+					foreach (var rank in freelancerDto.ranks)
+					{
+						queryString.Add($"ranks={rank}");
+					}
+				}
+			}
+			else if (dto is ClientFilterationDTO clientDto)
+			{
+				if (clientDto.ranks != null && clientDto.ranks.Count > 0)
+				{
+					foreach (var rank in clientDto.ranks)
+					{
+						queryString.Add($"ranks={rank}");
+					}
+				}
+			}
+
+			var queryStringResult = string.Join("&", queryString);
+			return $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_httpContextAccessor.HttpContext.Request.Path}?{queryStringResult}";
+		}
+		#endregion
 		[HttpGet("FreeAgent/{username}")]
 		public async Task<IActionResult> getFreelancerById(string username)
 		{
@@ -121,7 +234,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest("Please wait till you get response for the first verification request");
 			}
-			currentuser.NationalId = dto.IdPicture.Save(_env);
+			currentuser.NationalId = dto.IdPicture.Save();
 			await _userManager.UpdateAsync(currentuser);
 			foreach (var admin in _userManager.Users.OfType<Admin>().ToList())
 			{
@@ -205,7 +318,11 @@ namespace Freelancing.Controllers
 			_mapper.Map(dto, newuser);
 			if (dto.ProfilePicture is not null)
 			{
-				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
+				if (newuser.ProfilePicture != null)
+				{
+					SaveImage.Delete(newuser.ProfilePicture);
+				}
+				newuser.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			result = await _userManager.UpdateAsync(newuser);
 			if (!result.Succeeded)
@@ -332,7 +449,7 @@ namespace Freelancing.Controllers
 			
 			if (dto.ProfilePicture is not null)
 			{
-				admin.ProfilePicture = dto.ProfilePicture.Save(_env);
+				admin.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			admin.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
 			admin.EmailConfirmed = true;
@@ -417,7 +534,7 @@ namespace Freelancing.Controllers
 			}
 			if (dto.ProfilePicture is not null)
 			{
-				newuser.ProfilePicture = dto.ProfilePicture.Save(_env);
+				newuser.ProfilePicture = dto.ProfilePicture.Save();
 			}
 			newuser.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
 
@@ -648,8 +765,7 @@ namespace Freelancing.Controllers
 						Email = email,
 						firstname = name,
 						lastname = "",
-						City = "",
-						Country = "",
+						CityId=2,
 						EmailConfirmed = true
 					};
 				}
@@ -661,8 +777,7 @@ namespace Freelancing.Controllers
 						Email = email,
 						firstname = name,
 						lastname = "",
-						City = "",
-						Country = "",
+						CityId = 2,//TEMPCITY ID
 						EmailConfirmed = true
 					};
 				}
@@ -723,7 +838,9 @@ namespace Freelancing.Controllers
 				, claims, expires: expiry,
 				signingCredentials: signcred,
 				notBefore: DateTime.UtcNow);
-			return new JwtSecurityTokenHandler().WriteToken(token);
+            Console.WriteLine(" Token being generated for user: " + user.UserName);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 	}
 }

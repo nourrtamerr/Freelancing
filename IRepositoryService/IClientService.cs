@@ -5,6 +5,7 @@ namespace Freelancing.IRepositoryService
 {
 	public interface IClientService
 	{
+		Task<List<ViewClientDTO>> GetAllFiltered(ClientFilterationDTO dto);
 		Task<bool> AddClient(Client Client);
 		Task<bool> UpdateClient(Client Client);
 		Task<bool> DeleteClient(string id);

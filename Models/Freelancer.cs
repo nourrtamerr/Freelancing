@@ -6,7 +6,7 @@ namespace Freelancing.Models
 	{
 		public List<Certificate> Certificates { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
-		public bool isAvailable { get; set; }
+		public bool isAvailable { get; set; } = true;
 		public decimal Balance { get; set; } = 0;
 		//public string Description { set; get; }=string.Empty;
 		public Education Education { get; set; }
