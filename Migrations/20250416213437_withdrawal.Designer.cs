@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250416213437_withdrawal")]
+    partial class withdrawal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1175,7 +1178,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "84c466f7-cbbe-459f-b4b1-b3f5ba571512",
+                            ConcurrencyStamp = "38a6ad05-63a4-4e03-bf40-38269c5bd32e",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
                             EmailConfirmed = true,
@@ -1183,11 +1186,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJuLw4YySZjoYH7wnsqTXxBoXl/rn1QQu8pNhr8qEW9MmMBJikWjkXxd4yuTlUxeEg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDED5elCyRYnReCNMSbUgYU3tx7SPai/YiXEqWVKk896verFMM/pRoO8sUrxDCKRIQ==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 17, 1, 24, 17, 836, DateTimeKind.Local).AddTicks(9492),
-                            SecurityStamp = "02c2e1ea-dda4-4cb3-823d-9f78a4ebefde",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 16, 23, 34, 34, 118, DateTimeKind.Local).AddTicks(1687),
+                            SecurityStamp = "00350cc0-60a7-4c3b-b34e-c4cb019b36e4",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1223,9 +1226,6 @@ namespace Freelancing.Migrations
 
                     b.Property<int?>("RemainingNumberOfBids")
                         .HasColumnType("int");
-
-                    b.Property<string>("StripeAccountId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isAvailable")
                         .HasColumnType("bit");

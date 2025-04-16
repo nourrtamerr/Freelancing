@@ -5,7 +5,7 @@ namespace Freelancing.Models
 	public class FreelancerWithdrawals:Payment
 	{
 		[ForeignKey("Freelancer")]
-		public int FreelancerId { set; get; }
+		public string FreelancerId { set; get; }
 		public Freelancer Freelancer { set; get; }
 	}
 }

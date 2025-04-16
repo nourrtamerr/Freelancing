@@ -55,7 +55,7 @@ namespace Freelancing.Controllers
 		}
 		 */
 		[HttpGet("create-checkout-session")]
-		public ActionResult<Freelancing.Models.Stripe.PaymentResponse> CreateCheckoutSession(string Amount, string redirectionurl)
+		public ActionResult<Freelancing.Models.Stripe.PaymentResponse> CreateCheckoutSession(string Amount, string redirectionurl,bool payout=false)
 		{
 
 			try
@@ -67,7 +67,7 @@ namespace Freelancing.Controllers
 									  //var successUrl = $"{Request.Scheme}://{Request.Host}/api/Order/PaymentSuccess?session_id={{CHECKOUT_SESSION_ID}}&successurl={{successurl}}";
 
 				var successUrl = redirectionurl;
-				var cancelUrl = $"{baseUrl}/api/Order/canceled";
+				var cancelUrl = $"{baseUrl}/api/Stripe/cancel";
 				StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
 				var options = new SessionCreateOptions
@@ -106,7 +106,9 @@ namespace Freelancing.Controllers
 				session.SuccessUrl = redirectionurl;
 
 
+				
 				return Ok(new { session.Url });
+				//return Redirect( session.Url);
 
 			}
 			catch (StripeException e)
@@ -115,30 +117,82 @@ namespace Freelancing.Controllers
 				return BadRequest(new { error = e.StripeError.Message });
 			}
 		}
+		[HttpGet("create-connected-account")]
+		public IActionResult CreateConnectedAccount(string freelancerEmail)
+		{
+			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
+			var accountOptions = new AccountCreateOptions
+			{
+				Type = "express", // Or "custom" if you want full control
+				Country = "US",
+				Email = freelancerEmail,
+				Capabilities = new AccountCapabilitiesOptions
+				{
+					Transfers = new AccountCapabilitiesTransfersOptions
+					{
+						Requested = true
+					}
+				}
+			};
+
+			var accountService = new AccountService();
+			var account = accountService.Create(accountOptions);
+
+			// Save this account.Id to your database linked with the freelancer
+			var url= Url.ActionLink("onboard-freelancer", "Stripe", new { accountId=account.Id });
+			return Redirect(url);
+		}
+		[HttpGet("onboard-freelancer")]
+		public IActionResult OnboardFreelancer(string accountId)
+		{
+			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+
+			var linkOptions = new AccountLinkCreateOptions
+			{
+				Account = accountId,
+				RefreshUrl = $"{Request.Scheme}://{Request.Host}/api/stripe/onboard-freelancer?accountId={accountId}",
+				ReturnUrl = $"{Request.Scheme}://{Request.Host}/onboarding-complete",
+				Type = "account_onboarding"
+			};
+
+			var linkService = new AccountLinkService();
+			var accountLink = linkService.Create(linkOptions);
+			var url = Url.ActionLink("onboard-freelancer", "Stripe", new { connectedAccountId = accountId, amountInCents=8000 });
+			return Ok(new { url = accountLink.Url });
+		}
+
+		[HttpGet("transfer-to-freelancer")]
+		public IActionResult TransferToFreelancer(string connectedAccountId, long amountInCents)
+		{
+			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+
+			var accountService = new AccountService();
+			var account = accountService.Get(connectedAccountId);  // Make sure the account is ready and capable of receiving payouts
+
+			if (account.PayoutsEnabled)
+			{
+				var transferService = new TransferService();
+				var transfer = transferService.Create(new TransferCreateOptions
+				{
+					Amount = amountInCents, // e.g., 8000 = $80
+					Currency = "usd",
+					Destination = connectedAccountId,
+					Description = "Freelancer payment"
+				});
+
+				return Ok(new { transferId = transfer.Id });
+			}
+			else
+			{
+				return BadRequest("Account is not fully onboarded or payouts are not enabled.");
+			}
+		}
 		[HttpGet("cancel")]
 		[AllowAnonymous]
-		public IActionResult Cancel(
-										[FromQuery] string session_id,  // Stripe includes this automatically
-										[FromQuery] string reason = "") // Optional: Stripe may provide cancellation reason
+		public IActionResult Cancel()
 		{
-			_logger.LogInformation($"Checkout canceled. Session: {session_id}, Reason: {reason}");
-
-			// Optional: Fetch session details from Stripe
-			var sessionService = new Stripe.Checkout.SessionService();
-			var session = sessionService.Get(session_id);
-
-			return Ok(new
-			{
-				Message = "Payment was canceled.",
-				SessionId = session_id,
-				Amount = session.AmountTotal / 100,
-				Currency = session.Currency,
-				CustomerEmail = session.CustomerDetails?.Email,
-				// Frontend can use this to redirect or show UI
-				RedirectUrl = "https://your-app.com/checkout/retry",
-				reason = reason
-			});
+			return Redirect(configuration["AppSettings:AngularAppUrl"]+"/PaymentCancelled");
 		}
 	}
 }
