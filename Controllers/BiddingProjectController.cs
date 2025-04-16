@@ -57,9 +57,9 @@ namespace Freelancing.Controllers
 
 
         [HttpPost("Filter")]
-        public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto)
+        public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
         {
-            return Ok(await _biddingProjectService.Filter(pdto));
+            return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Freelancing.IRepositoryService
         Task<BiddingProject> UpdateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, int projectDTOid);
         Task<bool> DeleteBiddingProjectAsync(int id);
 
-        Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO biddingProjectFilters);
+        Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO biddingProjectFilters, int pageNumber, int PageSize);
 
     }
 }

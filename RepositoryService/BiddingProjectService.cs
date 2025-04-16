@@ -180,8 +180,10 @@ namespace Freelancing.RepositoryService
         //----------------------------------------------------------------------------------------------------
 
 
-        public async Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO filters)
+        public async Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO filters, int pageNumber, int PageSize)
         {
+
+
             var query = _context.biddingProjects.Include(b=>b.Subcategory)
                                                 .ThenInclude(s=>s.Category)
                                                 .Include(b=>b.ProjectSkills)
@@ -236,7 +238,10 @@ namespace Freelancing.RepositoryService
 
             }
 
-
+            if(filters.ClientCountry is { Count: > 0 })
+            {
+                query = query.Where(b => filters.ClientCountry.Contains(b.Client.City.CountryId));
+            }
 
             if (filters.MinExpectedDuration > 0)
             {
@@ -255,7 +260,7 @@ namespace Freelancing.RepositoryService
 
 
 
-            return filterdto;
+            return filterdto.Skip((pageNumber-1)*PageSize).Take(PageSize).ToList();
 
         }
         //foreach (var dto in filterdto)

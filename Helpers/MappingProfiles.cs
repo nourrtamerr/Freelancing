@@ -3,6 +3,8 @@ using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.MilestoneDTOs;
 using Freelancing.DTOs.ProposalDTOS;
 using Freelancing.DTOs.BiddingProjectDTOs;
+using Freelancing.DTOs;
+
 
 namespace Freelancing.Helpers
 {
@@ -37,11 +39,13 @@ namespace Freelancing.Helpers
             CreateMap<AppUser, UsersRequestingVerificationViewDTO>()
                 .ForMember(dest=>dest.Country, opt=> opt.MapFrom(src=>src.City.Country.Name))
                 .ForMember(dest=>dest.City, opt=> opt.MapFrom(src=>src.City.Name));
+
+
             CreateMap<Freelancer, ViewFreelancersDTO>()
                 .ForMember(dest => dest.UserSkills, opt =>
                 opt.MapFrom(src => src.UserSkills.Select(us => us.Skill.Name).ToList()))
 				.ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City.Country.Name))
-.ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name)); 
+            .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name)); 
 
             //CreateMap<Review, FreelancerReviewDTO>()
             //.ForMember(dest => dest.ReviewerName, opt => opt.MapFrom(src => src.Reviewer != null ? src.Reviewer.UserName : string.Empty));
@@ -140,21 +144,31 @@ namespace Freelancing.Helpers
 			.ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration))
 			.ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
 			.ForMember(dest => dest.rank, opt => opt.MapFrom(src => src.Freelancer.Rank));
+
+
             CreateMap<Proposal, ProposalViewDTO>()
             .ForMember(dest => dest.FreelancerName, opt => opt.MapFrom(src => src.Freelancer.UserName))
+            
             .ForMember(dest => dest.FreelancerProfilePicture, opt => opt.MapFrom(src => src.Freelancer.ProfilePicture))
+            
             .ForMember(dest => dest.Freelancerskills, opt => opt.MapFrom(src =>
                 src.Freelancer.UserSkills
                     .Where(us => !us.IsDelete)
                     .Select(us => us.Skill.Name).ToList()))
+            
             .ForMember(dest => dest.FreelancerLanguages, opt => opt.MapFrom(src =>
                 src.Freelancer.Languages
                     .Where(fl => !fl.IsDeleted)
                     .Select(fl => fl.Language.ToString()).ToList()))
+            
             .ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => src.Freelancer.EmailConfirmed))
-            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.Country))
+            
+            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Freelancer.City.Country.Name))
+            
             .ForMember(dest => dest.SuggestedDuration, opt => opt.MapFrom(src => src.SuggestedDuration))
+            
             .ForMember(dest => dest.suggestedMilestones, opt => opt.MapFrom(src => src.suggestedMilestones))
+            
             .ForMember(dest => dest.rank, opt => opt.MapFrom(src => src.Freelancer.Rank));
 
             #endregion
