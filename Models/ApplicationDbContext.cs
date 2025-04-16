@@ -52,6 +52,7 @@ namespace Freelancing.Models
 		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 		public DbSet<MilestoneFile> MilestoneFiles { set; get; }
         public DbSet<UserConnection> UserConnections { get; set; }
+        public DbSet<FreelancerWithdrawals> FreelancerWithdrawals { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
