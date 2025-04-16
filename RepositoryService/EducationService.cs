@@ -38,6 +38,19 @@ namespace Freelancing.RepositoryService
             }
                 return educations;
         }
+        public async Task<IEnumerable<Education>> GetAllEducationsByFreelancerUserName(string username)
+        {
+            var educations =await _context.Educations
+                .Include(c => c.Freelancer) 
+                .Where(c=>c.Freelancer.UserName == username)
+                .ToListAsync();
+            if (educations.Count == 0)
+            {
+                return null;
+            }
+                return educations;
+        }
+
 
         public Task<Education> GetEducationById(int id)
         {

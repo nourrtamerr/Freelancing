@@ -13,7 +13,7 @@ namespace Freelancing.RepositoryService
 
 		public async Task<bool> DeleteExperience(int id)
 		{
-			var exp = await _context.Experiences.FirstOrDefaultAsync(c => c.Id == id);
+			var exp = await GetExperienceById(id);
 			if (exp == null)
 			{
 				return false;
@@ -30,34 +30,51 @@ namespace Freelancing.RepositoryService
 
 		public async Task<IEnumerable<Experience>> GetAllExperiences()
 		{
-			return await _context.Experiences.ToListAsync();
+			var exp = await _context.Experiences
+                //.Include(e => e.Freelancer)                
+                .OrderByDescending(e => e.StartDate)
+				.ToListAsync();			
+                return exp;            
 		}
 
 		public async Task<IEnumerable<Experience>> GetExperienceByCompanyName(string name)
 		{
-			return await _context.Experiences.Where(e=>e.Company.Contains(name.Trim())).ToListAsync();
+            var exp = await _context.Experiences
+                .Include(e => e.Freelancer)
+                .Where(e => e.Company.Contains(name.Trim()))
+                .OrderByDescending(e => e.StartDate)
+                .ToListAsync();
+            return exp;            
 		}
 
-		public async Task<IEnumerable<Experience>> GetExperienceByFreelancerId(string id)
+		public async Task<IEnumerable<Experience>> GetExperienceByFreelancerUserName(string username)
 		{
-			return await _context.Experiences.Where(e => e.FreelancerId==id).ToListAsync();
+            var exp = await _context.Experiences
+                .Include(e => e.Freelancer)
+				.Where(e => e.Freelancer.UserName == username)
+				.OrderByDescending(e => e.StartDate)
+                .ToListAsync();
+            return exp;            
 		}
 
 		public async Task<Experience> GetExperienceById(int id)
 		{
-			return await _context.Experiences.FirstOrDefaultAsync(e => e.Id == id);
+			var exp = await _context.Experiences
+				.Include(e => e.Freelancer)
+				.AsNoTracking()
+				.FirstOrDefaultAsync(e => e.Id == id);
+			return exp;
 		}
 
 		public async Task<bool> UpdateExperience(Experience Experience)
 		{
-			var exp = await _context.Experiences.FirstOrDefaultAsync(c => c.Id == Experience.Id);
+			var exp = await GetExperienceById(Experience.Id);
 			if (exp == null)
 			{
 				return false;
 			}
 			_context.Experiences.Update(Experience);
 			return await _context.SaveChangesAsync() > 0;
-
 		}
 	}
 }

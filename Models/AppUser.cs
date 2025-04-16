@@ -5,17 +5,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 public abstract class AppUser :IdentityUser
 {
 
-    public string firstname { get; set; }
+	public DateOnly AccountCreationDate { set; get; }
+	public string firstname { get; set; }
 	public string lastname { get; set; }
-	public string City { get; set; }
-	public string Country { get; set; }
+	public DateOnly DateOfBirth { get; set; }
+	[ForeignKey("City")]
+	public int? CityId { set; get; }
+	public City? City { get; set; }
 	public string? ProfilePicture { get; set; }
-
-	public bool isDeleted { get; set; } = false;
-	public bool IsVerified { get; set; } = false;
-
     public string? NationalId { get; set; }
+	public bool IsVerified { get; set; } = false;
+	public bool isDeleted { get; set; } = false;
 
+	public string RefreshToken { set; get; }
+	public DateTime RefreshTokenExpiryDate { set; get; }
 
 	[InverseProperty("Reviewee")]
 	public virtual List<Review> Reviewed { get; set; }

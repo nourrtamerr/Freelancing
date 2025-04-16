@@ -10,6 +10,8 @@ namespace Freelancing.IRepositoryService
         Task<Ban> CreateBanAsync(Ban ban);
         Task UpdateBanAsync(Ban ban);
         Task DeleteBanAsync(int id);
+
+        Task<List<AppUser>>GetBannedUsersAsync();
         Task<bool> IsUserBannedAsync(string userId);
     }
 }

@@ -23,13 +23,13 @@ public abstract class Project
 
 	[ForeignKey("Client")]
     public string ClientId { get; set; } //not in dto
-    public virtual AppUser Client { get; set; }
+    public virtual Client Client { get; set; }
 
 
 
 	[ForeignKey("Freelancer")]
     public string? FreelancerId { get; set; } //not in dto
-	public virtual AppUser? Freelancer { get; set; }
+	public virtual Freelancer? Freelancer { get; set; }
 	
 
 
@@ -42,10 +42,15 @@ public abstract class Project
 	[ForeignKey("Subcategory")]
     public int SubcategoryId { get; set; }
 	public virtual Subcategory Subcategory { set; get; }
+
+
+
 	public virtual List<Milestone> Milestones { get; set; } = new List<Milestone>();
 	public ExperienceLevel experienceLevel { get; set; }
 	public virtual List<Proposal> Proposals { get; set; } = new List<Proposal>();
 	public virtual List<ProjectSkill> ProjectSkills { get; set; }
+
+	public bool IsDeleted { get; set; } = false;
 }
 
 

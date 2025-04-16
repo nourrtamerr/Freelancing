@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.Migrations;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations.Schema;
+using Freelancing.DTOs;
+using System.Diagnostics;
 
 namespace Freelancing.Models
 {
@@ -8,7 +13,7 @@ namespace Freelancing.Models
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
 		{
-			this.ChangeTracker.LazyLoadingEnabled = true;
+			//this.ChangeTracker.LazyLoadingEnabled = true;
 		}
 		public DbSet<Admin> Admins { get; set; }
 		public DbSet<Client> clients { get; set; }
@@ -16,15 +21,17 @@ namespace Freelancing.Models
 		public DbSet<Ban> Bans { get; set; }
 		//public DbSet<Project> Projects { get; set; }
 		public DbSet<BiddingProject> biddingProjects { get; set; }
+		[NotMapped]
+		public DbSet<Project> project { get; set; }
 		public DbSet<FixedPriceProject> fixedPriceProjects { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<Certificate> certificates { get; set; }
 		public DbSet<Chat> Chats { set; get; }
 		public DbSet<Education> Educations { set; get; }
 		public DbSet<Experience> Experiences { set; get; }
+		public DbSet<FreelancerLanguage> freelancerLanguages { set; get; }
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<SuggestedMilestone> suggestedMilestones { get; set; }
-
 		public DbSet<Notification> Notifications { set; get; }
 
 		//public DbSet<Payment> Payments { get; set; }
@@ -34,6 +41,9 @@ namespace Freelancing.Models
 		public DbSet<PortofolioProject> PortofolioProjects { get; set; }
 		public DbSet<PortofolioProjectImage> PortofolioProjectImages { get; set; }
 		public DbSet<Proposal> Proposals { get; set; }
+		public DbSet<Country> Countries { get; set; }
+		public DbSet<City> Cities { get; set; }
+
 		public DbSet<Review> Reviews { get; set; }
 		public DbSet<Skill> Skills { get; set; }
 		public DbSet<Subcategory> Subcategories { get; set; }
@@ -41,7 +51,8 @@ namespace Freelancing.Models
 		public DbSet<ProjectSkill> ProjectSkills { get; set; }
 		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<UserConnection> UserConnections { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 
@@ -62,7 +73,41 @@ namespace Freelancing.Models
 			modelBuilder.Entity<Client>().ToTable("clients");
 			modelBuilder.Entity<Freelancer>().ToTable("freelancers");
 
+			
+
 			var hasher = new PasswordHasher<Admin>();
+			var country = new Country()
+			{
+				Id = 1,
+				Name = "Admin Country",
+				isDeleted = false
+			};
+			modelBuilder.Entity<Country>().HasData(country);
+			var city = new City()
+			{
+				Id = 1,
+				Name = "Admin City",
+				CountryId = 1,
+				isDeleted = false
+			};
+			modelBuilder.Entity<City>().HasData(city);
+
+			var tempcountry = new Country()
+			{
+				Id = 2,
+				Name = "temp Country",
+				isDeleted = false
+			};
+			modelBuilder.Entity<Country>().HasData(tempcountry);
+			var tempcity = new City()
+			{
+				Id = 2,
+				Name = "temp City",
+				CountryId = 2,
+				isDeleted = false
+			};
+			modelBuilder.Entity<City>().HasData(tempcity);
+
 			var admin = new Admin
 			{
 				Id = "1", // Use string ID for IdentityUser
@@ -73,14 +118,15 @@ namespace Freelancing.Models
 				EmailConfirmed = true,
 				SecurityStamp = Guid.NewGuid().ToString("D"),
 				PasswordHash = hasher.HashPassword(null, "Admin@123"),
-				City = "Admin City",
-				Country = "Admin Country",
+				CityId = 1,
 				firstname = "Admin",
 				lastname = "User",
-
+				RefreshToken = "",
+				RefreshTokenExpiryDate = DateTime.Now
 			};
 
 			modelBuilder.Entity<Admin>().HasData(admin);
+
 
 			modelBuilder.Entity<MilestonePayment>()
 				.HasOne(mp => mp.Milestone)
@@ -101,5 +147,17 @@ namespace Freelancing.Models
 				.HasForeignKey(ps => ps.ProjectId)
 				.OnDelete(DeleteBehavior.Cascade);
 		}
+
+
+			modelBuilder.Entity<UserConnection>(entity =>
+            {
+                entity.HasOne(uc => uc.User)
+                    .WithMany()
+                    .HasForeignKey(uc => uc.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+	    //public DbSet<Freelancing.DTOs.PortofolioProjectImageDTO> PortofolioProjectImageDTO { get; set; } = default!;
+	    //public DbSet<Freelancing.DTOs.UserSkillDto> UserSkillDto { get; set; } = default!;
 	}
 }

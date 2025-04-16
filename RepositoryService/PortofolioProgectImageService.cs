@@ -1,5 +1,6 @@
 ﻿using Freelancing.DTOs;
 using Freelancing.IRepositoryService;
+using Freelancing.Migrations;
 using Freelancing.Models;
 
 namespace Freelancing.RepositoryService
@@ -10,7 +11,7 @@ namespace Freelancing.RepositoryService
         public async Task<List<PortofolioProjectImage>> GetByPortfolioProjectIdAsync(int id)
         {
             var project = context.PortofolioProjects.SingleOrDefault(p => p.Id == id);
-            var images = context.PortofolioProjectImages.Where(i => i.PreviousProjectId == project.Id).ToList();
+            var images =await context.PortofolioProjectImages.Where(i => i.PreviousProjectId == project.Id && !i.IsDeleted).ToListAsync();
             return images;
         }
 
@@ -18,7 +19,12 @@ namespace Freelancing.RepositoryService
 
         public async Task<PortofolioProjectImage> AddAsync(PortofolioProjectImageDTO portofolioProjectImage)
         {
-            PortofolioProjectImage p = new PortofolioProjectImage()
+            if (portofolioProjectImage == null)
+            {
+                throw new ArgumentNullException(nameof(portofolioProjectImage));
+            }
+
+            var p = new PortofolioProjectImage()
             {
                 Image = portofolioProjectImage.Image,
                 PreviousProjectId = portofolioProjectImage.PreviousProjectId

@@ -1,20 +1,28 @@
-﻿using Freelancing.DTOs;
+﻿using Freelancing.DTOs.MilestoneDTOs;
 
 namespace Freelancing.IRepositoryService
 {
     public interface IMilestoneService
     {
-        Task<List<Milestone>> GetAllAsync();
+        Task<List<MilestoneGetAllDTO>> GetAllAsync();
 
-        Task<Milestone> GetByIdAsync(int id);
+        Task<MilestoneGetByIdOrProjectIdDTO> GetByIdAsync(int id);
 
-        Task<List<Milestone>> GetByProjectId(int id);
+        Task<List<MilestoneGetByIdOrProjectIdDTO>> GetByProjectId(int ProjectId);
 
-        Task<Milestone> CreateAsync(MilestoneDTO milestone);
+        Task<MilestoneCreateDTO> CreateAsync(MilestoneCreateDTO milestone);
 
-        Task<Milestone> UpdateAsync(MilestoneDTO milestone);
+        /*Task<Milestone> UpdateStatusAsync(MilestoneGetAllDTO milestone);*/ //for status only => httppatch
+
+
+        Task<MilestoneGetAllDTO> UpdateStatusAsync(int MilestoneId, int StatusId);
+
+
+        Task<MilestoneGetAllDTO> UpdateAsync(MilestoneGetByIdOrProjectIdDTO milestone);
 
         Task<bool> DeleteAsync(int id);
+
+
 
 
     }

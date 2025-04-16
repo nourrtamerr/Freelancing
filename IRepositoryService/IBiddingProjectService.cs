@@ -1,16 +1,17 @@
-﻿using Freelancing.Models;
+﻿using Freelancing.DTOs.BiddingProjectDTOs;
+using Freelancing.Models;
 
 namespace Freelancing.IRepositoryService
 {
     public interface IBiddingProjectService
     {
-        Task<List<BiddingProject>> GetAllBiddingProjectsAsync();
-        Task<BiddingProject> GetBiddingProjectByIdAsync(int id);
-        Task<BiddingProject> CreateBiddingProjectAsync(BiddingProject project);
-        Task<BiddingProject> UpdateBiddingProjectAsync(BiddingProject project);
+        Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsync();
+        Task<BiddingProjectGetByIdDTO> GetBiddingProjectByIdAsync(int id);
+        Task<BiddingProject> CreateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, string ClinetId);
+        Task<BiddingProject> UpdateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, int projectDTOid);
         Task<bool> DeleteBiddingProjectAsync(int id);
 
-
+        Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO biddingProjectFilters, int pageNumber, int PageSize);
 
     }
 }

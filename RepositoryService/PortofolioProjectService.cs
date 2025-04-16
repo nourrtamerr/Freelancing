@@ -1,21 +1,22 @@
-﻿using Freelancing.DTOs;
+﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class PortofolioProjectService(ApplicationDbContext context) : IPortofolioProject
+    public class PortofolioProjectService(ApplicationDbContext context, IMapper _mapper) : IPortofolioProject
     {
 
         public async Task<List<PortofolioProject>> GetAllAync()
         {
-            return await context.PortofolioProjects.Where(p => !p.IsDeleted).ToListAsync();
+            return await context.PortofolioProjects.Include(p => p.Images).Where(p => !p.IsDeleted).ToListAsync();
         }
 
-        public async Task<PortofolioProject> GetById(int id)
+        public async Task<PortofolioProject> GetByIdAsync(int id)
         {
-            return await context.PortofolioProjects.FirstOrDefaultAsync(p => p.Id == id);
+            return await context.PortofolioProjects.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<List<PortofolioProject>> GetByFreelancerId(string id)
@@ -66,12 +67,13 @@ namespace Freelancing.RepositoryService
         public async Task<PortofolioProject> UpdateAsync(PortofolioProjectDTO portofolioProject)
         {
             var p = context.PortofolioProjects.SingleOrDefault(p => p.Id == portofolioProject.Id);
-            if(p is not null)
+            if (p is not null)
             {
-                p.Title = portofolioProject.Title;
-                p.Description = portofolioProject.Description;
-                p.CreatedAt = portofolioProject.CreatedAt;
-                p.Images = portofolioProject.Images;
+                //p.Title = portofolioProject.Title;
+                //p.Description = portofolioProject.Description;
+                //p.CreatedAt = portofolioProject.CreatedAt;
+                //p.Images = portofolioProject.Images;
+                _mapper.Map(portofolioProject, p);
 
                 await context.SaveChangesAsync();
                 return p;
@@ -79,6 +81,11 @@ namespace Freelancing.RepositoryService
 
             throw new KeyNotFoundException("Invalid Portfolio Project");
            
+        }
+
+        public Task<PortofolioProject> GetById(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
