@@ -109,7 +109,7 @@ namespace Freelancing.Controllers
 			dto.type = project.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding;
 			if (dto.type == projectType.fixedprice)
 			{
-				if ((project as FixedPriceProject).fixedPrice != dto.Price)
+				if ((project as FixedPriceProject).Price != dto.Price)
 				{
 					return BadRequest("not matching the price");
 				}
