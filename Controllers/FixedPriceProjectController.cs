@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs;
+using Freelancing.DTOs.MilestoneDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -412,13 +413,13 @@ namespace Freelancing.Controllers
                 foreach (var milestonedto in dto.Milestones)
                 {
 
-                    await _milestoneService.CreateAsync(new MilestoneDTO()
+                    await _milestoneService.CreateAsync(new MilestoneCreateDTO()
                     {
                         Title = milestonedto.Title,
                         StartDate = milestonedto.startdate,
                         EndDate = milestonedto.enddate,
-                        Status = milestonedto.Status,
-                       ProjectId  = createdProject.Id,
+                        Status = (int)milestonedto.Status,
+                        ProjectId  = createdProject.Id,
                         Amount = milestonedto.Amount,
                         Description = milestonedto.Description
 
