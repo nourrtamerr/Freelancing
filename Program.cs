@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Freelancing.Filters;
 using Freelancing.SignalR;
 using Microsoft.OpenApi.Models;
+using Freelancing.Services;
 
 
 namespace Freelancing
@@ -20,20 +21,22 @@ namespace Freelancing
 
 			builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddSignalR();
-			#region AddCors
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("ChatPolicy", builder =>
-				{
-					builder.WithOrigins("http://127.0.0.1:5500")
-						   .AllowAnyMethod()
-						   .AllowAnyHeader()
-						   .AllowCredentials();
-				});
-			});
-			#endregion
-			#region Configuring identity
-			builder.Services.AddIdentity<AppUser, IdentityRole>()
+            #region AddCors
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy
+                        .WithOrigins("http://127.0.0.1:5500")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(_ => true); 
+                });
+            });
+            #endregion
+            #region Configuring identity
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 			builder.Services.AddAuthentication((options) =>
@@ -55,6 +58,18 @@ namespace Freelancing
 					ClockSkew = TimeSpan.Zero
 
 
+				};
+				options.Events = new JwtBearerEvents
+				{
+					OnMessageReceived = context =>
+					{
+						if (context.Request.Path.StartsWithSegments("/chathub"))
+						{
+							var accessToken = context.Request.Query["access_token"];
+							context.Token = accessToken;
+						}
+						return Task.CompletedTask;
+					}
 				};
 			}).AddCookie(
 
@@ -147,6 +162,7 @@ namespace Freelancing
             //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             //});
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
+            builder.Services.AddScoped<CloudinaryService>();
 
 
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
@@ -172,6 +188,8 @@ namespace Freelancing
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IUserSkillService, UserSkillService>();
             builder.Services.AddScoped<IProjectSkillRepository, ProjectSkillRepository>();
+            builder.Services.AddScoped<ICountryService, CountryService>();
+            builder.Services.AddScoped<ICityService, CityService>();
 			builder.Services.AddHttpContextAccessor();
 
 			#endregion
@@ -229,8 +247,9 @@ namespace Freelancing
 				app.UseSwaggerUI();
 			}
 			app.UseHttpsRedirection();
-			app.UseCors("ChatPolicy");
-			app.UseAuthentication();
+            app.UseCors("AllowAll");
+
+            app.UseAuthentication();
 			app.UseAuthorization();
 
 

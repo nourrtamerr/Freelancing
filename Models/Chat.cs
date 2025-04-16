@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 public class Chat
@@ -14,8 +15,9 @@ public class Chat
 	public string ReceiverId { get; set; }
     public AppUser Receiver { get; set; }
 
-
-    public string Message { get; set; } //contains(".com") 
+    [MaxLength(2048)]
+    public string? ImageUrl { get; set; }
+    public string? Message { get; set; } //contains(".com") 
     public DateTime SentAt { get; set; }
     public bool isRead { set; get; }
 }

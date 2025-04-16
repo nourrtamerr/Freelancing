@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415182653_MakeImageUrlNullable")]
+    partial class MakeImageUrlNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -189,6 +192,7 @@ namespace Freelancing.Migrations
                         .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Message")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiverId")
@@ -1120,7 +1124,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "28a59b3e-f1f4-4a0b-a9cd-0ffe74c1871a",
+                            ConcurrencyStamp = "d785bcfd-1ee8-4d5e-987d-83e17f5ab5de",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
                             EmailConfirmed = true,
@@ -1128,11 +1132,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECglvTv4PUAZF+DgCyRK47Hdousm13+a46KzkktifTl3Sh2GElkdYjF/KAigaYdckg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBY1yc5Q32Mp1rxXninKVsRWof6wp7CKxxQT18BbuvA7j9rGeDlS+fsoftYnGZNx+g==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 16, 0, 35, 7, 415, DateTimeKind.Local).AddTicks(9801),
-                            SecurityStamp = "42fc2d83-4b7c-40db-a8c6-51dc7fb24716",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 15, 20, 26, 48, 920, DateTimeKind.Local).AddTicks(7939),
+                            SecurityStamp = "3df7b69a-1290-45c5-9e52-ba6aa8864b94",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",

@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415170039_ChatImage")]
+    partial class ChatImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,11 +36,16 @@ namespace Freelancing.Migrations
                     b.Property<DateOnly>("AccountCreationDate")
                         .HasColumnType("date");
 
-                    b.Property<int?>("CityId")
-                        .HasColumnType("int");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("DateOfBirth")
@@ -112,8 +120,6 @@ namespace Freelancing.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -185,10 +191,12 @@ namespace Freelancing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Message")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiverId")
@@ -212,6 +220,50 @@ namespace Freelancing.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("Freelancing.DTOs.PortofolioProjectImageDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PreviousProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PortofolioProjectImageDTO");
+                });
+
+            modelBuilder.Entity("Freelancing.DTOs.UserSkillDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FreelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SkillName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserSkillDto");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Ban", b =>
@@ -241,81 +293,6 @@ namespace Freelancing.Migrations
                     b.HasIndex("BannedUserId");
 
                     b.ToTable("Bans");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.ToTable("Cities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CountryId = 1,
-                            Name = "Admin City",
-                            isDeleted = false
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CountryId = 2,
-                            Name = "temp City",
-                            isDeleted = false
-                        });
-                });
-
-            modelBuilder.Entity("Freelancing.Models.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Admin Country",
-                            isDeleted = false
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "temp Country",
-                            isDeleted = false
-                        });
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -1119,8 +1096,9 @@ namespace Freelancing.Migrations
                             Id = "1",
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
-                            CityId = 1,
-                            ConcurrencyStamp = "28a59b3e-f1f4-4a0b-a9cd-0ffe74c1871a",
+                            City = "Admin City",
+                            ConcurrencyStamp = "b4784e21-7671-49a3-9d72-11a128b96847",
+                            Country = "Admin Country",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
                             EmailConfirmed = true,
@@ -1128,11 +1106,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECglvTv4PUAZF+DgCyRK47Hdousm13+a46KzkktifTl3Sh2GElkdYjF/KAigaYdckg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENLotUSuVGOCjcJr+c9j5hjSky9UnAi1ZPo+Uu1vizFJMg2Q0bc3weTsB5UzHaJaiA==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 16, 0, 35, 7, 415, DateTimeKind.Local).AddTicks(9801),
-                            SecurityStamp = "42fc2d83-4b7c-40db-a8c6-51dc7fb24716",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 15, 19, 0, 20, 278, DateTimeKind.Local).AddTicks(5319),
+                            SecurityStamp = "83f1dca4-59ac-4152-895c-642b68450cca",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1212,16 +1190,6 @@ namespace Freelancing.Migrations
                     b.ToTable("fixedPriceProjects", (string)null);
                 });
 
-            modelBuilder.Entity("AppUser", b =>
-                {
-                    b.HasOne("Freelancing.Models.City", "City")
-                        .WithMany("Users")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("City");
-                });
-
             modelBuilder.Entity("Certificate", b =>
                 {
                     b.HasOne("Freelancing.Models.Freelancer", "Freelancer")
@@ -1261,17 +1229,6 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("BannedUser");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.City", b =>
-                {
-                    b.HasOne("Freelancing.Models.Country", "Country")
-                        .WithMany("Cities")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -1652,16 +1609,6 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Category", b =>
                 {
                     b.Navigation("Subcategories");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.City", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.Country", b =>
-                {
-                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("Freelancing.Models.PortofolioProject", b =>
