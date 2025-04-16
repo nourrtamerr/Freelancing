@@ -158,7 +158,7 @@ namespace Freelancing
 
 
 
-
+			builder.Services.AddLogging();
             builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 

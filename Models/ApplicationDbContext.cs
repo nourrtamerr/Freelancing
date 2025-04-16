@@ -50,7 +50,7 @@ namespace Freelancing.Models
 		public DbSet<UserSkill> UserSkills { get; set; }
 		public DbSet<ProjectSkill> ProjectSkills { get; set; }
 		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
-
+		public DbSet<MilestoneFile> MilestoneFiles { set; get; }
         public DbSet<UserConnection> UserConnections { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

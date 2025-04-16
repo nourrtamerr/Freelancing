@@ -10,7 +10,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StripeController(StripeSettings _stripesettings, ILogger _logger,IConfiguration configuration) : ControllerBase
+    public class StripeController(StripeSettings _stripesettings, ILogger<StripeController> _logger, IConfiguration configuration) : ControllerBase
     {
 		// method(DTO) 
 		// var baseUrl = $"{Request.Scheme}://{Request.Host}";
