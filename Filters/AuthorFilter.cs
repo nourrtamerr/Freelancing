@@ -22,10 +22,16 @@ namespace Freelancing.Filters
 
 				authorId = _context.Proposals.Find(id).FreelancerId;
 			}
-			else
+			else if (entityType.ToLower() == "BiddingProject".ToLower())
+            {
+
+                authorId = _context.biddingProjects.Find(id).ClientId;
+            }
+            else
 			{
 				authorId = null;
-			}
+			}			
+
 			var userid = context.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var user = userManager.FindByIdAsync(userid).GetAwaiter().GetResult();
 			if (user == null)
@@ -58,7 +64,12 @@ namespace Freelancing.Filters
 
 				authorId = _context.Proposals.Find(id).FreelancerId;
 			}
-			else
+            if (entityType.ToLower() == "BiddingProject".ToLower())
+            {
+
+                authorId = _context.biddingProjects.Find(id).ClientId;
+            }
+            else
 			{
 				authorId = null;
 			}

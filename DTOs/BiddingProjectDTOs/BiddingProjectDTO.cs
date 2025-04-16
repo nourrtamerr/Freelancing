@@ -1,4 +1,4 @@
-﻿namespace Freelancing.DTOs
+﻿namespace Freelancing.DTOs.BiddingProjectDTOs
 {
     public class BiddingProjectDTO //create & update
     {

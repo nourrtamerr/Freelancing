@@ -1,8 +1,8 @@
-﻿namespace Freelancing.DTOs
+﻿namespace Freelancing.DTOs.BiddingProjectDTOs
 {
-    public class BiddingProjectCreateDTO
+    public class BiddingProjectCreateUpdateDTO
     {
-        public string ClientId { get; set; }
+        //public string ClientId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
 
@@ -14,10 +14,13 @@
         public DateTime BiddingStartDate { get; set; }
         public DateTime BiddingEndDate { get; set; }
 
-        public List<string> projectSkills { get; set; }
         public string ExperienceLevel { get; set; }
 
         public int ExpectedDuration { get; set; }
-        public string SubCategoryName { get; set; }
+        //public List<string> ProjectSkills { get; set; }
+        //public string SubcategoryName { get; set; }
+
+        public List<int> ProjectSkillsIds { get; set; }
+        public int SubcategoryId { get; set; }
     }
 }

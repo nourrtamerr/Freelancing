@@ -1,6 +1,6 @@
-﻿namespace Freelancing.DTOs
+﻿namespace Freelancing.DTOs.BiddingProjectDTOs
 {
-    public class BiddingProjectGetAllDTO
+    public class BiddingProjectGetByIdDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -16,5 +16,14 @@
         public int ClientTotalNumberOfReviews { get; set; }
         public double ClientRating { get; set; }
 
+        public DateTime BiddingEndDate { get; set; }
+        public bool ClientIsverified { get; set; }
+        public string ClientCountry { get; set; }
+        public string ClientCity { get; set; }
+        public DateTime ClinetAccCreationDate { get; set; }
+
+        public string FreelancersubscriptionPlan { get; set; }
+        public int FreelancerTotalNumber { get; set; }
+        public int FreelancerRemainingNumberOfBids { get; set; } 
     }
 }
