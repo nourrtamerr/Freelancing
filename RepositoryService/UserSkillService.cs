@@ -49,13 +49,17 @@ namespace Freelancing.RepositoryService
 
         public async Task<UserSkill> UpdateUserSkillAsync(UserSkill userskill, string freelancerId)
         {
-            var existingUserSkill = await context.UserSkills.Include(s=>s.Skill).FirstOrDefaultAsync(u => u.id == userskill.id && u.FreelancerId == freelancerId && !u.IsDelete);
+            var existingUserSkill = await context.UserSkills.Include(s=>s.Skill).FirstOrDefaultAsync(u => u.Skill.Name == userskill.Skill.Name && u.FreelancerId == freelancerId && !u.IsDelete);
             if (existingUserSkill == null)
             {
                 return null;
             }
-            existingUserSkill.FreelancerId = userskill.FreelancerId;
+            //existingUserSkill.FreelancerId = userskill.FreelancerId;
             existingUserSkill.SkillId = userskill.SkillId;
+            if (existingUserSkill == null)
+            {
+                throw new Exception("Skill not found or does not belong to current freelancer.");
+            }
 
             await context.SaveChangesAsync();
             return existingUserSkill;

@@ -9,6 +9,7 @@ using Freelancing.DTOs;
 using Freelancing.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -21,9 +22,17 @@ namespace Freelancing.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserSkillDto>>> GetUserSkills()
         {
-            var freelancerId = User.Identity.Name;  // el freelancer el logged
+           //  var freelancerId = User.Identity.Name;
+
+           var freelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           
+            if (string.IsNullOrEmpty(freelancerId))
+            {
+                return Unauthorized("Freelancer ID not found in token.");
+            }
+
             var skills = await context.GetUserSkillByUserIdAsync(freelancerId);
-            //var skills =await context.GetAllUserSkillAsync();
+          //  var skills =await context.GetAllUserSkillAsync();
             if (skills == null || !skills.Any())
             {
                 return NotFound();
@@ -53,27 +62,7 @@ namespace Freelancing.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserSkill(int id, UserSkillDto userSkillDto)
         {
-            var freelancerId = User.Identity.Name;  // el freelancer el logged
-            //if (id != userSkillDto.Id)
-            //{
-            //    return BadRequest(); 
-            //}
-            //var userSkill = await context.GetUserSkillByIDAsync(id);
-            //if (userSkill== null)
-            //{
-            //    return BadRequest();
-            //}
-
-            //mapper.Map(userSkillDto, userSkill);
-
-            //try
-            //{
-            //    await context.UpdateUserSkillAsync(userSkill); 
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    return StatusCode(StatusCodes.Status500InternalServerError, "Database error occurred.");
-            //}
+            var freelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier);  // el freelancer el logged
 
             var userSkill = mapper.Map<UserSkill>(userSkillDto);
             userSkill.id = id;  // Ensure we pass the ID to the service method
@@ -84,10 +73,14 @@ namespace Freelancing.Controllers
                 return Unauthorized();  // User cannot update someone else's skill
             }
 
+            if (id != userSkillDto.Id)
+            {
+                return BadRequest("ID mismatch between route and body.");
+            }
+
+
             return Ok(updatedUserSkill);
 
-
-            return Ok(userSkillDto);
         }
 
         // POST: api/UserSkill

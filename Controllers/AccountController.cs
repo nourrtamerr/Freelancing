@@ -838,7 +838,9 @@ namespace Freelancing.Controllers
 				, claims, expires: expiry,
 				signingCredentials: signcred,
 				notBefore: DateTime.UtcNow);
-			return new JwtSecurityTokenHandler().WriteToken(token);
+            Console.WriteLine(" Token being generated for user: " + user.UserName);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 	}
 }

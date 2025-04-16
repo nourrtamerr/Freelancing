@@ -38,16 +38,16 @@ namespace Freelancing.Controllers
             return Ok(mapper.Map<UserSkillDto>(userSkill));
         }
 
-        [HttpPost]
-        public async Task<ActionResult<UserSkillDto>> CreateUserSkill([FromBody] UserSkillDto userSkillCreateDto)
-        {
-            if (userSkillCreateDto == null || !ModelState.IsValid)
-                return BadRequest(ModelState);
-            var userSkill = mapper.Map<UserSkill>(userSkillCreateDto);
-            var createdUserSkill = await skillService.CreateUserSkillAsync(userSkill);
-            var userSkillDto = mapper.Map<UserSkillDto>(createdUserSkill);
-            return CreatedAtAction(nameof(GetUserSkillById), new { id = userSkillDto.SkillId }, userSkillDto);
-        }
+        //[HttpPost]
+        //public async Task<ActionResult<UserSkillDto>> CreateUserSkill([FromBody] UserSkillDto userSkillCreateDto)
+        //{
+        //    if (userSkillCreateDto == null || !ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    var userSkill = mapper.Map<UserSkill>(userSkillCreateDto);
+        //    var createdUserSkill = await skillService.CreateUserSkillAsync(userSkill);
+        //    var userSkillDto = mapper.Map<UserSkillDto>(createdUserSkill);
+        //    return CreatedAtAction(nameof(GetUserSkillById), new { id = userSkillDto.SkillId }, userSkillDto);
+        //}
 
         //[HttpPut("{id}")]
         //public async Task<ActionResult<SkillDto>>  UpdateUserSkill(int id, [FromBody] UserSkillDto userSkillUpdateDto)

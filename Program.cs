@@ -95,21 +95,57 @@ namespace Freelancing
 			#region services
 
 			builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.MapType<IFormFile>(() => new OpenApiSchema
-                {
-                    Type = "string",
-                    Format = "binary"
-                });
-            });
-            builder.Services.AddControllers().AddJsonOptions(x =>
-    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            //builder.Services.AddSwaggerGen(c =>
+            //{
+            //    c.MapType<IFormFile>(() => new OpenApiSchema
+            //    {
+            //        Type = "string",
+            //        Format = "binary"
+            //    });
+            //});
+
 
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+
+                // Enable JWT Auth in Swagger
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter: Bearer {your JWT token}"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
             });
+
+
+
+
+            builder.Services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+            //builder.Services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            //});
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
 
 
