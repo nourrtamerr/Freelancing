@@ -146,8 +146,6 @@ namespace Freelancing.Models
 				.WithOne(ps => ps.Project)
 				.HasForeignKey(ps => ps.ProjectId)
 				.OnDelete(DeleteBehavior.Cascade);
-		}
-
 
 			modelBuilder.Entity<UserConnection>(entity =>
             {
@@ -156,7 +154,10 @@ namespace Freelancing.Models
                     .HasForeignKey(uc => uc.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
-        }
+		}
+
+
+        
 	    //public DbSet<Freelancing.DTOs.PortofolioProjectImageDTO> PortofolioProjectImageDTO { get; set; } = default!;
 	    //public DbSet<Freelancing.DTOs.UserSkillDto> UserSkillDto { get; set; } = default!;
 	}
