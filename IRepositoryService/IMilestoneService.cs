@@ -22,7 +22,12 @@ namespace Freelancing.IRepositoryService
 
         Task<bool> DeleteAsync(int id);
 
+        Task<List<string>> UploadFile(List<IFormFile> files, int MilestoneId);
 
+        Task<bool> RemoveFile(int FileId);
+
+
+        Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId);
 
 
     }

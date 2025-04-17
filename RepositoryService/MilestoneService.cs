@@ -2,6 +2,7 @@
 using Freelancing.DTOs.MilestoneDTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
@@ -52,16 +53,23 @@ namespace Freelancing.RepositoryService
 
         public async Task<MilestoneGetAllDTO> UpdateStatusAsync(int MilestoneId, int StatusId)
         {
-            var milestone = context.Milestones.FirstOrDefault(m => m.Id == MilestoneId);
+            var milestone = context.Milestones.Include(m=>m.Project).ThenInclude(p=>p.Freelancer).FirstOrDefault(m => m.Id == MilestoneId);
+            var freelancer = milestone.Project.Freelancer;
+
             if(milestone is not null)
             {
                 milestone.Status = (MilestoneStatus)StatusId;
-                await context.SaveChangesAsync();
+                if(milestone.Status== MilestoneStatus.Completed){
+                    freelancer.Balance += milestone.Amount;
+                }
 
+                await context.SaveChangesAsync();
                 var milestoneDto = mapper.Map<MilestoneGetAllDTO>(milestone);
                 return milestoneDto;
             }
             throw new Exception("Milestone is not found");
+
+
 
             //var ms = context.Milestones.SingleOrDefault(m => m.Id == milestone.Id);
             //if(ms is not null)
@@ -128,6 +136,44 @@ namespace Freelancing.RepositoryService
                 return mapper.Map<MilestoneGetAllDTO>(ms);
             }
             throw new Exception("Milestone is not found");
+        }
+
+
+        public async Task<List<string>> UploadFile(List<IFormFile> files, int MilestoneId)
+        {
+            List<string> FilesNames = new List<string>();
+            foreach (var file in files)
+            {
+                MilestoneFile mf = new MilestoneFile() { MilestoneId = MilestoneId, fileName = file.Save() };
+                context.MilestoneFiles.Add(mf);
+                FilesNames.Add(mf.fileName);
+            }
+            await context.SaveChangesAsync();
+            return FilesNames;
+        }
+
+
+        public async Task<bool> RemoveFile(int FileId)
+        {
+            var file = context.MilestoneFiles.FirstOrDefault(f => f.id == FileId);
+            if(file is not null)
+            {
+                context.MilestoneFiles.Remove(file);
+                await context.SaveChangesAsync();
+                SaveImage.Delete(file.fileName);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId)
+        {
+            var milestone =await context.Milestones.Include(m=>m.MilestoneFiles).FirstOrDefaultAsync(m => m.Id == MilsestoneId);
+            if(milestone is not null)
+            {
+                return milestone.MilestoneFiles.ToList();
+            }
+            throw new Exception("Milestone not found");
         }
     }
 }

@@ -121,7 +121,7 @@ namespace Freelancing.Controllers
         }
 
 
-        [HttpGet("ClientPayFromBalance")]
+        [HttpGet("ClientPayFromCard")]
         public async Task<IActionResult> ClientPayFromcard(int proposalId, [FromQuery]CardPaymentDTO card)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
