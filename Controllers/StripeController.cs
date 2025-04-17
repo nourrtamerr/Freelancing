@@ -6,11 +6,14 @@ using Stripe;
 using static Freelancing.Models.Stripe;
 using Stripe.Checkout;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Stripe.V2;
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StripeController(StripeSettings _stripesettings, ILogger<StripeController> _logger, IConfiguration configuration) : ControllerBase
+    public class StripeController(ApplicationDbContext _context,StripeSettings _stripesettings, ILogger<StripeController> _logger, IConfiguration configuration) : ControllerBase
     {
 		// method(DTO) 
 		// var baseUrl = $"{Request.Scheme}://{Request.Host}";
@@ -117,31 +120,42 @@ namespace Freelancing.Controllers
 				return BadRequest(new { error = e.StripeError.Message });
 			}
 		}
+		[Authorize]
 		[HttpGet("create-connected-account")]
-		public IActionResult CreateConnectedAccount(string freelancerEmail)
+		public IActionResult CreateConnectedAccount(string freelancerEmail,long amountInCents)
 		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userId);
+
+			if (freelancer == null)
+				return NotFound("Freelancer not found.");
+
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
-			var accountOptions = new AccountCreateOptions
+			var account = new AccountService().Create(new AccountCreateOptions
 			{
-				Type = "express", // Or "custom" if you want full control
+				Type = "express",
 				Country = "US",
-				Email = freelancerEmail,
+				Email = freelancer.Email,
 				Capabilities = new AccountCapabilitiesOptions
 				{
-					Transfers = new AccountCapabilitiesTransfersOptions
-					{
-						Requested = true
-					}
+					Transfers = new AccountCapabilitiesTransfersOptions { Requested = true }
 				}
-			};
+			});
 
-			var accountService = new AccountService();
-			var account = accountService.Create(accountOptions);
+			freelancer.StripeAccountId = account.Id;
+			_context.SaveChanges();
 
-			// Save this account.Id to your database linked with the freelancer
-			var url= Url.ActionLink("onboard-freelancer", "Stripe", new { accountId=account.Id });
-			return Redirect(url);
+			var link = new AccountLinkService().Create(new AccountLinkCreateOptions
+			{
+				Account = account.Id,
+				RefreshUrl = $"{Request.Scheme}://{Request.Host}/api/stripe/create-connected-account?amountInCents={amountInCents}",
+				ReturnUrl = $"{Request.Scheme}://{Request.Host}/api/stripe/onboarding-complete?accountId={account.Id}&amountInCents={amountInCents}",
+				Type = "account_onboarding"
+			});
+			return Ok(new { link.Url });
+
+			//return Redirect(link.Url);
 		}
 		[HttpGet("onboard-freelancer")]
 		public IActionResult OnboardFreelancer(string accountId)
@@ -162,32 +176,65 @@ namespace Freelancing.Controllers
 			return Ok(new { url = accountLink.Url });
 		}
 
+		[HttpGet("onboarding-complete")]
+		public IActionResult OnboardingComplete(string accountId, long amountInCents)
+		{
+			// User completed onboarding — now do the transfer
+			return RedirectToAction(nameof(TransferToFreelancer), new { connectedAccountId = accountId, amountInCents });
+		}
+
+		[Authorize]
 		[HttpGet("transfer-to-freelancer")]
 		public IActionResult TransferToFreelancer(string connectedAccountId, long amountInCents)
 		{
+			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userid);
+			if (freelancer == null || string.IsNullOrEmpty(freelancer.StripeAccountId))
+				return BadRequest("Freelancer is not onboarded yet.");
+
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
-			var accountService = new AccountService();
-			var account = accountService.Get(connectedAccountId);  // Make sure the account is ready and capable of receiving payouts
-
-			if (account.PayoutsEnabled)
+			var options = new PaymentIntentCreateOptions
 			{
-				var transferService = new TransferService();
-				var transfer = transferService.Create(new TransferCreateOptions
+				Amount = amountInCents,
+				Currency = "usd",
+				PaymentMethodTypes = new List<string> { "card" },
+				TransferData = new PaymentIntentTransferDataOptions
 				{
-					Amount = amountInCents, // e.g., 8000 = $80
-					Currency = "usd",
-					Destination = connectedAccountId,
-					Description = "Freelancer payment"
-				});
+					Destination = freelancer.StripeAccountId
+				},
+				ApplicationFeeAmount = amountInCents*(long)0.2,
+			};
 
-				return Ok(new { transferId = transfer.Id });
-			}
-			else
-			{
-				return BadRequest("Account is not fully onboarded or payouts are not enabled.");
-			}
+			var service = new PaymentIntentService();
+			var intent = service.Create(options);
+
+
+
+			//StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+
+			//var account = new AccountService().Get(connectedAccountId);
+			//if (!account.PayoutsEnabled)
+			//	return BadRequest("Account not ready for payouts.");
+
+			////var transfer = new TransferService().Create(new TransferCreateOptions
+			////{
+			////	Amount = amountInCents,
+			////	Currency = "usd",
+			////	Destination = connectedAccountId,
+			////	Description = "Freelancer payout"
+			////});
+			////fake test mode 
+
+			//string session_id= Guid.NewGuid().ToString();
+			var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.ClientSecret, amount = amountInCents / 1000 });
+			//// Redirect to frontend success page
+
+			return Redirect(url);
 		}
+
+
+
 		[HttpGet("cancel")]
 		[AllowAnonymous]
 		public IActionResult Cancel()

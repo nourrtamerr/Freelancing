@@ -127,7 +127,8 @@ namespace Freelancing.Models
 			};
 
 			modelBuilder.Entity<Admin>().HasData(admin);
-
+			
+			modelBuilder.Entity<SubscriptionPlan>().HasData(SubscriptionPlansHelper.SubscriptionPlans);
 
 			modelBuilder.Entity<MilestonePayment>()
 				.HasOne(mp => mp.Milestone)

@@ -7,6 +7,9 @@
 			public string SecretKey { get; set; }
 			public string PublishableKey { get; set; }
 		}
+
+
+
 		public class PaymentResponse
 		{
 			public string Url { get; set; }
