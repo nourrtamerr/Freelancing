@@ -1,5 +1,5 @@
 ﻿using Freelancing.DTOs.AuthDTOs;
-using Freelancing.Migrations;
+//using Freelancing.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -33,8 +33,8 @@ namespace Freelancing.Models
 		public DbSet<Milestone> Milestones { get; set; }
 		public DbSet<SuggestedMilestone> suggestedMilestones { get; set; }
 		public DbSet<Notification> Notifications { set; get; }
-
-		//public DbSet<Payment> Payments { get; set; }
+		[NotMapped]
+		public DbSet<Payment> Payments { get; set; }
 		public DbSet<MilestonePayment> MilestonePayments { get; set; }
 		public DbSet<SubscriptionPayment> SubscriptionPayments { get; set; }
 		public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
@@ -52,7 +52,9 @@ namespace Freelancing.Models
 		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 		public DbSet<MilestoneFile> MilestoneFiles { set; get; }
         public DbSet<UserConnection> UserConnections { get; set; }
-        public DbSet<FreelancerWithdrawals> FreelancerWithdrawals { get; set; }
+        public DbSet<Withdrawal> Withdrawals { get; set; }
+		public DbSet<ClientProposalPayment> ClientProposalPayments { set; get; }
+		public DbSet<AddingFunds> Funds { set; get; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -68,8 +70,13 @@ namespace Freelancing.Models
 
 			modelBuilder.Entity<BiddingProject>().ToTable("biddingProjects");
 			modelBuilder.Entity<FixedPriceProject>().ToTable("fixedPriceProjects");
+
 			modelBuilder.Entity<MilestonePayment>().ToTable("MilestonePayments");
 			modelBuilder.Entity<SubscriptionPayment>().ToTable("SubscriptionPayments");
+			modelBuilder.Entity<ClientProposalPayment>().ToTable("ClientProposalPayment");
+			modelBuilder.Entity<Withdrawal>().ToTable("Withdrawals");
+			modelBuilder.Entity<AddingFunds>().ToTable("Funds");
+
 			modelBuilder.Entity<Admin>().ToTable("Admins");
 			modelBuilder.Entity<Client>().ToTable("clients");
 			modelBuilder.Entity<Freelancer>().ToTable("freelancers");
