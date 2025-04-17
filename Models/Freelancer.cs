@@ -20,7 +20,7 @@ namespace Freelancing.Models
 		[ForeignKey("subscriptionPlan")]
 		public int? subscriptionPlanId { get; set; }
 		public virtual SubscriptionPlan? subscriptionPlan { get; set; }
-		public virtual List<FreelancerWithdrawals>  Withdrawals {set;get;}
+		public virtual List<Withdrawal>  Withdrawals {set;get;}
 		public int? RemainingNumberOfBids { get; set; } = 6;
 		[NotMapped]
 		public Rank Rank

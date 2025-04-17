@@ -52,8 +52,9 @@ namespace Freelancing.Models
 		public DbSet<UserSubscriptionPlanPayment> UserSubscriptionPlanPayments { get; set; }
 		public DbSet<MilestoneFile> MilestoneFiles { set; get; }
         public DbSet<UserConnection> UserConnections { get; set; }
-        public DbSet<FreelancerWithdrawals> FreelancerWithdrawals { get; set; }
+        public DbSet<Withdrawal> Withdrawals { get; set; }
 		public DbSet<ClientProposalPayment> ClientProposalPayments { set; get; }
+		public DbSet<AddingFunds> Funds { set; get; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -73,7 +74,8 @@ namespace Freelancing.Models
 			modelBuilder.Entity<MilestonePayment>().ToTable("MilestonePayments");
 			modelBuilder.Entity<SubscriptionPayment>().ToTable("SubscriptionPayments");
 			modelBuilder.Entity<ClientProposalPayment>().ToTable("ClientProposalPayment");
-			modelBuilder.Entity<FreelancerWithdrawals>().ToTable("FreelancerWithdrawals");
+			modelBuilder.Entity<Withdrawal>().ToTable("Withdrawals");
+			modelBuilder.Entity<AddingFunds>().ToTable("Funds");
 
 			modelBuilder.Entity<Admin>().ToTable("Admins");
 			modelBuilder.Entity<Client>().ToTable("clients");
