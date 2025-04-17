@@ -126,8 +126,8 @@ namespace Freelancing.Controllers
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userId);
-
-			if (freelancer == null)
+			var client = _context.clients.FirstOrDefault(f => f.Id == userId);
+			if (freelancer == null&&client==null)
 				return NotFound("Freelancer not found.");
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
@@ -136,15 +136,19 @@ namespace Freelancing.Controllers
 			{
 				Type = "express",
 				Country = "US",
-				Email = freelancer.Email,
+				Email = freelancer?.Email??client.Email,
 				Capabilities = new AccountCapabilitiesOptions
 				{
 					Transfers = new AccountCapabilitiesTransfersOptions { Requested = true }
 				}
 			});
-
+			if(freelancer is not null)
 			freelancer.StripeAccountId = account.Id;
-			_context.SaveChanges();
+			else
+			{
+				client.StripeAccountId = account.Id;
+			}
+				_context.SaveChanges();
 
 			var link = new AccountLinkService().Create(new AccountLinkCreateOptions
 			{
@@ -189,8 +193,11 @@ namespace Freelancing.Controllers
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userid);
+			var client = _context.clients.FirstOrDefault(f => f.Id == userid);
+
 			if (freelancer == null || string.IsNullOrEmpty(freelancer.StripeAccountId))
-				return BadRequest("Freelancer is not onboarded yet.");
+				if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
+				return BadRequest(" not onboarded yet.");
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
@@ -201,7 +208,7 @@ namespace Freelancing.Controllers
 				PaymentMethodTypes = new List<string> { "card" },
 				TransferData = new PaymentIntentTransferDataOptions
 				{
-					Destination = freelancer.StripeAccountId
+					Destination = freelancer?.StripeAccountId??client.StripeAccountId
 				},
 				ApplicationFeeAmount = amountInCents*(long)0.2,
 			};
