@@ -10,8 +10,6 @@ namespace Freelancing.Models
         [ForeignKey("subscriptionPlan")]
         public int? subscriptionPlanId { get; set; }
         public virtual SubscriptionPlan? subscriptionPlan { get; set; }
-
-
 		public int? RemainingNumberOfProjects { get; set; } = 6;
 
 		[NotMapped]
