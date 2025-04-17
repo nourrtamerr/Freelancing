@@ -22,12 +22,12 @@ namespace Freelancing.Migrations
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Description", "DurationInDays", "Price", "TotalNumber", "isDeleted", "name" },
+                columns: new[] { "Description", "DurationInDays", "Price", "TotalNumber", "isDeleted", "name" },
                 values: new object[,]
                 {
-                    { 1, "Basic access, limited bids/applications.", 30, 0m, 6, false, "Starter" },
-                    { 2, "More bids, priority support.", 60, 100m, 30, false, "Pro Freelancer" },
-                    { 3, "Maximum exposure, profile boosts.", 90, 200m, 60, false, "Elite" }
+                    {  "Basic access, limited bids/applications.", 30, 0m, 6, false, "Starter" },
+                    {  "More bids, priority support.", 60, 100m, 30, false, "Pro Freelancer" },
+                    {  "Maximum exposure, profile boosts.", 90, 200m, 60, false, "Elite" }
                 });
         }
 

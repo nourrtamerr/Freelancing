@@ -34,6 +34,7 @@ namespace Freelancing.Controllers
 				}
 				
 			}
+
 			#region withdrawal
 			//else
 			//{
@@ -50,6 +51,7 @@ namespace Freelancing.Controllers
 
 			//return Redirect(url3);
 			#endregion
+
 			var baseUrl = $"{Request.Scheme}://{Request.Host}";
 			var successUrl = $"{baseUrl}/api/FreelancerWithdrawal/success?session_id={{CHECKOUT_SESSION_ID}}&amount={money}";
 			var url = Url.ActionLink("CreateCheckoutSession", "Stripe", new { Amount = money.ToString(), redirectionurl = successUrl });
