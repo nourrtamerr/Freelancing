@@ -48,13 +48,13 @@ namespace Freelancing.Controllers
                             foreach(var milestone in proposal.suggestedMilestones)
                             {
                                 
-                                project.Milestones.Add(new Milestone { Title=milestone.Description, Description=milestone.Description, Amount=milestone.Amount, StartDate=DateTime.Now, EndDate= DateTime.Now.AddDays(milestone.Duration), ProjectId=project.Id, Status=MilestoneStatus.Pending});
-
+                                project.Milestones.Add(new Milestone { Title=milestone.Title, Description=milestone.Description, Amount=milestone.Amount, StartDate=DateTime.Now, EndDate= DateTime.Now.AddDays(milestone.Duration), ProjectId=project.Id, Status=MilestoneStatus.Pending});
+                                
                             }
                             return Ok(C);
                         }
                     }
-                    return BadRequest("Freelancer not found");
+                    return BadRequest("Proposal not found");
                 }
             }
             return BadRequest("Client not found");
