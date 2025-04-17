@@ -22,6 +22,9 @@ namespace Freelancing.Models
 		public virtual SubscriptionPlan? subscriptionPlan { get; set; }
 		public virtual List<Withdrawal>  Withdrawals {set;get;}
 		public int? RemainingNumberOfBids { get; set; } = 6;
+
+		public virtual List<NonRecommendedUserSkill> NonRecommendedUserSkills { get; set; }
+
 		[NotMapped]
 		public Rank Rank
 		{

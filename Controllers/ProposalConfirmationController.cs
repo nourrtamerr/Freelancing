@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.Models;
+using Humanizer;
+
 
 ////using Freelancing.Migrations;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +19,7 @@ namespace Freelancing.Controllers
     {
 
 
-        private string Pay(int proposalId, PaymentMethod method)
+        private string Pay(int proposalId, PaymentMethod method, string TransactionId)
         {
             var proposal = context.Proposals.Include(p=>p.suggestedMilestones).FirstOrDefault(p => p.Id == proposalId);
             var project = context.project.FirstOrDefault(p => p.Id == proposal.ProjectId);
@@ -36,7 +39,7 @@ namespace Freelancing.Controllers
                 context.ClientProposalPayments.Add(new()
                 {
                     Amount = Amount,
-                    TransactionId = Guid.NewGuid().ToString(),
+                    TransactionId = TransactionId,
                     PaymentMethod = method,
                     ProposalId = proposalId,
                     Date = DateTime.Now
@@ -109,7 +112,7 @@ namespace Freelancing.Controllers
                     //}
                     #endregion
 
-                    var url = Pay(proposalId, PaymentMethod.Balance);
+                    var url = Pay(proposalId, PaymentMethod.Balance, Guid.NewGuid().ToString());
                     return Redirect(url);
                 }
                 return BadRequest("proposal not found");
@@ -117,6 +120,38 @@ namespace Freelancing.Controllers
             return BadRequest("Client not found");
         }
 
+
+        [HttpGet("ClientPayFromBalance")]
+        public async Task<IActionResult> ClientPayFromcard(int proposalId, [FromQuery]CardPaymentDTO card)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
+            if (client == null)
+            {
+                return BadRequest("user not found");
+            }
+
+            if (client is Client C)
+            {
+
+                var proposal = context.Proposals.Include(p => p.suggestedMilestones).FirstOrDefault(p => p.Id == proposalId);
+
+                if (proposal is not null)
+                {
+                    var Amount = proposal.suggestedMilestones.Sum(m => m.Amount);
+                   
+                    var url = Pay(proposalId, PaymentMethod.CreditCard, card.Cardnumber + "," + card.cvv);
+                    return Redirect(url);
+                }
+                return BadRequest("proposal not found");
+            }
+            return BadRequest("Client not found");
+        }
 
 
 
@@ -204,7 +239,7 @@ namespace Freelancing.Controllers
                     #endregion
 
 
-                    var url = Pay(proposalId, PaymentMethod.Stripe);
+                    var url = Pay(proposalId, PaymentMethod.Stripe, session_id);
                     return Redirect(url);
                 }
                 return BadRequest("Proposal not found");
