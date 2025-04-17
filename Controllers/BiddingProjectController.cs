@@ -1,6 +1,7 @@
 ﻿using Freelancing.DTOs.BiddingProjectDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -34,7 +35,7 @@ namespace Freelancing.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
-            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, "FF3257D3-F476-45BE-996F-8357CDEB12A1");
+            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
         }
