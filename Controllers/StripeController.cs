@@ -57,6 +57,12 @@ namespace Freelancing.Controllers
 		Redirect (_configuration["AppSettings:AngularAppUrl"]/PaymentSuccess)
 		}
 		 */
+
+
+
+
+
+
 		[HttpGet("create-checkout-session")]
 		public ActionResult<Freelancing.Models.Stripe.PaymentResponse> CreateCheckoutSession(string Amount, string redirectionurl,bool payout=false)
 		{
@@ -120,6 +126,12 @@ namespace Freelancing.Controllers
 				return BadRequest(new { error = e.StripeError.Message });
 			}
 		}
+		
+		
+		
+
+
+		
 		[Authorize]
 		[HttpGet("create-connected-account")]
 		public IActionResult CreateConnectedAccount(string freelancerEmail,long amountInCents)
@@ -157,6 +169,13 @@ namespace Freelancing.Controllers
 
 			//return Redirect(link.Url);
 		}
+		
+		
+		
+
+
+
+		
 		[HttpGet("onboard-freelancer")]
 		public IActionResult OnboardFreelancer(string accountId)
 		{
@@ -176,6 +195,12 @@ namespace Freelancing.Controllers
 			return Ok(new { url = accountLink.Url });
 		}
 
+		
+		
+
+
+
+		
 		[HttpGet("onboarding-complete")]
 		public IActionResult OnboardingComplete(string accountId, long amountInCents)
 		{
@@ -183,6 +208,13 @@ namespace Freelancing.Controllers
 			return RedirectToAction(nameof(TransferToFreelancer), new { connectedAccountId = accountId, amountInCents });
 		}
 
+		
+		
+		
+
+
+
+		
 		[Authorize]
 		[HttpGet("transfer-to-freelancer")]
 		public IActionResult TransferToFreelancer(string connectedAccountId, long amountInCents)
@@ -232,6 +264,9 @@ namespace Freelancing.Controllers
 
 			return Redirect(url);
 		}
+
+
+
 
 
 
