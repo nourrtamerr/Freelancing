@@ -12,7 +12,11 @@ namespace Freelancing.Models
         public virtual SubscriptionPlan? subscriptionPlan { get; set; }
 		public int? RemainingNumberOfProjects { get; set; } = 6;
 
-		[NotMapped]
+        public decimal Balance { get; set; } = 0;
+        public string? StripeAccountId { set; get; }
+
+
+        [NotMapped]
 		public Rank Rank
 		{
 			get

@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250417161229_ClinetBalanceAndStripeAccId")]
+    partial class ClinetBalanceAndStripeAccId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -782,10 +785,6 @@ namespace Freelancing.Migrations
                     b.Property<int>("ProposalId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProposalId");
@@ -1211,7 +1210,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "f275dce7-1a27-416f-b51f-c8e2cfba28f5",
+                            ConcurrencyStamp = "db00cc72-5091-47f5-bb7d-ad332700adc7",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Email = "admin@example.com",
                             EmailConfirmed = true,
@@ -1219,11 +1218,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHEcmsxK9rW/jj5ky0nQBejt4MLK8SGyk2nsnQYzPp3lpluCN+g0xsGn8tNTwrxgCw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMtK9w4udOFxIugOuUkurWIBJSi2u47PmNBVUHiVUQyAH4GPYviT77/xl97OvlvOCQ==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 17, 19, 8, 27, 176, DateTimeKind.Local).AddTicks(6214),
-                            SecurityStamp = "8b3c8f59-3bfc-42fd-9d12-bbbff11d6ef7",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 17, 18, 12, 27, 268, DateTimeKind.Local).AddTicks(2974),
+                            SecurityStamp = "afb7e80b-61ad-46eb-84bb-ba6aa12f3c1e",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
