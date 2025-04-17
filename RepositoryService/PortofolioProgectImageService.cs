@@ -1,6 +1,6 @@
 ﻿using Freelancing.DTOs;
 using Freelancing.IRepositoryService;
-using Freelancing.Migrations;
+//using Freelancing.Migrations;
 using Freelancing.Models;
 
 namespace Freelancing.RepositoryService

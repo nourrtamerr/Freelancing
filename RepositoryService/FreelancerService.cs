@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.IRepositoryService;
-using Freelancing.Migrations;
+////using Freelancing.Migrations;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Freelancing.Migrations;
+////using Freelancing.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -51,6 +51,7 @@ namespace Freelancing.Controllers
                                 project.Milestones.Add(new Milestone { Title=milestone.Description, Description=milestone.Description, Amount=milestone.Amount, StartDate=DateTime.Now, EndDate= DateTime.Now.AddDays(milestone.Duration), ProjectId=project.Id, Status=MilestoneStatus.Pending});
 
                             }
+
                             return Ok(C);
                         }
                     }
