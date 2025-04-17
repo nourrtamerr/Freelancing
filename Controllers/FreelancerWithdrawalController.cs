@@ -32,7 +32,7 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					FreelancerId = userid,
 					TransactionId = dto.Cardnumber+","+dto.cvv,
-					PaymentMethod = PaymentMethod.Stripe
+					PaymentMethod = PaymentMethod.CreditCard
 				};
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(freelancer1);
@@ -51,7 +51,7 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					ClientId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
-					PaymentMethod = PaymentMethod.Stripe
+					PaymentMethod = PaymentMethod.CreditCard
 				};
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(client1);
