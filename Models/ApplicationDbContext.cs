@@ -55,6 +55,8 @@ namespace Freelancing.Models
         public DbSet<Withdrawal> Withdrawals { get; set; }
 		public DbSet<ClientProposalPayment> ClientProposalPayments { set; get; }
 		public DbSet<AddingFunds> Funds { set; get; }
+		public DbSet<NonRecommendedUserSkill> nonRecommendedUserSkills { set; get; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
