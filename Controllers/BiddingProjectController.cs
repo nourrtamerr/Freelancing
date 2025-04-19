@@ -18,10 +18,10 @@ namespace Freelancing.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
         {
 
-            return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync());
+            return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync(filters, pageNumber, PageSize));
         }
 
 
@@ -57,10 +57,10 @@ namespace Freelancing.Controllers
         }
 
 
-        [HttpPost("Filter")]
-        public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
-        {
-            return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
-        }
+        //[HttpPost("Filter")]
+        //public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
+        //{
+        //    return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
+        //}
     }
 }
