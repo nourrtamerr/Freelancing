@@ -8,6 +8,7 @@ namespace Freelancing.Models
 		public List<UserSkill> UserSkills { get; set; }
 		public bool isAvailable { get; set; } = true;
 		public decimal Balance { get; set; } = 0;
+		public string? StripeAccountId {set;get;}
 		//public string Description { set; get; }=string.Empty;
 		public Education Education { get; set; }
 		public List<Experience> Experiences { get; set; }
@@ -19,8 +20,11 @@ namespace Freelancing.Models
 		[ForeignKey("subscriptionPlan")]
 		public int? subscriptionPlanId { get; set; }
 		public virtual SubscriptionPlan? subscriptionPlan { get; set; }
-
+		public virtual List<Withdrawal>  Withdrawals {set;get;}
 		public int? RemainingNumberOfBids { get; set; } = 6;
+
+		public virtual List<NonRecommendedUserSkill> NonRecommendedUserSkills { get; set; }
+
 		[NotMapped]
 		public Rank Rank
 		{

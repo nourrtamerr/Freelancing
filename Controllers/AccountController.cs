@@ -831,7 +831,7 @@ namespace Freelancing.Controllers
 			}.Union(userClaims).Union(roleClaims);
 
 
-			var expiry = DateTime.UtcNow.AddMinutes(15);
+			var expiry = DateTime.UtcNow.AddHours(2);
 
 			var token =
 				new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]

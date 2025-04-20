@@ -1,6 +1,7 @@
-﻿using Freelancing.DTOs;
+﻿using Freelancing.DTOs.BiddingProjectDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -17,10 +18,10 @@ namespace Freelancing.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
         {
 
-            return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync());
+            return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync(filters, pageNumber, PageSize));
         }
 
 
@@ -32,10 +33,34 @@ namespace Freelancing.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(BiddingProjectCreateDTO p)
+        public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
-            return Ok(await _biddingProjectService.CreateBiddingProjectAsync(p));
+            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
         }
 
+
+        [HttpPut("/{id}")]
+        public async Task<IActionResult> Update(int id,[FromBody]BiddingProjectCreateUpdateDTO p)
+        {
+            var project = await _biddingProjectService.UpdateBiddingProjectAsync(p, id);
+
+            return Ok(new { project.ClientId, project.Subcategory.Name, p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList() });
+        }
+
+
+        [HttpDelete("/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            return Ok(await _biddingProjectService.DeleteBiddingProjectAsync(id));
+        }
+
+
+        //[HttpPost("Filter")]
+        //public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
+        //{
+        //    return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
+        //}
     }
 }

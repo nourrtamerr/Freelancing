@@ -1,5 +1,5 @@
 ﻿using Freelancing.IRepositoryService;
-using Freelancing.Migrations;
+//using Freelancing.Migrations;
 using Freelancing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

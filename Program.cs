@@ -9,6 +9,8 @@ using Freelancing.Filters;
 using Freelancing.SignalR;
 using Microsoft.OpenApi.Models;
 using Freelancing.Services;
+using Microsoft.Extensions.Options;
+using static Freelancing.Models.Stripe;
 
 
 namespace Freelancing
@@ -110,17 +112,20 @@ namespace Freelancing
 			#region services
 
 			builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddSwaggerGen(c =>
-            //{
-            //    c.MapType<IFormFile>(() => new OpenApiSchema
-            //    {
-            //        Type = "string",
-            //        Format = "binary"
-            //    });
-            //});
+			//builder.Services.AddSwaggerGen(c =>
+			//{
+			//    c.MapType<IFormFile>(() => new OpenApiSchema
+			//    {
+			//        Type = "string",
+			//        Format = "binary"
+			//    });
+			//});
+			builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+			builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<StripeSettings>>().Value);
+			builder.Services.AddHttpClient();
 
 
-            builder.Services.AddSwaggerGen(c =>
+			builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
 
@@ -153,7 +158,7 @@ namespace Freelancing
 
 
 
-
+			builder.Services.AddLogging();
             builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
@@ -166,6 +171,15 @@ namespace Freelancing
 
 
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
+            builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
+            builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
+            builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
+            builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+            builder.Services.AddScoped<IFixedProjectService, FixedProjectService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
+
+
 			builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
 			builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
 			builder.Services.AddScoped<INotificationRepositoryService, NotificationRepositoryService>();
