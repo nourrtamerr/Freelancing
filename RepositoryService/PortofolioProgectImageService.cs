@@ -11,7 +11,11 @@ namespace Freelancing.RepositoryService
         public async Task<List<PortofolioProjectImage>> GetByPortfolioProjectIdAsync(int id)
         {
             var project = context.PortofolioProjects.SingleOrDefault(p => p.Id == id);
-            var images =await context.PortofolioProjectImages.Where(i => i.PreviousProjectId == project.Id && !i.IsDeleted).ToListAsync();
+            if (project == null)
+            {
+                return null;
+            }
+                var images =await context.PortofolioProjectImages.Where(i => i.PreviousProjectId == project.Id && !i.IsDeleted).ToListAsync();
             return images;
         }
 
