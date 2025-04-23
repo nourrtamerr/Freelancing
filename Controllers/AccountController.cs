@@ -725,114 +725,115 @@ namespace Freelancing.Controllers
 			}
 		}
 
-		[HttpGet("External-login")]
-		[AllowAnonymous]
-		public IActionResult ExternalLogin(string provider, userRole? role=null, string returnUrl = null, string errorurl = null)
-		{
+        [HttpGet("External-login")]
+        [AllowAnonymous]
+        public IActionResult ExternalLogin(string provider, userRole role, string returnUrl = null, string errorurl = null)
+        {
+            // Validate role
+            if (!Enum.IsDefined(typeof(userRole), role))
+            {
+                return BadRequest("Invalid role specified.");
+            }
 
-			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl, role });
-			var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-			properties.Items["LoginProvider"] = provider;
-			return Challenge(properties, provider);
-		}
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl, role });
+            var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            properties.Items["LoginProvider"] = provider;
+            return Challenge(properties, provider);
+        }
 
-		[HttpGet("external-login-callback")]
-		[AllowAnonymous]
-		public async Task<IActionResult> ExternalLoginCallback(userRole? role=null, string returnUrl = null, string remoteError = null, string errorurl = null)
-		{
+        [HttpGet("external-login-callback")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(userRole role, string returnUrl = null, string remoteError = null, string errorurl = null)
+        {
+            // Validate role
+            if (!Enum.IsDefined(typeof(userRole), role))
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Invalid role specified.")}");
+            }
 
-			if (remoteError != null)
-			{
-				return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
+            if (remoteError != null)
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
+            }
+
+            var info = await _signinManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
+            }
+
+            // Allow only Google and Facebook providers
+            if (info.LoginProvider != "Google" && info.LoginProvider != "Facebook")
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Only Google and Facebook login are supported.")}");
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Redirect to registration page with query parameters
+                var registerUrl = $"{_configuration["AppSettings:AngularAppUrl"]}/register?fromExternalLogin=true&error={Uri.EscapeDataString("User not found. Please register to continue.")}";
+                return Redirect(registerUrl);
+            }
+
+            // Remove existing logins to ensure clean state
+            var existingLogins = await _userManager.GetLoginsAsync(user);
+            foreach (var login in existingLogins)
+            {
+                await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+            }
+
+            // Add the new external login
+            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+            if (!addLoginResult.Succeeded)
+            {
+                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Failed to add external login.")}");
+            }
+
+            // Handle role update
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var roleName = role.ToString();
+
+            if (!currentRoles.Contains(roleName))
+            {
+                // Remove existing roles
+                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                // Add new role
+                var addRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+                if (!addRoleResult.Succeeded)
+                {
+                    return Redirect($"{errorurl}?error={Uri.EscapeDataString("Failed to update role.")}");
+                }
+            }
+
+            // Refresh claims
+            await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));
+            await _signinManager.RefreshSignInAsync(user);
+
+            // Generate new token with updated claims
+            var token = await GenerateToken(user);
+
+            // Set cookie
+            Response.Cookies.Append("user_Token", token, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
+            return Redirect(returnUrl ?? "/home2/profile");
+        }
 
 
-
-			}
-
-			var info = await _signinManager.GetExternalLoginInfoAsync();
-			if (info == null)
-			{
-				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
-
-			}
-
-			var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-			var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-
-			if (string.IsNullOrEmpty(email))
-			{
-				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
-			}
-			var userbyname = await _userManager.FindByNameAsync(name);
-			var userbyemail = await _userManager.FindByEmailAsync(email);
-			if ((userbyname != null && userbyemail != null) && (userbyemail.UserName != userbyname.UserName || userbyname.Email != userbyemail.Email))
-			{
-				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email is already associated with another account.")}");
-			}
-			var user = userbyemail;
-			if (user == null)
-			{
-				if(role==null)
-				{
-					return Redirect($"{errorurl}?error={Uri.EscapeDataString("You need to choose a role before external register")}");
-				}
-				if (role == userRole.Client)
-				{
-					user = new Client
-					{
-						UserName = Regex.Replace(name, "[^a-zA-Z0-9]", ""),
-						Email = email,
-						firstname = name,
-						lastname = "",
-						CityId=2,
-						EmailConfirmed = true,
-						RefreshToken = JWTHelpers.CreateRefreshToken(),
-						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
-					};
-				}
-				else
-				{
-					user = new Freelancer
-					{
-						UserName = Regex.Replace(name, "[^a-zA-Z0-9]", ""),
-						Email = email,
-						firstname = name,
-						lastname = "",
-						CityId = 2,//TEMPCITY ID
-						EmailConfirmed = true,
-						RefreshToken = JWTHelpers.CreateRefreshToken(),
-						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
-						
-					};
-				}
-
-				var result = await _userManager.CreateAsync(user);
-				if (!result.Succeeded)
-				{
-					//return BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
-					var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
-					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
-
-				}
-				user.EmailConfirmed = true;
-				var result2 = await _userManager.UpdateAsync(user);
-				if (!result2.Succeeded)
-				{
-					var errorMessages = string.Join(", ", result2.Errors.Select(e => e.Description));
-					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
-
-				}
-				await _userManager.AddLoginAsync(user, info);
-			}
-			else
-			{
-				await _userManager.AddLoginAsync(user, info);
-			}
-			var token = await GenerateToken(user);
-			return Redirect($"{returnUrl}?token={token}");
-		}
-
-		private async Task<string> GenerateToken(AppUser user)
+        private async Task<string> GenerateToken(AppUser user)
 		{
 
 			var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
