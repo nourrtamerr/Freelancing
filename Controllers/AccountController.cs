@@ -72,7 +72,7 @@ namespace Freelancing.Controllers
 
 		private string GetPreviousPageLink(FilterationDTO dto)
 		{
-			if (dto.pageNum > 0)
+			if (dto.pageNum > 1)
 			{
 				var prevPageNum = dto.pageNum - 1;
 				return GeneratePageLink(prevPageNum, dto);
@@ -193,7 +193,7 @@ namespace Freelancing.Controllers
 			return Ok(userDtos);
 		}
 
-		[HttpGet]
+		[HttpGet("getUserIdentityPicture")]
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUserIdentityPicture(string userid)
 		{
@@ -204,7 +204,7 @@ namespace Freelancing.Controllers
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUsersRequestingVerifications()
 		{
-			var users = _userManager.Users.Where(u => u.NationalId != null&&!u.IsVerified).ToList();
+			var users = _userManager.Users.Include(u=>u.City).ThenInclude(c=>c.Country).Where(u => u.NationalId != null&&!u.IsVerified).ToList();
 			if (users.Count == 0)
 			{
 				return NotFound("No users are requesting verification");
@@ -296,7 +296,7 @@ namespace Freelancing.Controllers
 		}
 
 
-		[HttpPost("EditProfile")]
+		[HttpPut("EditProfile")]
 		[Authorize]
 		public async Task<IActionResult> editProfile(EditProfileDTO dto)
 		{
@@ -612,7 +612,7 @@ namespace Freelancing.Controllers
 				{
 					Subject = "Reset Password",
 					To = user.Email,
-					Body = "kitablah3lek"
+					Body = ResetPasswordLink
 				};
 				_emailSettings.SendEmail(email);
 				return Ok(new { Message= "Forgetpassword link was sent to your email"});
@@ -700,7 +700,8 @@ namespace Freelancing.Controllers
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
-				return Ok(new { message = "EmailConfirmed" });
+				var url = configuration["AppSettings:AngularAppUrl"] + "/EmailConfirmed";
+				return Redirect(url);
 
 
 			}
@@ -712,7 +713,7 @@ namespace Freelancing.Controllers
 
 		[HttpGet("External-login")]
 		[AllowAnonymous]
-		public IActionResult ExternalLogin(string provider, userRole role, string returnUrl = null, string errorurl = null)
+		public IActionResult ExternalLogin(string provider, userRole? role=null, string returnUrl = null, string errorurl = null)
 		{
 
 			var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl, role });
@@ -723,7 +724,7 @@ namespace Freelancing.Controllers
 
 		[HttpGet("external-login-callback")]
 		[AllowAnonymous]
-		public async Task<IActionResult> ExternalLoginCallback(userRole role, string returnUrl = null, string remoteError = null, string errorurl = null)
+		public async Task<IActionResult> ExternalLoginCallback(userRole? role=null, string returnUrl = null, string remoteError = null, string errorurl = null)
 		{
 
 			if (remoteError != null)
@@ -757,6 +758,10 @@ namespace Freelancing.Controllers
 			var user = userbyemail;
 			if (user == null)
 			{
+				if(role==null)
+				{
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString("You need to choose a role before external register")}");
+				}
 				if (role == userRole.Client)
 				{
 					user = new Client
@@ -766,7 +771,9 @@ namespace Freelancing.Controllers
 						firstname = name,
 						lastname = "",
 						CityId=2,
-						EmailConfirmed = true
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
 					};
 				}
 				else
@@ -778,7 +785,10 @@ namespace Freelancing.Controllers
 						firstname = name,
 						lastname = "",
 						CityId = 2,//TEMPCITY ID
-						EmailConfirmed = true
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+						
 					};
 				}
 
