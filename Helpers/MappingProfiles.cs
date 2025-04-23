@@ -100,9 +100,11 @@ namespace Freelancing.Helpers
                 {
                     dest.PaymentVerified = client.PaymentVerified;
                 }
-            });
+            })
+            .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name))
+            .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City.Country.Name));
 
-            CreateMap<Freelancer, ViewFreelancerPageDTO>()
+			CreateMap<Freelancer, ViewFreelancerPageDTO>()
                .ForMember(dest => dest.UserSkills, opt =>
                opt.MapFrom(src => src.UserSkills.Select(us => us.Skill.Name).ToList()))
                .ForMember(dest => dest.Languages, opt =>

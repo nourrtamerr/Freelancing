@@ -1,6 +1,6 @@
 ﻿namespace Freelancing.DTOs.AuthDTOs
 {
-	public class UsersViewDTO
+	public class ViewProfileDTO
 	{
 		public string Id { get; set; }
 		public string firstname { get; set; }
@@ -21,11 +21,4 @@
 		public bool? isAvailable { get; set; }
 		public bool? PaymentVerified { get; set; }
 	}
-	
-public enum Accountrole
-{
-	Freelancer,
-	Client,
-	Admin
-}
 }

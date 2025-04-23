@@ -9,7 +9,7 @@ namespace Freelancing.Models
 		public bool isAvailable { get; set; } = true;
 		public decimal Balance { get; set; } = 0;
 		public string? StripeAccountId {set;get;}
-		//public string Description { set; get; }=string.Empty;
+		public string? Description { set; get; } = string.Empty;
 		public Education Education { get; set; }
 		public List<Experience> Experiences { get; set; }
 		public List<FreelancerLanguage> Languages { get; set; }

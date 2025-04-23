@@ -193,6 +193,20 @@ namespace Freelancing.Controllers
 			return Ok(userDtos);
 		}
 
+
+		[HttpGet("MyProfile")]
+		[Authorize]
+		public async Task<IActionResult> MyProfile()
+		{
+			var user = await _userManager.Users.Include(u=>u.City).ThenInclude(c=>c.Country).FirstOrDefaultAsync(U=>U.Id==User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if (user is null)
+			{
+				return NotFound("No users found");
+			}
+			
+			return Ok(_mapper.Map<UsersViewDTO>(user));
+		}
+
 		[HttpGet("getUserIdentityPicture")]
 		[Authorize(Roles ="Admin")]
 		public async Task<IActionResult> getUserIdentityPicture(string userid)
