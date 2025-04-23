@@ -3,8 +3,11 @@ using Freelancing.DTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace Freelancing.RepositoryService
 {
@@ -24,25 +27,94 @@ namespace Freelancing.RepositoryService
 
 
 
-        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsync()
+            //var projects = (await _context.biddingProjects
+
+            //                             .Include(p => p.Proposals)
+            //                             .Include(p => p.ProjectSkills)
+            //                             .ThenInclude(ps => ps.Skill)
+            //                             .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+            //                             .Where(p => !p.IsDeleted)
+            //                             .ToListAsync())
+            //                             .Where(p => p.Status == projectStatus.Pending)
+            //                             .ToList();
+
+            //var projectsDTO = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
+            //return projectsDTO;
+        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsync(BiddingProjectFilterDTO filters, int pageNumber, int PageSize)
         {
 
-            var projects = (await _context.biddingProjects
 
-                                         .Include(p => p.Proposals)
-                                         .Include(p => p.ProjectSkills)
-                                         .ThenInclude(ps => ps.Skill)
-                                         .Include(b => b.Client).ThenInclude(c => c.Reviewed)
-                                         .Where(p => !p.IsDeleted)
-                                         .ToListAsync())
-                                         .Where(p => p.Status == projectStatus.Pending)
-                                         .ToList();
+            var query = _context.biddingProjects.Include(b => b.Subcategory)
+                                                .ThenInclude(s => s.Category)
+                                                .Include(b => b.ProjectSkills)
+                                                .ThenInclude(ps => ps.Skill)
+                                                .Include(b => b.Proposals)
+                                                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+                                                .Where(b => !b.IsDeleted ).AsQueryable();
 
-            var projectsDTO = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
+            if (filters.minPrice > 0)
+            {
+                query = query.Where(q => q.minimumPrice == filters.minPrice);
+            }
+            if (filters.maxPrice > 0)
+            {
+                query = query.Where(b => b.maximumprice == filters.maxPrice);
+            }
+            if (filters.Currency is { Count: > 0 })
+            {
+                query = query.Where(b => filters.Currency.Contains((int)b.currency));
+            }
+            if (filters.Category is { Count: > 0 })
+            {
+                query = query.Where(b => filters.Category.Contains(b.Subcategory.Category.Id));
+            }
+            if (filters.SubCategory is { Count: > 0 })
+            {
+                query = query.Where(b => filters.SubCategory.Contains(b.SubcategoryId));
+            }
+            if (filters.Skills is { Count: > 0 })
+            {
+                query = query.Where(b => b.ProjectSkills.Any(ps => filters.Skills.Contains(ps.SkillId)));
+            }
+            if (filters.ExperienceLevel is { Count: > 0 })
+            {
+                query = query.Where(b => filters.ExperienceLevel.Contains((int)b.experienceLevel));
+            }
+            if (filters.MinNumOfProposals > 0)
+            {
+                query = query.Where(b => b.Proposals.Count() >= filters.MinNumOfProposals);
+            }
+            if (filters.MaxNumOfProposals > 0)
+            {
+                query = query.Where(b => b.Proposals.Count() <= filters.MaxNumOfProposals);
+            }
+            if (filters.ClientCountry is { Count: > 0 })
+            {
+                query = query.Where(b => filters.ClientCountry.Contains(b.Client.City.CountryId));
+            }
+            if (filters.MinExpectedDuration > 0)
+            {
+                query = query.Where(b => b.ExpectedDuration >= filters.MinExpectedDuration);
+            }
+            if (filters.MaxExpectedDuration > 0)
+            {
+                query = query.Where(b => b.ExpectedDuration <= filters.MaxExpectedDuration);
+            }
+            var result = await query.ToListAsync();
 
-            //foreach (var dto in projectsDTO)
+            var filterdto = _mapper.Map<List<BiddingProjectGetAllDTO>>(result);
+
+
+            //foreach (var (dto, entity) in filterdto.Zip(result, (dto, entity) => (dto, entity)))
             //{
-            //    var original = projects.FirstOrDefault(p => p.Id == dto.Id);
+            //    var reviews = entity.Client?.Reviewed?.ToList();
+            //    dto.ClientRating = (reviews != null && reviews.Any()) ? reviews.Average(r => r.Rating) : 0;
+            //}
+
+
+            //foreach (var dto in filterdto)
+            //{
+            //    var original = query.FirstOrDefault(p => p.Id == dto.Id);
 
             //    var clientReviews = await _context.Reviews.Where(r => r.RevieweeId == original.ClientId).ToListAsync();
 
@@ -54,7 +126,7 @@ namespace Freelancing.RepositoryService
 
             //}
 
-            return projectsDTO;
+            return filterdto.Skip((pageNumber - 1) * PageSize).Take(PageSize).ToList();
 
         }
 
@@ -68,6 +140,7 @@ namespace Freelancing.RepositoryService
                                         .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
                                         .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                                         .Include(b=>b.Freelancer).ThenInclude(f=>f.subscriptionPlan)
+                                        .Include(b=>b.Client.City).ThenInclude(c=>c.Country)
                                         .FirstOrDefaultAsync(b => b.Id == id);
 
             var projectDto = _mapper.Map<BiddingProjectGetByIdDTO>(project);
@@ -180,89 +253,89 @@ namespace Freelancing.RepositoryService
         //----------------------------------------------------------------------------------------------------
 
 
-        public async Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO filters, int pageNumber, int PageSize)
-        {
+        //public async Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO filters, int pageNumber, int PageSize)
+        //{
 
 
-            var query = _context.biddingProjects.Include(b=>b.Subcategory)
-                                                .ThenInclude(s=>s.Category)
-                                                .Include(b=>b.ProjectSkills)
-                                                .ThenInclude(ps=>ps.Skill)
-                                                .Include(b=>b.Proposals)
-                                                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
-                                                .Where(b => !b.IsDeleted).AsQueryable();
+        //    var query = _context.biddingProjects.Include(b=>b.Subcategory)
+        //                                        .ThenInclude(s=>s.Category)
+        //                                        .Include(b=>b.ProjectSkills)
+        //                                        .ThenInclude(ps=>ps.Skill)
+        //                                        .Include(b=>b.Proposals)
+        //                                        .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+        //                                        .Where(b => !b.IsDeleted).AsQueryable();
 
-            if (filters.minPrice > 0)
-            {
-                query = query.Where(q => q.minimumPrice == filters.minPrice);
-            }
+        //    if (filters.minPrice > 0)
+        //    {
+        //        query = query.Where(q => q.minimumPrice == filters.minPrice);
+        //    }
 
-            if (filters.maxPrice > 0)
-            {
-                query = query.Where(b => b.maximumprice == filters.maxPrice);
-            }
+        //    if (filters.maxPrice > 0)
+        //    {
+        //        query = query.Where(b => b.maximumprice == filters.maxPrice);
+        //    }
 
-            if(filters.Currency is { Count: > 0 })
-            {
-                query = query.Where(b => filters.Currency.Contains((int)b.currency));
-            }
+        //    if(filters.Currency is { Count: > 0 })
+        //    {
+        //        query = query.Where(b => filters.Currency.Contains((int)b.currency));
+        //    }
 
-            if(filters.Category is { Count: > 0 })
-            {
-                query = query.Where(b => filters.Category.Contains(b.Subcategory.Category.Id));
-            }
+        //    if(filters.Category is { Count: > 0 })
+        //    {
+        //        query = query.Where(b => filters.Category.Contains(b.Subcategory.Category.Id));
+        //    }
 
-            if(filters.SubCategory is { Count: > 0 })
-            {
-                query = query.Where(b => filters.SubCategory.Contains(b.SubcategoryId));
-            }
+        //    if(filters.SubCategory is { Count: > 0 })
+        //    {
+        //        query = query.Where(b => filters.SubCategory.Contains(b.SubcategoryId));
+        //    }
 
-            if(filters.Skills is { Count: > 0 })
-            {
-                query = query.Where(b=>b.ProjectSkills.Any(ps=>filters.Skills.Contains(ps.SkillId)));
-            }
+        //    if(filters.Skills is { Count: > 0 })
+        //    {
+        //        query = query.Where(b=>b.ProjectSkills.Any(ps=>filters.Skills.Contains(ps.SkillId)));
+        //    }
 
-            if(filters.ExperienceLevel is { Count: > 0 })
-            {
-                query = query.Where(b => filters.ExperienceLevel.Contains((int)b.experienceLevel));
-            }
+        //    if(filters.ExperienceLevel is { Count: > 0 })
+        //    {
+        //        query = query.Where(b => filters.ExperienceLevel.Contains((int)b.experienceLevel));
+        //    }
 
-            if (filters.MinNumOfProposals > 0)
-            {
-                query = query.Where(b => b.Proposals.Count() >= filters.MinNumOfProposals);
-            }
+        //    if (filters.MinNumOfProposals > 0)
+        //    {
+        //        query = query.Where(b => b.Proposals.Count() >= filters.MinNumOfProposals);
+        //    }
 
-            if(filters.MaxNumOfProposals > 0)
-            {
-                query = query.Where(b => b.Proposals.Count() <= filters.MaxNumOfProposals);
+        //    if(filters.MaxNumOfProposals > 0)
+        //    {
+        //        query = query.Where(b => b.Proposals.Count() <= filters.MaxNumOfProposals);
 
-            }
+        //    }
 
-            if(filters.ClientCountry is { Count: > 0 })
-            {
-                query = query.Where(b => filters.ClientCountry.Contains(b.Client.City.CountryId));
-            }
+        //    if(filters.ClientCountry is { Count: > 0 })
+        //    {
+        //        query = query.Where(b => filters.ClientCountry.Contains(b.Client.City.CountryId));
+        //    }
 
-            if (filters.MinExpectedDuration > 0)
-            {
-                query = query.Where(b => b.ExpectedDuration >= filters.MinExpectedDuration);
-            }
+        //    if (filters.MinExpectedDuration > 0)
+        //    {
+        //        query = query.Where(b => b.ExpectedDuration >= filters.MinExpectedDuration);
+        //    }
 
-            if (filters.MaxExpectedDuration > 0)
-            {
-                query = query.Where(b => b.ExpectedDuration <= filters.MaxExpectedDuration);
-            }
+        //    if (filters.MaxExpectedDuration > 0)
+        //    {
+        //        query = query.Where(b => b.ExpectedDuration <= filters.MaxExpectedDuration);
+        //    }
 
-            var result = await query.ToListAsync();
+        //    var result = await query.ToListAsync();
 
-            var filterdto = _mapper.Map<List<BiddingProjectGetAllDTO>>(result);
-
-
+        //    var filterdto = _mapper.Map<List<BiddingProjectGetAllDTO>>(result);
 
 
-            return filterdto.Skip((pageNumber-1)*PageSize).Take(PageSize).ToList();
 
-        }
+
+        //    return filterdto.Skip((pageNumber-1)*PageSize).Take(PageSize).ToList();
+
+        //}
         //foreach (var dto in filterdto)
         //{
         //    var original = query.FirstOrDefault(p => p.Id == dto.Id);

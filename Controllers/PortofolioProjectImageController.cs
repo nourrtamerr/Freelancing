@@ -9,6 +9,7 @@ using Freelancing.DTOs;
 using Freelancing.Models;
 using AutoMapper;
 using Microsoft.CodeAnalysis;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Freelancing.Controllers
 {
@@ -17,12 +18,12 @@ namespace Freelancing.Controllers
     public class PortofolioProjectImageController(IPortofolioProjectImage context, IMapper mapper, IPortofolioProject projectRepository) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetImageByProjectId(int id)
+        public async Task<IActionResult> GetImageByProjectId(int previousProjectId)
         {
-            var images = await context.GetByPortfolioProjectIdAsync(id);
+            var images = await context.GetByPortfolioProjectIdAsync(previousProjectId);
             if (images == null)
             {
-                return NotFound($"Image with ID {id} not found.");
+                return NotFound($"Image with Pervious Project {previousProjectId} is not found.");
             }
 
             var dto = mapper.Map<List<PortofolioProjectImageDTO>>(images);
@@ -71,28 +72,18 @@ namespace Freelancing.Controllers
         }
 
 
-
-        // POST: api/PortofolioProjectImage
-        //[HttpPost]
-        //public async Task<ActionResult<PortofolioProjectImageDTO>> AddImage(PortofolioProjectImageDTO portofolioProjectImageDTO)
-        //{
-        //    var addedImage = await context.AddAsync(portofolioProjectImageDTO);
-
-
-        //    return CreatedAtAction("GetImageById", new { id = addedImage.Id }, addedImage);
-
-        //}
-
         // DELETE: api/PortofolioProjectImage/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePortofolioProjectImage(int id)
         {
             var portofolioProjectImageDTO = await context.DeleteAsync(id);
-            if (portofolioProjectImageDTO == null)
+            if (!portofolioProjectImageDTO)
             {
-                return NotFound();
+                return BadRequest(new { msg = $"Unable to find or delete image with ID {id}" });
             }
-            return NoContent();
+
+
+            return Ok(new { msg = "Image marked as deleted successfully" });
         }
 
     }
