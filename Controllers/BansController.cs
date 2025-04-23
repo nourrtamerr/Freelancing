@@ -113,15 +113,15 @@ namespace Freelancing.Controllers
 
 
         [HttpGet("banned-users")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<UsersViewDTO>>> GetBannedUsers()
+        //[Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<BanDto>>> GetBannedUsers()
         {
             var bannedUsers = await banService.GetBannedUsersAsync();
-            if (bannedUsers == null || !bannedUsers.Any())
+            if (bannedUsers.Count()==0)
             {
                 return NotFound("No banned users found.");
             }
-            var bannedUserDtos = mapper.Map<List<UsersViewDTO>>(bannedUsers);
+            var bannedUserDtos = mapper.Map<List<BanDto>>(bannedUsers);
             return Ok(bannedUserDtos);
         }
     }
