@@ -37,7 +37,18 @@ namespace Freelancing.Controllers
 			return Ok(await _freelancersmanager.GetAllAsync());
 		}
 
-
+		[HttpGet("ToggleAvailability")]
+		[Authorize(Roles ="Freelancer")]
+		public async Task<IActionResult> ToggleAvailability()
+		{
+			var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if(user is Freelancer x)
+			{
+				x.isAvailable = !x.isAvailable;
+				await _userManager.UpdateAsync(x);
+			}
+			return Ok();
+		}
 		[HttpGet("FilteredFreeAgents")]
 		public async Task<IActionResult> getAllFreelancersFiltered([FromQuery]FreelancerFilterationDTO dto)
 		{
@@ -260,7 +271,7 @@ namespace Freelancing.Controllers
 					UserId= admin.Id
 				});
 			}
-			return Ok("Pending Verification");
+			return Ok(new { Message = "Pending Verification" });
 		}
 		[HttpPost("ManageVerificationRequest")]
 		[Authorize(Roles ="Admin")]
@@ -309,10 +320,15 @@ namespace Freelancing.Controllers
 			return Ok(new { User.Identity.IsAuthenticated, UserName = User.FindFirstValue(ClaimTypes.Name) });
 		}
 
-
+		[HttpPost("Testingformdata")]
+		public IActionResult Test([FromForm] string test)
+		{
+			int x = 5;
+			return Ok("Success");
+		}
 		[HttpPut("EditProfile")]
 		[Authorize]
-		public async Task<IActionResult> editProfile(EditProfileDTO dto)
+		public async Task<IActionResult> editProfile([FromForm]EditProfileDTO dto)
 		{
 			var newuser = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -337,6 +353,10 @@ namespace Freelancing.Controllers
 					SaveImage.Delete(newuser.ProfilePicture);
 				}
 				newuser.ProfilePicture = dto.ProfilePicture.Save();
+			}
+			if(dto.Description is not null)
+			{
+				newuser.Description=dto.Description;
 			}
 			result = await _userManager.UpdateAsync(newuser);
 			if (!result.Succeeded)
@@ -866,5 +886,10 @@ namespace Freelancing.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
 		}
+	}
+
+	public class TestDto
+	{
+		public string? Test { get; set; }
 	}
 }

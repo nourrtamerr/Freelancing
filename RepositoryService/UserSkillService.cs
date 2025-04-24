@@ -20,7 +20,7 @@ namespace Freelancing.RepositoryService
 
             await context.SaveChangesAsync();
 
-            return NewUserSkill;
+            return await GetUserSkillByIDAsync(NewUserSkill.id);
         }
 
         public async Task<bool> DeleteUserSkillAsync(int id, string freelancerId)

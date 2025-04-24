@@ -11,6 +11,7 @@
 		public string? ProfilePicture { get; set; }
 		public string City { get; set; }
 		public string Country { get; set; }
+		public string? NationalId { get; set; }
 		public DateOnly DateOfBirth { get; set; }
 		public string Description { get; set; }
 		public Accountrole role { get; set; }
