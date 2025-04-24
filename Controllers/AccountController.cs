@@ -612,66 +612,87 @@ namespace Freelancing.Controllers
 			var token = await GenerateToken(user);
 			return Ok(new { token, user.RefreshToken });
 		}
-		[Route("ForgotPassword")]
-		[HttpPost]
-		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO dto,string reseturl)
-		{
-			var user = await _userManager.FindByEmailAsync(dto.Email); //hat el user bt3 el email da
-			if (user is not null)
-			{
-				var Token = await _userManager.GeneratePasswordResetTokenAsync(user);
-				var ResetPasswordLink = Url.Action("ResetPassword", "Account", new { email = user.Email, token = Token,reseturl= reseturl }, Request.Scheme); //Account/ResetPassword/userEmail  ,, Request.Scheme: protocol+host https://localhost5012
+        [Route("ForgotPassword")]
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO dto, string reseturl)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user is not null)
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var encodedToken = WebUtility.UrlEncode(token);
 
-				var email = new Email2()
-				{
-					Subject = "Reset Password",
-					To = user.Email,
-					Body = ResetPasswordLink
-				};
-				_emailSettings.SendEmail(email);
-				return Ok(new { Message= "Forgetpassword link was sent to your email"});
-			}
-			else
-				return BadRequest("Email is invalid");
-		}
-		[Route("ResetPassword")]
-		[HttpGet]
-		public async Task<IActionResult> ResetPasswordPage(string Email, string token,string reseturl)
-		{
-			return Redirect($"{reseturl}?token={token}&email={Email}");
-		}
+                var resetPasswordLink = Url.Action("ResetPassword", "Account", new
+                {
+                    email = user.Email,
+                    token = encodedToken,
+                    reseturl = reseturl
+                }, Request.Scheme);
 
-		[Route("ResetPassword")]
-		[HttpPost]
-		public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
-		{
-			
-				var user = await _userManager.FindByEmailAsync(dto.Email);
-				var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+                var email = new Email2()
+                {
+                    Subject = "Reset Password",
+                    To = user.Email,
+                    Body = resetPasswordLink
+                };
 
-				if (result.Succeeded)
-				{
-				return Ok(new { Message = "Password changes successfully" });
-				}
-			foreach (var error in result.Errors)
-				ModelState.AddModelError("", error.Description);
-			var validationErrors = ModelState
-				.Where(ms => ms.Value.Errors.Count > 0)  // Only include fields with errors
-				.ToDictionary(
-					kv => kv.Key, // Field name
-					kv => kv.Value.Errors.Select(e => new { errorMessage = e.ErrorMessage }).ToList() // List of error messages
-				);
+                _emailSettings.SendEmail(email);
+                return Ok(new { Message = "Forget password link was sent to your email" });
+            }
+            else
+            {
+                return BadRequest("Email is invalid");
+            }
+        }
 
-			var errorResponse = new
-			{
-				title = "One or more validation errors occurred.",
-				status = 400,
-				errors = validationErrors,
-			};
-			return BadRequest(errorResponse);
-		}
+        [Route("ResetPassword")]
+        [HttpGet]
+        public IActionResult ResetPasswordPage(string email, string token, string reseturl)
+        {
+            return Redirect($"{reseturl}?token={token}&email={email}");
+        }
 
-		[HttpGet("ResendEmailConfirmation")]
+        [Route("ResetPassword")]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Invalid user." });
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok(new { Message = "Password changed successfully" });
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            var validationErrors = ModelState
+                .Where(ms => ms.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kv => kv.Key,
+                    kv => kv.Value.Errors.Select(e => new { errorMessage = e.ErrorMessage }).ToList()
+                );
+
+            var errorResponse = new
+            {
+                title = "One or more validation errors occurred.",
+                status = 400,
+                errors = validationErrors,
+            };
+
+            return BadRequest(errorResponse);
+        }
+        [HttpGet("ResendEmailConfirmation")]
+
+
+
 		public async Task<IActionResult> ResendEmailConfirmation(string emailToBeCONFIRMED)
 		{
 			var newuser = await _userManager.FindByEmailAsync(emailToBeCONFIRMED);
@@ -724,17 +745,10 @@ namespace Freelancing.Controllers
 				return BadRequest(new { message = "Email confirmation failed." });
 			}
 		}
-
         [HttpGet("External-login")]
         [AllowAnonymous]
-        public IActionResult ExternalLogin(string provider, userRole role, string returnUrl = null, string errorurl = null)
+        public IActionResult ExternalLogin(string provider, userRole? role = null, string returnUrl = null, string errorurl = null)
         {
-            // Validate role
-            if (!Enum.IsDefined(typeof(userRole), role))
-            {
-                return BadRequest("Invalid role specified.");
-            }
-
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, errorurl, role });
             var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             properties.Items["LoginProvider"] = provider;
@@ -743,14 +757,8 @@ namespace Freelancing.Controllers
 
         [HttpGet("external-login-callback")]
         [AllowAnonymous]
-        public async Task<IActionResult> ExternalLoginCallback(userRole role, string returnUrl = null, string remoteError = null, string errorurl = null)
+        public async Task<IActionResult> ExternalLoginCallback(userRole? role = null, string returnUrl = null, string remoteError = null, string errorurl = null)
         {
-            // Validate role
-            if (!Enum.IsDefined(typeof(userRole), role))
-            {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Invalid role specified.")}");
-            }
-
             if (remoteError != null)
             {
                 return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
@@ -762,7 +770,6 @@ namespace Freelancing.Controllers
                 return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
             }
 
-            // Allow only Google and Facebook providers
             if (info.LoginProvider != "Google" && info.LoginProvider != "Facebook")
             {
                 return Redirect($"{errorurl}?error={Uri.EscapeDataString("Only Google and Facebook login are supported.")}");
@@ -775,14 +782,16 @@ namespace Freelancing.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(email);
+
+            // If user not found, redirect to registration page with role
             if (user == null)
             {
-                // Redirect to registration page with query parameters
-                var registerUrl = $"{_configuration["AppSettings:AngularAppUrl"]}/register?fromExternalLogin=true&error={Uri.EscapeDataString("User not found. Please register to continue.")}";
-                return Redirect(registerUrl);
+             
+                // Redirect to Angular registration page
+             return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
             }
 
-            // Remove existing logins to ensure clean state
+            // Remove existing logins (clean state)
             var existingLogins = await _userManager.GetLoginsAsync(user);
             foreach (var login in existingLogins)
             {
@@ -796,28 +805,13 @@ namespace Freelancing.Controllers
                 return Redirect($"{errorurl}?error={Uri.EscapeDataString("Failed to add external login.")}");
             }
 
-            // Handle role update
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            var roleName = role.ToString();
-
-            if (!currentRoles.Contains(roleName))
-            {
-                // Remove existing roles
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-                // Add new role
-                var addRoleResult = await _userManager.AddToRoleAsync(user, roleName);
-                if (!addRoleResult.Succeeded)
-                {
-                    return Redirect($"{errorurl}?error={Uri.EscapeDataString("Failed to update role.")}");
-                }
-            }
+           
 
             // Refresh claims
             await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));
             await _signinManager.RefreshSignInAsync(user);
 
-            // Generate new token with updated claims
+            // Generate token
             var token = await GenerateToken(user);
 
             // Set cookie
@@ -831,7 +825,6 @@ namespace Freelancing.Controllers
 
             return Redirect(returnUrl ?? "/home2/profile");
         }
-
 
         private async Task<string> GenerateToken(AppUser user)
 		{
