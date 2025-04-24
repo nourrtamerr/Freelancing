@@ -67,13 +67,13 @@ namespace Freelancing.RepositoryService
 
         }
 
-        public Task<List<AppUser>> GetBannedUsersAsync()
+        public async Task<List<Ban>> GetBannedUsersAsync()
         {
             var currentDate = DateTime.UtcNow;
-            return _context.Bans.Include(b => b.BannedUser)
-                .Where(b => b.BanDate <= currentDate &&
-                       b.BanEndDate >= currentDate)
-                .Select(b => b.BannedUser)
+            return await _context.Bans.Include(b => b.BannedUser)
+                //.Where(b => b.BanDate <= currentDate &&
+                //       b.BanEndDate >= currentDate)
+                //.Select(b => b.BannedUser)
                 .ToListAsync();
         }
 

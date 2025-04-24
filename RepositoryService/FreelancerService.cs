@@ -23,7 +23,7 @@ namespace Freelancing.RepositoryService
        
 		public async Task<List<ViewFreelancersDTO>> GetAllFiltered(FreelancerFilterationDTO dto)
 		{
-			var freelancers =  context.freelancers.Include(f => f.UserSkills).ThenInclude(S => S.Skill)
+			var freelancers =  context.freelancers.Include(f=>f.NonRecommendedUserSkills).Include(f => f.UserSkills).ThenInclude(S => S.Skill)
 				.Include(f => f.Languages).Include(c=>c.City).ThenInclude(c=>c.Country).Include(f=>f.Reviewed).Include(f=>f.subscriptionPlan).Where(f => !f.isDeleted);
 			if (dto.CountryIDs is { Count: > 0 })
 			{
@@ -68,7 +68,7 @@ namespace Freelancing.RepositoryService
 			dto.numofpages = dto.pagesize > 0
 	                            ? (int)Math.Ceiling((double)freelancerslist.Count() / dto.pagesize)
 	                            : 0;
-			List<ViewFreelancersDTO> freelancerdtos = _mapper.Map<List<ViewFreelancersDTO>>((freelancerslist.Skip(dto.pageNum*dto.pagesize).Take(dto.pagesize)));
+			List<ViewFreelancersDTO> freelancerdtos = _mapper.Map<List<ViewFreelancersDTO>>((freelancerslist.Skip((dto.pageNum-1)*dto.pagesize).Take(dto.pagesize)));
 			
 			return freelancerdtos;
 		}
@@ -106,7 +106,7 @@ namespace Freelancing.RepositoryService
         public async Task<List<ViewFreelancersDTO>> GetAllAsync()
         {
 
-            var freelancers= await context.freelancers.Include(c => c.City).ThenInclude(c => c.Country).Include(f=>f.UserSkills).ThenInclude(S=>S.Skill).Where(f=>!f.isDeleted).ToListAsync();
+            var freelancers= await context.freelancers.Include(f=>f.NonRecommendedUserSkills).Include(c => c.City).ThenInclude(c => c.Country).Include(f=>f.UserSkills).ThenInclude(S=>S.Skill).Where(f=>!f.isDeleted).ToListAsync();
             List<ViewFreelancersDTO> freelancerdtos = new();
             foreach(var freelancer in freelancers)
 			{

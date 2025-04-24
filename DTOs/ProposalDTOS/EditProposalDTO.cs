@@ -10,7 +10,7 @@ namespace Freelancing.DTOs.ProposalDTOS
 		public decimal? Price => type == projectType.bidding ? this.suggestedMilestones.Sum(x => x.Amount) : null;
 		[NotMapped]
 		public int SuggestedDuration => this.suggestedMilestones.Sum(x => x.Duration); //in days
-		public List<CreateProposalSuggestedMilestoneDTO> suggestedMilestones { get; set; }
+		public List<UpdateProposalSuggestedMilestoneDTO> suggestedMilestones { get; set; }
 		public projectType type { set; get; }
 	}
 }

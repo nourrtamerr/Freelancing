@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423154031_freelancerdescription")]
+    partial class freelancerdescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,9 +45,6 @@ namespace Freelancing.Migrations
 
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -1181,20 +1181,19 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "701ab99f-3adf-4fa6-a5f3-7a3b14d20eee",
+                            ConcurrencyStamp = "c8a044e4-b342-496c-be03-b27f5772703b",
                             DateOfBirth = new DateOnly(1, 1, 1),
-                            Description = "",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             IsVerified = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE8suFD6ihhRZCxGGe6DC2RAx9S0qXxD9H0ILEdymSdczHQZU2PWnC7Py41zq7omXQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJczzlGWLt3BbmlKZYAymXzujq1CRf1l0P1TFHqyLBn35h9d1GYKXTguQ+NmOB9DEA==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 23, 23, 41, 7, 514, DateTimeKind.Local).AddTicks(6381),
-                            SecurityStamp = "46d2c703-ed80-4370-95a8-e479017bfe02",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 23, 17, 40, 29, 509, DateTimeKind.Local).AddTicks(5300),
+                            SecurityStamp = "9be57ae2-82d5-4541-b4b2-4523e40e5f73",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1233,6 +1232,9 @@ namespace Freelancing.Migrations
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("RemainingNumberOfBids")
                         .HasColumnType("int");

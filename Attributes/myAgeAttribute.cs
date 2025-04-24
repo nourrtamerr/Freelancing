@@ -4,6 +4,10 @@ namespace Freelancing.Attributes
 {
 	public class myAgeAttribute:ValidationAttribute //new
 	{
+		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+		{
+			return base.IsValid(value, validationContext);
+		}
 		public override bool IsValid(object? value)
 		{
 

@@ -85,10 +85,13 @@ namespace Freelancing.Controllers
 
         // POST: api/UserSkill
         [HttpPost]
+        [Authorize(Roles ="Freelancer")]
         public async Task<ActionResult<UserSkillDto>> AddUserSkill(UserSkillDto userSkillDto)
         { 
             var userSkill = mapper.Map<UserSkill>(userSkillDto);
-            var NewUserSkill = await context.CreateUserSkillAsync(userSkill);
+            userSkill.FreelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            userSkill.SkillId = userSkillDto.Id;
+			var NewUserSkill = await context.CreateUserSkillAsync(userSkill);
             var NewUserSkillDto = mapper.Map<UserSkillDto>(NewUserSkill);
 
             return CreatedAtAction("GetUserSkillById", new { id = NewUserSkillDto.Id }, NewUserSkillDto);
@@ -106,7 +109,7 @@ namespace Freelancing.Controllers
 
             //await context.DeleteUserSkillAsync(id);
 
-            var freelancerId = User.Identity.Name;  
+            var freelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier);  
             var isDeleted = await context.DeleteUserSkillAsync(id, freelancerId);
 
             if (!isDeleted)

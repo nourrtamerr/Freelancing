@@ -91,7 +91,7 @@ namespace Freelancing.Controllers
 
         // PUT api/<ProposalController>/5
         [HttpPut("{id}")]
-		[Authorize(Roles ="Freelancer")]
+		[Authorize(Roles = "Freelancer")]
 		[ServiceFilter(typeof(AuthorFilter))]
 		public async Task<IActionResult> Update(int id,[FromBody]EditProposalDTO dto)
         {

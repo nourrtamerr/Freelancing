@@ -7,7 +7,7 @@ namespace Freelancing.DTOs.AuthDTOs
 	{
 		public string firstname { get; set; }
 		public string lastname { get; set; }
-		public string City { set; get; }
+		public int CityId { set; get; }
 
 		public string UserName { set; get; }
 		[MaxLength(500)]
