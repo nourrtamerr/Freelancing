@@ -58,14 +58,14 @@ namespace Freelancing.Controllers
 
             var image = new PortofolioProjectImage
             {
-                Image = "/images/" + fileName,
+                Image =  fileName,
                 //PreviousProjectId = request.ProjectId
             };
 
             await context.AddAsync(new PortofolioProjectImageDTO
             {
                 Image = image.Image,
-                PreviousProjectId = image.PreviousProjectId
+                PreviousProjectId = request.ProjectId
             });
 
             return Ok(image);

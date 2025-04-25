@@ -14,6 +14,7 @@ namespace Freelancing.Models
 		public List<Experience> Experiences { get; set; }
 		public List<FreelancerLanguage> Languages { get; set; }
 		public List<PortofolioProject> Portofolio { get; set; }
+
 		//public bool IsDeleted { get; set; } = false;
 
 

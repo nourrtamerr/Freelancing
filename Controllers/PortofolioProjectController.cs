@@ -10,6 +10,8 @@ using Freelancing.Models;
 using AutoMapper;
 
 using System.Threading.Channels;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Freelancing.Controllers
 {
@@ -39,8 +41,28 @@ namespace Freelancing.Controllers
             return Ok(DTO);
         }
 
-        // GET: api/PortofolioProject/5
-        [HttpGet("{id}")]
+		[HttpGet("MyPortofolioProjects")]
+		public async Task<IActionResult> GetmyPortofolioProjects()
+		{
+			var p = await portofolioProjectContext.GetByFreelancerId(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if (p == null)
+			{
+				return NotFound();
+			}
+			var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
+			return Ok(DTO.Select(p=> new
+            {
+                p.Id,
+                p.Description,
+                p.FreelancerId,
+                p.Title,
+                p.CreatedAt,
+                Images=p.Images.Select(i => new {i.Image,i.Id,i.PreviousProjectId})
+			}));
+		}
+
+		// GET: api/PortofolioProject/5
+		[HttpGet("{id}")]
         public async Task<IActionResult> GetPortofolioProjecBytId(int id)
         {
             var p = await portofolioProjectContext.GetByIdAsync(id);
@@ -57,12 +79,13 @@ namespace Freelancing.Controllers
         // PUT: api/PortofolioProject/5
         //needs update bs kman shwaya
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] PortofolioProjectDTO portofolioProjectDTO)
+        [Authorize(Roles ="Freelancer")]
+        public async Task<IActionResult> Update(int id, [FromBody] TempModel portofolioProjectDTO)
         {
-            if (id != portofolioProjectDTO.Id)
-            {
-                return BadRequest();
-            }
+            //if (id != portofolioProjectDTO.Id)
+            //{
+            //    return BadRequest();
+            //}
 
             //find the project
             var existingProject = await portofolioProjectContext.GetByIdAsync(id);
@@ -81,7 +104,14 @@ namespace Freelancing.Controllers
             mapper.Map<PortofolioProjectDTO>(existingProject);
 
             //update it
-            var updatedProject = await portofolioProjectContext.UpdateAsync(portofolioProjectDTO);
+            var updatedProject = await portofolioProjectContext.UpdateAsync(new PortofolioProjectDTO()
+            {
+                CreatedAt= portofolioProjectDTO.CreatedAt,
+                Description= portofolioProjectDTO.Description,
+                Title= portofolioProjectDTO.Title,
+                Id=id,
+                FreelancerId=User.FindFirstValue(ClaimTypes.NameIdentifier)
+			});
 
             //to be sent back to respone as dto
             var updatedDTO = mapper.Map<PortofolioProjectDTO>(updatedProject);
@@ -93,13 +123,14 @@ namespace Freelancing.Controllers
 
         //  POST: api/PortofolioProject
         [HttpPost]
-        public async Task<ActionResult<PortofolioProjectDTO>> Create(PortofolioProjectDTO portofolioProjectDTO)
+        [Authorize(Roles ="Freelancer")]
+        public async Task<ActionResult<PortofolioProjectDTO>> Create([FromForm] CreatePortfolioProjectDTO portofolioProjectDTO)
         {
-            var createdProject = await portofolioProjectContext.AddAsync(portofolioProjectDTO);
+            var createdProject = await portofolioProjectContext.AddAsync(portofolioProjectDTO,User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             var dto = mapper.Map<PortofolioProjectDTO>(createdProject);
 
-            return CreatedAtAction("GetPortofolioProjectDTO", new { id = dto.Id }, dto);
+            return Ok(new {Message="Created"});
         }
 
         // DELETE: api/PortofolioProject/5
@@ -116,4 +147,11 @@ namespace Freelancing.Controllers
         }
 
     }
+
+	public class TempModel
+	{
+		public string Title { get; set; }
+		public string Description { get; set; }
+		public DateTime CreatedAt { get; set; }
+	}
 }
