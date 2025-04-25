@@ -51,7 +51,7 @@ namespace Freelancing.RepositoryService
 		{
             var exp = await _context.Experiences
                 .Include(e => e.Freelancer)
-				.Where(e => e.Freelancer.UserName == username)
+				.Where(e => e.Freelancer.UserName == username&&!e.isDeleted)
 				.OrderByDescending(e => e.StartDate)
                 .ToListAsync();
             return exp;            

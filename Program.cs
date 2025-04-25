@@ -243,7 +243,11 @@ namespace Freelancing
 				FileProvider = new PhysicalFileProvider(uploadsPath),
 				RequestPath = "/files"
 			}); //enabling wwwroot with the localhost/files url 
-
+			app.UseStaticFiles(new StaticFileOptions
+			{
+				FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")),
+				RequestPath = "/projectimages"
+			});
 
 			using (var scope = app.Services.CreateScope())//seeding roles and a user
 			{

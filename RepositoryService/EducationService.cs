@@ -5,6 +5,13 @@ namespace Freelancing.RepositoryService
     {
         public async Task<bool> AddEducation(Education education)
         {
+            if(_context.Educations.Any(e=>e.FreelancerId==education.FreelancerId))
+            {
+                var duplicate = await _context.Educations.FirstOrDefaultAsync(e => e.FreelancerId == education.FreelancerId);
+                _context.Educations.Remove(duplicate);
+                await _context.SaveChangesAsync();
+
+			}
             await _context.Educations.AddAsync(education);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -42,7 +49,7 @@ namespace Freelancing.RepositoryService
         {
             var educations =await _context.Educations
                 .Include(c => c.Freelancer) 
-                .Where(c=>c.Freelancer.UserName == username)
+                .Where(c=>c.Freelancer.UserName == username&&!c.IsDeleted)
                 .ToListAsync();
             if (educations.Count == 0)
             {

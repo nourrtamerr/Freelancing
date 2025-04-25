@@ -95,6 +95,9 @@ namespace Freelancing.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -1181,7 +1184,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "701ab99f-3adf-4fa6-a5f3-7a3b14d20eee",
+                            ConcurrencyStamp = "65952636-9d35-416e-a4a7-f2123d251fcb",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1190,11 +1193,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE8suFD6ihhRZCxGGe6DC2RAx9S0qXxD9H0ILEdymSdczHQZU2PWnC7Py41zq7omXQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAHxQqGHENGksaUnJbi3qOBm/IVQF49UKBdx6Tg8mZKCXuwxy+wZg1U3mgyD6YXYhQ==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 23, 23, 41, 7, 514, DateTimeKind.Local).AddTicks(6381),
-                            SecurityStamp = "46d2c703-ed80-4370-95a8-e479017bfe02",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 24, 23, 54, 57, 793, DateTimeKind.Local).AddTicks(6489),
+                            SecurityStamp = "57a0d203-4eb7-4ec2-b25c-abdb658aae8e",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",

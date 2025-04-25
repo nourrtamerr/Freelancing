@@ -755,7 +755,7 @@ namespace Freelancing.Controllers
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
-				var url = configuration["AppSettings:AngularAppUrl"] + "/EmailConfirmed";
+				var url = configuration["AppSettings:AngularAppUrl"] + "/home?pleaseLogin";
 				return Redirect(url);
 
 
