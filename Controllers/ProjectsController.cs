@@ -5,7 +5,14 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectsController : ControllerBase
+    public class ProjectsController(IProjectService context) : ControllerBase
     {
+        [HttpGet]
+        public async Task<ActionResult<List<Project>>> GetAllProjects()
+        {
+            var projects = await context.GetAllProjectsAsync();
+            return Ok(projects);
+
+        }
     }
 }
