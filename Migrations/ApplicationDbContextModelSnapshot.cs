@@ -43,6 +43,9 @@ namespace Freelancing.Migrations
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -90,6 +93,9 @@ namespace Freelancing.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -164,6 +170,10 @@ namespace Freelancing.Migrations
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1178,19 +1188,20 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "3c78089f-d7e4-4e05-bf9e-b82d1a1de373",
+                            ConcurrencyStamp = "7fd0153b-c5f0-4047-a5ce-7a6730036db7",
                             DateOfBirth = new DateOnly(1, 1, 1),
+                            Description = "",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             IsVerified = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECSjevHPE/SdOLxC1FKQQoktgnxJLPirsNQxI/Ey2tqsG0QAp2RuaRhsnykw+dbLkg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFSu7YkhhdIZsYM9UDmQITQP0lwSp1eckh3c3B1VKYjuoN+P73IGFHrdiebY7kM+Yw==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 18, 0, 24, 25, 557, DateTimeKind.Local).AddTicks(5303),
-                            SecurityStamp = "defe2304-2681-468c-85d1-ac957d40273f",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 25, 18, 58, 38, 298, DateTimeKind.Local).AddTicks(9932),
+                            SecurityStamp = "12204e35-6065-4ee9-9855-6c2ff7118320",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",

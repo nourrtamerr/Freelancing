@@ -43,7 +43,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllExperiencesByFreelancerUserName( string username)
         {
             var experienceslist = await _experienceService.GetExperienceByFreelancerUserName(username);
-            if (experienceslist == null || !experienceslist.Any())
+            if (experienceslist == null )
             {
                 return NotFound(new { msg = "No experiences found." });
             }

@@ -11,9 +11,10 @@ namespace Freelancing.IRepositoryService
 
         Task<List<PortofolioProject>> GetByFreelancerId(string id);
 
-        Task<PortofolioProject> AddAsync(PortofolioProjectDTO portofolioProject);
+        Task<PortofolioProject> AddAsync(CreatePortfolioProjectDTO portofolioProject, string freelancerid);
 
-        Task<PortofolioProject> UpdateAsync(PortofolioProjectDTO portofolioProject);
+
+		Task<PortofolioProject> UpdateAsync(PortofolioProjectDTO portofolioProject);
 
         Task<bool> DeleteAsync(int id);
     }

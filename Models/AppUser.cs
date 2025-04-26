@@ -8,6 +8,9 @@ public abstract class AppUser :IdentityUser
 	public DateOnly AccountCreationDate { set; get; }
 	public string firstname { get; set; }
 	public string lastname { get; set; }
+	public string? Title { set; get; }
+	public string? Description { set; get; } = string.Empty;
+
 	public DateOnly DateOfBirth { get; set; }
 	[ForeignKey("City")]
 	public int? CityId { set; get; }

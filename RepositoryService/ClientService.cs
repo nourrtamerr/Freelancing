@@ -47,7 +47,7 @@ namespace Freelancing.RepositoryService
 			dto.numofpages = dto.pagesize > 0
 								? (int)Math.Ceiling((double)Clientsslist.Count() / dto.pagesize)
 								: 0;
-			List<ViewClientDTO> clientsdtos = _mapper.Map<List<ViewClientDTO>>((Clientsslist.Skip(dto.pageNum * dto.pagesize).Take(dto.pagesize)));
+			List<ViewClientDTO> clientsdtos = _mapper.Map<List<ViewClientDTO>>((Clientsslist.Skip((dto.pageNum-1) * dto.pagesize).Take(dto.pagesize)));
 
 			return clientsdtos;
 		}
