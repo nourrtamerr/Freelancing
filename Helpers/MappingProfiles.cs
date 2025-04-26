@@ -211,6 +211,9 @@ namespace Freelancing.Helpers
                     ? src.Client.Reviewed.Average(r => r.Rating)
                     : 0))
 
+                .ForMember(dest => dest.ClientCountry, opt => opt.MapFrom(src => src.Client.City.Country.Name))
+                .ForMember(dest => dest.NumOfBids, opt => opt.MapFrom(src => src.Proposals.Count()))
+                .ForMember(dest=>dest.ClientIsVerified, opt=>opt.MapFrom(src=>src.Client.IsVerified))
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom(src => src.Client.Reviewed.Average(r => r.Rating)))
                 ;
 
@@ -324,7 +327,8 @@ namespace Freelancing.Helpers
               //.ForMember(dest => dest.SubcategoryId, opt => opt.Ignore()) 
               //.ForMember(dest => dest.Subcategory, opt => opt.Ignore())
               //.ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
-              .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => Enum.Parse<ExperienceLevel>(src.ExperienceLevel)))
+              .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => (ExperienceLevel)src.ExperienceLevel))
+              .ForMember(dest => dest.currency, opt => opt.MapFrom(src => (Currency)src.currency))
               .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
               .ForMember(dest => dest.ProjectSkills, opt => opt.MapFrom(src => src.ProjectSkillsIds.Select(ps => new ProjectSkill() { SkillId = ps })))
                 .ForMember(dest => dest.SubcategoryId, opt => opt.MapFrom(src => src.SubcategoryId));

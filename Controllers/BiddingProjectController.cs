@@ -17,8 +17,8 @@ namespace Freelancing.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
+        [HttpPost("Filter")]
+        public async Task<IActionResult> GetAll([FromBody]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
         {
 
             return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync(filters, pageNumber, PageSize));
@@ -35,22 +35,22 @@ namespace Freelancing.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
-            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, "63d89bb1-7a13-4e02-bf19-14701398e3a1" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
 
-            return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
+            return Ok(new { project.ClientId, project.FreelancerId, project.Id });
         }
 
 
-        [HttpPut("/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id,[FromBody]BiddingProjectCreateUpdateDTO p)
         {
             var project = await _biddingProjectService.UpdateBiddingProjectAsync(p, id);
 
-            return Ok(new { project.ClientId, project.Subcategory.Name, p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList() });
+            return Ok(new { project.ClientId, project.FreelancerId, project.Id });
         }
 
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             return Ok(await _biddingProjectService.DeleteBiddingProjectAsync(id));
@@ -60,7 +60,7 @@ namespace Freelancing.Controllers
         //[HttpPost("Filter")]
         //public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
         //{
-        //    return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
+        //    return Ok(await _biddingProjectService.Filter(pdto, PageNumber, PageSize));
         //}
     }
 }

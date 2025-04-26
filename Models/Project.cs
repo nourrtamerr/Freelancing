@@ -53,18 +53,18 @@ public abstract class Project
 	public bool IsDeleted { get; set; } = false;
 }
 
+public enum projectStatus
+{
+	Pending,
+	Working,
+	Completed
+}
 
 public enum ExperienceLevel
 {
 	Entry,
 	Intermediate,
 	Expert
-}
-public enum projectStatus
-{
-	Pending,
-	Working,
-	Completed
 }
 public enum Currency
 {

@@ -3,6 +3,7 @@ using Freelancing.DTOs.MilestoneDTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
@@ -126,7 +127,7 @@ namespace Freelancing.RepositoryService
             
         }
 
-        public async Task<MilestoneGetAllDTO> UpdateAsync(MilestoneGetByIdOrProjectIdDTO milestone)
+        public async Task<MilestoneGetAllDTO> UpdateAsync(MilestoneCreateDTO milestone)
         {
             var ms = context.Milestones.FirstOrDefault(m => m.Id == milestone.Id);
             if (ms is not null)
@@ -139,6 +140,7 @@ namespace Freelancing.RepositoryService
         }
 
 
+        //[HttpPost]
         public async Task<List<string>> UploadFile(List<IFormFile> files, int MilestoneId)
         {
             List<string> FilesNames = new List<string>();

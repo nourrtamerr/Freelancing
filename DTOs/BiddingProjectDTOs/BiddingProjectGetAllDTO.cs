@@ -9,12 +9,16 @@
         public int BidAveragePrice { get; set; } //average
         public int minimumPrice { get; set; }
         public int maximumprice { get; set; }
-        public Currency currency { set; get; }
-        public ExperienceLevel experienceLevel { get; set; }
+        public string currency { set; get; }
+        public string experienceLevel { get; set; }
         public List<string> ProjectSkills { get; set; } = new List<string>();
         public int? PostedFrom { get; set; }
         public int ClientTotalNumberOfReviews { get; set; }
         public double ClientRating { get; set; }
+        public string ClientCountry { get; set; }
+        public int NumOfBids { get; set; }
+        public bool ClientIsVerified { get; set; }
+        public int ExpectedDuration { get; set; }
 
     }
 }
