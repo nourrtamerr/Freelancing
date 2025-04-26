@@ -11,11 +11,15 @@ namespace Freelancing.Controllers
     public class BiddingProjectController : ControllerBase
     {
         private readonly IBiddingProjectService _biddingProjectService;
+		private readonly UserManager<AppUser> _userManager;
 
-        public BiddingProjectController(IBiddingProjectService biddingProjectService)
+
+		public BiddingProjectController(IBiddingProjectService biddingProjectService,UserManager<AppUser>  userManager)
         {
             _biddingProjectService = biddingProjectService;
-        }
+            _userManager = userManager;
+
+		}
 
 
         [HttpPost("Filter")]
@@ -61,11 +65,14 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber, [FromQuery] int PageSize)
         {
             userRole role;
-            if (User.GetType() == typeof(Client))
+            var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var currentuser = await _userManager.FindByIdAsync(userid);
+            if (currentuser.GetType() == typeof(Client))
             {
                 role = userRole.Client;
             }
-            else if (User.GetType() == typeof(Freelancer))
+            else if (currentuser.GetType() == typeof(Freelancer))
             {
                 role = userRole.Freelancer;
             }
