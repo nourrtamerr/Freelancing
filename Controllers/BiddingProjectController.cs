@@ -1,4 +1,5 @@
-﻿using Freelancing.DTOs.BiddingProjectDTOs;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.DTOs.BiddingProjectDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -55,6 +56,27 @@ namespace Freelancing.Controllers
         {
             return Ok(await _biddingProjectService.DeleteBiddingProjectAsync(id));
         }
+
+        [HttpGet("GetMyBiddingProjects")]
+        public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber, [FromQuery] int PageSize)
+        {
+            userRole role;
+            if (User.GetType() == typeof(Client))
+            {
+                role = userRole.Client;
+            }
+            else if (User.GetType() == typeof(Freelancer))
+            {
+                role = userRole.Freelancer;
+            }
+            else
+            {
+                throw new Exception("User is not a client or freelancer");
+            }
+
+            return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));
+        }
+
 
 
         //[HttpPost("Filter")]
