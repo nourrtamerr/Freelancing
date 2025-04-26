@@ -28,7 +28,7 @@ namespace Freelancing.RepositoryService
         {
            var certificates = await context.certificates
                 .Include(c=>c.Freelancer)
-                .Where(c=>c.Freelancer.UserName == username)
+                .Where(c=>c.Freelancer.UserName == username && !c.IsDeleted)
                 .ToListAsync();
             return certificates;
         }

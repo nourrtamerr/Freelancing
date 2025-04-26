@@ -14,5 +14,12 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
-    }
+		[HttpGet]
+		public async Task<ActionResult<List<Project>>> GetMyProjects()
+		{
+			var projects = await context.GetAllProjectsAsync();
+			return Ok(projects);
+
+		}
+	}
 }
