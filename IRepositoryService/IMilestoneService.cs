@@ -18,14 +18,13 @@ namespace Freelancing.IRepositoryService
         Task<MilestoneGetAllDTO> UpdateStatusAsync(int MilestoneId, int StatusId);
 
 
-        Task<MilestoneGetAllDTO> UpdateAsync(MilestoneGetByIdOrProjectIdDTO milestone);
+        Task<MilestoneGetAllDTO> UpdateAsync(MilestoneCreateDTO milestone);
 
         Task<bool> DeleteAsync(int id);
 
         Task<List<string>> UploadFile(List<IFormFile> files, int MilestoneId);
 
         Task<bool> RemoveFile(int FileId);
-
 
         Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId);
 

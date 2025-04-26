@@ -62,7 +62,7 @@ namespace Freelancing.Controllers
 
 
         [HttpPut]
-        public async Task<IActionResult> Put(MilestoneGetByIdOrProjectIdDTO milestone)
+        public async Task<IActionResult> Put(MilestoneCreateDTO milestone)
         {
             return Ok(await _milestoneService.UpdateAsync(milestone));
         }
