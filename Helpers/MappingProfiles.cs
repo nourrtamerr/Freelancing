@@ -205,7 +205,7 @@ namespace Freelancing.Helpers
                     : 0
                 ))
                 .ForMember(dest => dest.PostedFrom, opt => opt.MapFrom(src =>
-                    (DateTime.Now - src.BiddingStartDate).Minutes
+                    (DateTime.Now - src.CreatedAt).Minutes
                 ))
                 .ForMember(dest => dest.ClientTotalNumberOfReviews, opt => opt.MapFrom(src => src.Client.Reviewed.Count()))
 
