@@ -1,4 +1,5 @@
-﻿using Freelancing.DTOs.BiddingProjectDTOs;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.DTOs.BiddingProjectDTOs;
 using Freelancing.Models;
 
 namespace Freelancing.IRepositoryService
@@ -10,8 +11,9 @@ namespace Freelancing.IRepositoryService
         Task<BiddingProject> CreateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, string ClinetId);
         Task<BiddingProject> UpdateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, int projectDTOid);
         Task<bool> DeleteBiddingProjectAsync(int id);
+		Task<List<BiddingProjectGetAllDTO>> GetmyBiddingProjectsAsync(string userId,userRole role,int pageNumber, int PageSize);
 
-        //Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO biddingProjectFilters, int pageNumber, int PageSize);
+		//Task<List<BiddingProjectGetAllDTO>> Filter(BiddingProjectFilterDTO biddingProjectFilters, int pageNumber, int PageSize);
 
-    }
+	}
 }
