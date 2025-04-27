@@ -261,8 +261,11 @@ namespace Freelancing.Helpers
                     : new List<string>()
             ))
 
+                .ForMember(dest => dest.NumOfBids, opt => opt.MapFrom(src => src.Proposals.Count()))
+
+
             .ForMember(dest => dest.PostedFrom, opt => opt.MapFrom(src =>
-                (DateTime.Now - src.BiddingStartDate).Days
+                (DateTime.Now - src.CreatedAt).TotalMinutes
             ))
 
             .ForMember(dest => dest.ClientTotalNumberOfReviews, opt => opt.MapFrom(src =>
@@ -270,6 +273,9 @@ namespace Freelancing.Helpers
                     ? src.Client.Reviewed.Count()
                     : 0
             ))
+
+            .ForMember(dest=>dest.ClientOtherProjectsIdsNotAssigned, opt=> opt.Ignore())
+            .ForMember(dest=>dest.ClientProjectsTotalCount, opt=>opt.Ignore())
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src ,dest)=>
                 //    src.Client.Reviewed != null && src.Client.Reviewed != null && src.Client.Reviewed.Any()
@@ -282,6 +288,8 @@ namespace Freelancing.Helpers
                     ? src.Client.Reviewed.Average(r => r.Rating)
                     : 0
                 ))
+
+                .ForMember(dest=>dest.ClinetAccCreationDate, opt=>opt.MapFrom(src=>src.Client.AccountCreationDate.ToString()))
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src, dest) =>
                 //{
@@ -354,6 +362,17 @@ namespace Freelancing.Helpers
 
 
             CreateMap<MilestoneCreateDTO, Milestone>();
+
+            CreateMap<Review, GetReviewByRevieweeIdDto>()
+                .ForMember(dest => dest.ProjectTitle, opt => opt.MapFrom(src => src.Project != null ? src.Project.Title : string.Empty))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToString()))
+                .ForMember(dest => dest.ReviewerName, opt => opt.MapFrom(src => src.Reviewer != null ? src.Reviewer.UserName : string.Empty))
+                .ForMember(dest => dest.ProjectType,
+                opt => opt.MapFrom(src =>
+                    src.Project != null
+                        ? (src.Project is BiddingProject ? "Bidding" : "Fixed")
+                        : string.Empty)); 
+
 
         }
     }
