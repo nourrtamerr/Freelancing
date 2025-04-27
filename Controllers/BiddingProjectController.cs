@@ -62,7 +62,7 @@ namespace Freelancing.Controllers
         }
 
         [HttpGet("GetMyBiddingProjects")]
-        public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber, [FromQuery] int PageSize)
+        public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber=1, [FromQuery] int PageSize=5)
         {
             userRole role;
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
