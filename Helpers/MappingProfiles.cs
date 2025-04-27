@@ -371,9 +371,12 @@ namespace Freelancing.Helpers
                 opt => opt.MapFrom(src =>
                     src.Project != null
                         ? (src.Project is BiddingProject ? "Bidding" : "Fixed")
-                        : string.Empty)); 
+                        : string.Empty));
 
 
+
+            CreateMap<Project, ProjectDTO>();
+            CreateMap<ProjectDTO, Project>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Freelancing.IRepositoryService
+﻿using Freelancing.DTOs;
+
+namespace Freelancing.IRepositoryService
 {
 	public interface IProjectService
 	{
@@ -7,5 +9,7 @@
 		Task<Project> CreateProjectAsync(Project project);
 		Task<Project> UpdateProjectAsync(Project project);
 		Task<bool> DeleteProjectAsync(int id);
-	}
+        Task<List<ProjectDTO>> GetAllProjectsDtoAsync();
+        Task<ProjectDTO> GetProjectDtoByIdAsync(int id);
+    }
 }

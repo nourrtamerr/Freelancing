@@ -1,8 +1,10 @@
-﻿using Freelancing.IRepositoryService;
+﻿using AutoMapper;
+using Freelancing.DTOs;
+using Freelancing.IRepositoryService;
 
 namespace Freelancing.RepositoryService
 {
-	public class ProjectService(ApplicationDbContext _context) : IProjectService
+	public class ProjectService(ApplicationDbContext _context,IMapper mapper) : IProjectService
 	{
 		public async Task<Project> CreateProjectAsync(Project project)
 		{
@@ -39,7 +41,23 @@ namespace Freelancing.RepositoryService
 			{
 				_context.Update(project);
 			}
-			return proj;
-		}
-	}
+            return proj;
+        }
+
+
+        public async Task<List<ProjectDTO>> GetAllProjectsDtoAsync()
+        {
+            var projects = await _context.Set<Project>()
+                                 .Where(p => !p.IsDeleted)
+                                 .ToListAsync();
+            return mapper.Map<List<ProjectDTO>>(projects);
+        }
+
+        public async Task<ProjectDTO> GetProjectDtoByIdAsync(int id)
+        {
+            var project = await _context.Set<Project>()
+                                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+            return mapper.Map<ProjectDTO>(project);
+        }
+    }
 }

@@ -10,7 +10,7 @@ namespace Freelancing.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Project>>> GetAllProjects()
         {
-            var projects = await context.GetAllProjectsAsync();
+            var projects = await context.GetAllProjectsDtoAsync();
             return Ok(projects);
 
         }
@@ -18,7 +18,7 @@ namespace Freelancing.Controllers
         [HttpGet("id")]
         public async Task<ActionResult<List<Project>>> GetProjectsById(int id)
         {
-            var project = await context.GetProjectByIdAsync(id);
+            var project = await context.GetProjectDtoByIdAsync(id);
             return Ok(project);
         }
     }
