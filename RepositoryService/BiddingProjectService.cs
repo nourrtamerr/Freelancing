@@ -198,6 +198,9 @@ namespace Freelancing.RepositoryService
 
             var projectDto = _mapper.Map<BiddingProjectGetByIdDTO>(project);
 
+            projectDto.ClientOtherProjectsIdsNotAssigned = _context.project.Where(p=>!p.IsDeleted && p.ClientId == project.ClientId && p.FreelancerId==null && p.Id!=id).Select(p=>p.Id).ToList();
+            projectDto.ClientProjectsTotalCount = _context.project.Where(p => !p.IsDeleted && p.ClientId == project.ClientId).Count();
+
             return projectDto;
 
         }
