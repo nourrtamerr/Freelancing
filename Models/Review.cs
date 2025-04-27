@@ -7,6 +7,7 @@ namespace Freelancing.Models
 		public int id { set; get; }
 		public int Rating { get; set; }
 		public string Comment { get; set; }
+		public DateTime Date { get; set; }
 
 
 		[ForeignKey("Reviewee")]
@@ -18,6 +19,12 @@ namespace Freelancing.Models
 		[ForeignKey("Reviewer")]
 		public string ReviewerId { set; get; }
 		public AppUser Reviewer { set; get; }
+
+
+
+		[ForeignKey("Project")]
+		public int ProjectId { get; set; }
+		public Project Project { get; set; }
 
 	}
 }

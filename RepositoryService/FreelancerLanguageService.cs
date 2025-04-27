@@ -45,7 +45,7 @@ namespace Freelancing.RepositoryService
         {
             var languages = await _context.freelancerLanguages
                 .Include(c => c.freelancer)
-                .Where(c => c.freelancer.UserName == username)
+                .Where(c => c.freelancer.UserName == username&& !c.IsDeleted)
                 .ToListAsync();
             return languages;
         }

@@ -171,6 +171,10 @@ namespace Freelancing.Migrations
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -658,6 +662,12 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -670,6 +680,8 @@ namespace Freelancing.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("RevieweeId");
 
@@ -1184,7 +1196,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "65952636-9d35-416e-a4a7-f2123d251fcb",
+                            ConcurrencyStamp = "097a6efb-5b41-462a-9b45-0e6102fd2793",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1193,11 +1205,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAHxQqGHENGksaUnJbi3qOBm/IVQF49UKBdx6Tg8mZKCXuwxy+wZg1U3mgyD6YXYhQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAe7TOlV/qE4Xj+rR8lG4+X/geXAh4osZsPqkVxC3sunNlYxU0fe6xzDulcMh5o3/g==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 24, 23, 54, 57, 793, DateTimeKind.Local).AddTicks(6489),
-                            SecurityStamp = "57a0d203-4eb7-4ec2-b25c-abdb658aae8e",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 27, 3, 5, 5, 899, DateTimeKind.Local).AddTicks(4044),
+                            SecurityStamp = "8ca6ffac-e23c-44c2-8ede-4cabe2559ba9",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1545,6 +1557,12 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Freelancing.Models.Review", b =>
                 {
+                    b.HasOne("Project", "Project")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("AppUser", "Reviewee")
                         .WithMany("Reviewed")
                         .HasForeignKey("RevieweeId")
@@ -1556,6 +1574,8 @@ namespace Freelancing.Migrations
                         .HasForeignKey("ReviewerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Project");
 
                     b.Navigation("Reviewee");
 
@@ -1929,6 +1949,8 @@ namespace Freelancing.Migrations
                     b.Navigation("ProjectSkills");
 
                     b.Navigation("Proposals");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Freelancer", b =>

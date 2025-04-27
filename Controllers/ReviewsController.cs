@@ -8,7 +8,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ReviewsController:ControllerBase
     {
         private readonly IReviewRepositoryService reviewService;
@@ -33,14 +33,14 @@ namespace Freelancing.Controllers
         }
 
         [HttpGet("reviewee/{revieweeId}")]
-        public async Task<ActionResult<List<ReviewDto>>> GetReviewsByRevieweeId(string revieweeId)
+        public async Task<ActionResult<List<GetReviewByRevieweeIdDto>>> GetReviewsByRevieweeId(string revieweeId)
         {
             var reviews = await reviewService.GetReviewsByRevieweeIdAsync(revieweeId);
             if (reviews == null || reviews.Count == 0)
             {
                 return NotFound();
             }
-            var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
+            var reviewDtos = mapper.Map<List<GetReviewByRevieweeIdDto>>(reviews);
             return Ok(reviewDtos);
         }
 

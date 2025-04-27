@@ -1,4 +1,5 @@
-﻿using Freelancing.DTOs.BiddingProjectDTOs;
+﻿using Freelancing.DTOs.AuthDTOs;
+using Freelancing.DTOs.BiddingProjectDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,15 +11,19 @@ namespace Freelancing.Controllers
     public class BiddingProjectController : ControllerBase
     {
         private readonly IBiddingProjectService _biddingProjectService;
+		private readonly UserManager<AppUser> _userManager;
 
-        public BiddingProjectController(IBiddingProjectService biddingProjectService)
+
+		public BiddingProjectController(IBiddingProjectService biddingProjectService,UserManager<AppUser>  userManager)
         {
             _biddingProjectService = biddingProjectService;
-        }
+            _userManager = userManager;
+
+		}
 
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
+        [HttpPost("Filter")]
+        public async Task<IActionResult> GetAll([FromBody]BiddingProjectFilterDTO filters, [FromQuery] int pageNumber, [FromQuery] int PageSize)
         {
 
             return Ok(await _biddingProjectService.GetAllBiddingProjectsAsync(filters, pageNumber, PageSize));
@@ -35,32 +40,56 @@ namespace Freelancing.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
-            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, "63d89bb1-7a13-4e02-bf19-14701398e3a1" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
 
-            return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
+            return Ok(new { project.ClientId, project.FreelancerId, project.Id });
         }
 
 
-        [HttpPut("/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id,[FromBody]BiddingProjectCreateUpdateDTO p)
         {
             var project = await _biddingProjectService.UpdateBiddingProjectAsync(p, id);
 
-            return Ok(new { project.ClientId, project.Subcategory.Name, p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList() });
+            return Ok(new { project.ClientId, project.FreelancerId, project.Id });
         }
 
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             return Ok(await _biddingProjectService.DeleteBiddingProjectAsync(id));
         }
 
+        [HttpGet("GetMyBiddingProjects")]
+        public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber=1, [FromQuery] int PageSize=5)
+        {
+            userRole role;
+            var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var currentuser = await _userManager.FindByIdAsync(userid);
+            if (currentuser.GetType() == typeof(Client))
+            {
+                role = userRole.Client;
+            }
+            else if (currentuser.GetType() == typeof(Freelancer))
+            {
+                role = userRole.Freelancer;
+            }
+            else
+            {
+                throw new Exception("User is not a client or freelancer");
+            }
+
+            return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));
+        }
+
+
 
         //[HttpPost("Filter")]
         //public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
         //{
-        //    return Ok(await _biddingProjectService.Filter(pdto,PageNumber, PageSize));
+        //    return Ok(await _biddingProjectService.Filter(pdto, PageNumber, PageSize));
         //}
     }
 }
