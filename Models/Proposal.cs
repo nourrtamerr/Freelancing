@@ -6,6 +6,7 @@ namespace Freelancing.Models
 	public class Proposal
 	{
 		public int Id { get; set; }
+		//public string title { get; set; }
 		public string CoverLetter { get; set; }
 		public decimal? Price { get; set; } // nullable for fixedpriceprojects
 

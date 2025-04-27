@@ -14,5 +14,12 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
+
+        [HttpGet("id")]
+        public async Task<ActionResult<List<Project>>> GetProjectsById(int id)
+        {
+            var project = await context.GetProjectByIdAsync(id);
+            return Ok(project);
+        }
     }
 }
