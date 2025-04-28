@@ -18,8 +18,7 @@
         public List<string> ProjectSkills { get; set; } = new List<string>();
         public List<MilestoneDto> Milestones { get; set; } = new List<MilestoneDto>();
 
-
-
+        public decimal Price { get; set; }
 
 
 

@@ -334,7 +334,8 @@ namespace Freelancing.Controllers
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
-              
+                Price=project.Price,
+
                 SubcategoryID = project.SubcategoryId,
                 ExperienceLevel = project.experienceLevel,
                 Milestones = project.Milestones?.Select(m => new MilestoneDto
@@ -437,6 +438,7 @@ namespace Freelancing.Controllers
                 Description = createdProject.Description,
                 Currency = createdProject.currency,
                 ExpectedDuration = createdProject.ExpectedDuration,
+                Price=createdProject.Price,
                 //SubcategoryName = createdProject.Subcategory?.Name,
                 SubcategoryID = createdProject.SubcategoryId,
                 ExperienceLevel = createdProject.experienceLevel,

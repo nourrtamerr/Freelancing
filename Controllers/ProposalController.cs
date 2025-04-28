@@ -48,7 +48,7 @@ namespace Freelancing.Controllers
 
 		// POST api/<ProposalController>
 		[HttpPost]
-        [Authorize(Roles = "Freelancer")]
+        //[Authorize(Roles = "Freelancer")]
         public async Task<IActionResult> Post([FromBody]CreateProposalDTO dto)
         {
             //var proposal = _mapper.Map<Proposal>(dto);
@@ -56,11 +56,11 @@ namespace Freelancing.Controllers
 
 			if (project is null)
             {
-				return BadRequest("Project not found");
+				return BadRequest(new {message= "The project no longer exists" });
 			}
             if(project.FreelancerId is not null)
             {
-                return BadRequest("Project is already assigned to a freelancer");
+                return BadRequest(new { message = "This project has already been assigned to another freelancer" });
             }
             dto.type=project.GetType()==typeof(FixedPriceProject)? projectType.fixedprice : projectType.bidding;
             if (dto.type == projectType.fixedprice)
@@ -76,16 +76,16 @@ namespace Freelancing.Controllers
 				{
 					if (prjct.minimumPrice > dto.Price || prjct.maximumprice <dto.Price)
 					{
-						return BadRequest("not within bid limits");
+						return BadRequest( new {message= "Your bid amount must be between the minimum and maximum price range" });
 					}
 					if (prjct.BiddingEndDate < DateTime.Now )
 					{
-						return BadRequest("bid is over");
+						return BadRequest(new { message = "The bidding period for this project has ended" });
 					}
 				}
 			}
 			return Ok(
-				await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier))
+				await _proposals.CreateProposalAsync(dto, "c2e230ae-7389-4ee3-8f26-862ca2625233" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/)
 				);
         }
 
