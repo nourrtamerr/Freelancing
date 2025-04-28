@@ -230,7 +230,7 @@ namespace Freelancing.Controllers
 		public async Task<IActionResult> getUsersRequestingVerifications()
 		{
 			var users = _userManager.Users.Include(u=>u.City).ThenInclude(c=>c.Country).Where(u => u.NationalId != null&&!u.IsVerified).ToList();
-			if (users.Count == 0)
+			if (users is null)
 			{
 				return NotFound("No users are requesting verification");
 			}
@@ -312,7 +312,7 @@ namespace Freelancing.Controllers
 					UserId = dto.userId
 				});
 			}
-			return Ok("Response sent");
+			return Ok(new { Message = "Response sent" });
 		}
 		[HttpGet("IsAuthenticated")]
 		public IActionResult IsAuthenticated()

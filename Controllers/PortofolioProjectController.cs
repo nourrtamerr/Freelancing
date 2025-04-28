@@ -61,6 +61,28 @@ namespace Freelancing.Controllers
 			}));
 		}
 
+
+		[HttpGet("UserPortofolioProjects/{userId}")]
+		public async Task<IActionResult> GetuserPortofolioProjects(string userId)
+		{
+            
+			var p = await portofolioProjectContext.GetByFreelancerId(userId);
+			if (p == null)
+			{
+				return NotFound();
+			}
+			var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
+			return Ok(DTO.Select(p => new
+			{
+				p.Id,
+				p.Description,
+				p.FreelancerId,
+				p.Title,
+				p.CreatedAt,
+				Images = p.Images.Select(i => new { i.Image, i.Id, i.PreviousProjectId })
+			}));
+		}
+
 		// GET: api/PortofolioProject/5
 		[HttpGet("{id}")]
         public async Task<IActionResult> GetPortofolioProjecBytId(int id)
