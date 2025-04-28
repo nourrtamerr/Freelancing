@@ -14,6 +14,30 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
+<<<<<<< Updated upstream
+=======
+
+        [HttpGet("numberofclients")]
+        [Authorize(Roles ="Freelancer")]
+        public async Task<IActionResult> GetClientsNumber()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            var projects = await context.GetAllProjectsAsync();
+            var prs = projects.Where(p => p.FreelancerId == userId);
+            var clients = projects.Where(p => p.FreelancerId == userId).Select(p => p.ClientId).Distinct().Count();
+            return Ok(new  { clients, completed = prs.Where(p=>p.Status== projectStatus.Completed).Count(),
+                //pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
+                working = prs.Where(p => p.Status == projectStatus.Working).Count()
+            });
+
+        }
+
+		//[HttpGet]
+  //      [Authorize]
+		//public async Task<ActionResult<List<Project>>> GetMyProjects()
+		//{
+>>>>>>> Stashed changes
 
         [HttpGet("id")]
         public async Task<ActionResult<List<Project>>> GetProjectsById(int id)
