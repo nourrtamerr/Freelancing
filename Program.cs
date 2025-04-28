@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Freelancing.Services;
 using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
+using Freelancing.Helpers;
 
 
 namespace Freelancing
@@ -29,7 +30,10 @@ namespace Freelancing
                 options.AddPolicy("AllowAll", policy =>
                 {
                     policy
-                        .WithOrigins("http://127.0.0.1:5500")
+					//.AllowAnyOrigin()
+                        .WithOrigins("http://localhost:4200")
+
+                  //  .WithOrigins("http://127.0.0.1:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
@@ -255,6 +259,7 @@ namespace Freelancing
 				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
 				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+			
 			}
 
 

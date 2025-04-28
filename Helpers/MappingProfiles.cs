@@ -335,10 +335,14 @@ namespace Freelancing.Helpers
             //.ForMember(dest=>dest.Subcategory, opt=>opt.MapFrom(src=>src.Subcategory.Name.ToString()))
 
             CreateMap<BiddingProjectCreateUpdateDTO, BiddingProject>()
+//.ForMember(dest => dest.SubcategoryId, opt => opt.Ignore()) 
+//.ForMember(dest => dest.Subcategory, opt => opt.Ignore())
+//.ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
+.ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => src.ExperienceLevel))
               //.ForMember(dest => dest.SubcategoryId, opt => opt.Ignore()) 
               //.ForMember(dest => dest.Subcategory, opt => opt.Ignore())
               //.ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
-              .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => (ExperienceLevel)src.ExperienceLevel))
+              //.ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => (ExperienceLevel)src.ExperienceLevel))
               .ForMember(dest => dest.currency, opt => opt.MapFrom(src => (Currency)src.currency))
               .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
               .ForMember(dest => dest.ProjectSkills, opt => opt.MapFrom(src => src.ProjectSkillsIds.Select(ps => new ProjectSkill() { SkillId = ps })))
@@ -371,9 +375,12 @@ namespace Freelancing.Helpers
                 opt => opt.MapFrom(src =>
                     src.Project != null
                         ? (src.Project is BiddingProject ? "Bidding" : "Fixed")
-                        : string.Empty)); 
+                        : string.Empty));
 
 
+
+            CreateMap<Project, ProjectDTO>();
+            CreateMap<ProjectDTO, Project>();
         }
     }
 }

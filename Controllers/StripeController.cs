@@ -158,7 +158,7 @@ namespace Freelancing.Controllers
 			freelancer.StripeAccountId = account.Id;
 			else
 			{
-				client.StripeAccountId = account.Id;
+				//client.StripeAccountId = account.Id;
 			}
 				_context.SaveChanges();
 
@@ -228,7 +228,7 @@ namespace Freelancing.Controllers
 			var client = _context.clients.FirstOrDefault(f => f.Id == userid);
 
 			if (freelancer == null || string.IsNullOrEmpty(freelancer.StripeAccountId))
-				if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
+				//if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
 				return BadRequest(" not onboarded yet.");
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
@@ -240,7 +240,7 @@ namespace Freelancing.Controllers
 				PaymentMethodTypes = new List<string> { "card" },
 				TransferData = new PaymentIntentTransferDataOptions
 				{
-					Destination = freelancer?.StripeAccountId??client.StripeAccountId
+					//Destination = freelancer?.StripeAccountId??client.StripeAccountId
 				},
 				ApplicationFeeAmount = amountInCents*(long)0.2,
 			};

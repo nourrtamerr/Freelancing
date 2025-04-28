@@ -2,6 +2,7 @@
 //using Freelancing.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Freelancing.Controllers
 {
@@ -124,7 +125,11 @@ namespace Freelancing.Controllers
             {
                 return BadRequest("Failed to delete category.");
             }
-            return Ok($"Category with ID {id} deleted successfully.");
+            return Ok(new {
+                Message=
+
+            $"Category with ID {id} deleted successfully."});
+            
         }
 
 
