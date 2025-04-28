@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -14,18 +15,14 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 
         [HttpGet("numberofclients")]
-        [Authorize(Roles ="Freelancer")]
+        //[Authorize(Roles ="Freelancer")]
         public async Task<IActionResult> GetClientsNumber()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var projects = await context.GetAllProjectsAsync();
             var prs = projects.Where(p => p.FreelancerId == userId);
             var clients = projects.Where(p => p.FreelancerId == userId).Select(p => p.ClientId).Distinct().Count();
@@ -35,14 +32,10 @@ namespace Freelancing.Controllers
             });
 
         }
+	
 
-		//[HttpGet]
-  //      [Authorize]
-		//public async Task<ActionResult<List<Project>>> GetMyProjects()
-		//{
->>>>>>> Stashed changes
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<List<Project>>> GetProjectsById(int id)
         {
             var project = await context.GetProjectDtoByIdAsync(id);
