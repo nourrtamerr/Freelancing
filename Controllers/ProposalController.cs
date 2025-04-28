@@ -45,6 +45,17 @@ namespace Freelancing.Controllers
 			
 				return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(user.Id)));
 		}
+		
+		[HttpGet("getbyfreelancerId")]
+		public async Task<IActionResult> GetProposalsbyfreelancerid()
+		{
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+            {
+                return BadRequest("usr not found");
+            }
+            return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(userId)));
+        }
 
 		// POST api/<ProposalController>
 		[HttpPost]
@@ -141,5 +152,7 @@ namespace Freelancing.Controllers
 			await _proposals.DeleteProposalAsync(id);
 			return Ok(new { Message = "Deleted" });
 		}
+
+
     }
 }

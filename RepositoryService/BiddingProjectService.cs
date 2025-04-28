@@ -305,10 +305,39 @@ namespace Freelancing.RepositoryService
             return true;
         }
 
+        //----------------------------------------------------------------------------------------------------
 
-		//----------------------------------------------------------------------------------------------------
+        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, BiddingProjectFilterDTO filters)
+        {
+            var projects = await _context.biddingProjects
+                .Include(b => b.Proposals)
+                .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
+                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+                .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
+                .Include(b => b.Client.City).ThenInclude(c => c.Country)
+                .Where(u => u.FreelancerId == id && !u.IsDeleted).ToListAsync();
+            var projectss = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
+            return projectss;
+        }
 
-		public async Task<List<BiddingProjectGetAllDTO>> GetmyBiddingProjectsAsync(string userId,userRole role,int pageNumber, int PageSize)
+        //----------------------------------------------------------------------------------------------------
+
+        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByclientId(string id,BiddingProjectFilterDTO filters)
+        {
+            var projects = await _context.biddingProjects
+                .Include(b => b.Proposals)
+                .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
+                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+                .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
+                .Include(b => b.Client.City).ThenInclude(c => c.Country)
+                .Where(u => u.ClientId == id && !u.IsDeleted).ToListAsync();
+            var projectss = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
+            return projectss;
+        }
+
+        //----------------------------------------------------------------------------------------------------
+
+        public async Task<List<BiddingProjectGetAllDTO>> GetmyBiddingProjectsAsync(string userId,userRole role,int pageNumber, int PageSize)
         {
             List<BiddingProject> projects;
 

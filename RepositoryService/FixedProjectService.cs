@@ -37,6 +37,26 @@ namespace Freelancing.RepositoryService
         .Include(p => p.Subcategory).Where(p=>!p.IsDeleted).ToListAsync();
         }
 
+        public async Task<List<FixedPriceProject>> GetAllFixedPriceProjectsAsyncByFreelancerId(string id)
+        {
+            return await _context.fixedPriceProjects.Include(p => p.ProjectSkills)
+            .ThenInclude(ps => ps.Skill)
+            .Include(p => p.Milestones)
+            .Include(p => p.Proposals)
+            .Include(p => p.Subcategory)
+            .Where(p => p.FreelancerId == id)
+            .ToListAsync();
+        }
+        public async Task<List<FixedPriceProject>> GetAllFixedPriceProjectsAsyncByClientId(string id)
+        {
+            return await _context.fixedPriceProjects.Include(p => p.ProjectSkills)
+            .ThenInclude(ps => ps.Skill)
+            .Include(p => p.Milestones)
+            .Include(p => p.Proposals)
+            .Include(p => p.Subcategory)
+            .Where(p => p.ClientId == id)
+            .ToListAsync();
+        }
 
 
 
