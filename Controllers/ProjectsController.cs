@@ -15,7 +15,10 @@ namespace Freelancing.Controllers
 
         }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
         [HttpGet("numberofclients")]
         [Authorize(Roles ="Freelancer")]
