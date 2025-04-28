@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -14,11 +16,7 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
+
 
         [HttpGet("numberofclients")]
         [Authorize(Roles ="Freelancer")]
@@ -40,7 +38,7 @@ namespace Freelancing.Controllers
   //      [Authorize]
 		//public async Task<ActionResult<List<Project>>> GetMyProjects()
 		//{
->>>>>>> Stashed changes
+
 
         [HttpGet("id")]
         public async Task<ActionResult<List<Project>>> GetProjectsById(int id)

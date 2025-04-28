@@ -388,7 +388,6 @@ namespace Freelancing.Controllers
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
-                Price=project.Price,
 
                 SubcategoryID = project.SubcategoryId,
                 ExperienceLevel = project.experienceLevel,
@@ -497,7 +496,6 @@ namespace Freelancing.Controllers
                 Description = createdProject.Description,
                 Currency = createdProject.currency,
                 ExpectedDuration = createdProject.ExpectedDuration,
-                Price=createdProject.Price,
                 //SubcategoryName = createdProject.Subcategory?.Name,
 
                 SubcategoryID = createdProject.SubcategoryId,
