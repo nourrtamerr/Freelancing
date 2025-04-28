@@ -16,31 +16,31 @@ namespace Freelancing.Controllers
             return Ok(projects);
 
         }
+<<<<<<< Updated upstream
+=======
+        //[Authorize(Roles ="Freelancer")]
+>>>>>>> Stashed changes
 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-        [HttpGet("numberofclients")]
-        [Authorize(Roles ="Freelancer")]
-        public async Task<IActionResult> GetClientsNumber()
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var projects = await context.GetAllProjectsAsync();
             var prs = projects.Where(p => p.FreelancerId == userId);
             var clients = projects.Where(p => p.FreelancerId == userId).Select(p => p.ClientId).Distinct().Count();
             return Ok(new  { clients, completed = prs.Where(p=>p.Status== projectStatus.Completed).Count(),
                 //pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
-                working = prs.Where(p => p.Status == projectStatus.Working).Count()
-            });
+	
 
-        }
-
-		//[HttpGet]
   //      [Authorize]
 		//public async Task<ActionResult<List<Project>>> GetMyProjects()
 		//{
+>>>>>>> Stashed changes
 
-
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<List<Project>>> GetProjectsById(int id)
         {
             var project = await context.GetProjectDtoByIdAsync(id);
