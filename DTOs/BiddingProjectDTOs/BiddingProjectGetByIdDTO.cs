@@ -32,6 +32,8 @@
         public int ClientProjectsTotalCount { get; set; }
 
         public int NumOfBids { get; set; }
+        public int ExpectedDuration { get; set; }
+
 
     }
 }

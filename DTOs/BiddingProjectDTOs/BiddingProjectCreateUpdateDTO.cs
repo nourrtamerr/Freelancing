@@ -14,7 +14,10 @@
         public DateTime BiddingStartDate { get; set; }
         public DateTime BiddingEndDate { get; set; }
 
-        public int ExperienceLevel { get; set; }
+        //  public string ExperienceLevel { get; set; }
+        public ExperienceLevel ExperienceLevel { get; set; }
+
+
 
         public int ExpectedDuration { get; set; }
 

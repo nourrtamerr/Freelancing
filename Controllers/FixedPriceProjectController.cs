@@ -152,6 +152,7 @@ namespace Freelancing.Controllers
                  [FromQuery] int? maxDuration = null,
                  [FromQuery] List<int> skillIds = null
             )
+        
         {
             if (!ModelState.IsValid)
             {
@@ -260,6 +261,7 @@ namespace Freelancing.Controllers
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
+                Price=p.Price,
                 Currency = p.currency,
                 ExpectedDuration = p.ExpectedDuration,
                 SubcategoryID = p.SubcategoryId,
@@ -271,6 +273,7 @@ namespace Freelancing.Controllers
                 {
                     Title = m.Title,
                     startdate = m.StartDate,
+                    
                     enddate = m.EndDate,
                     Status = m.Status,
                 }).ToList() ?? new List<MilestoneDto>(),
@@ -431,10 +434,12 @@ namespace Freelancing.Controllers
             {
                 Id = project.Id,
                 Title = project.Title,
+                Price = project.Price,
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
-              
+                Price=project.Price,
+
                 SubcategoryID = project.SubcategoryId,
                 ExperienceLevel = project.experienceLevel,
                 Milestones = project.Milestones?.Select(m => new MilestoneDto
@@ -444,6 +449,8 @@ namespace Freelancing.Controllers
                     startdate = m.StartDate,
                     enddate = m.EndDate,
                     Status = m.Status,
+                    Description = m.Description,
+                    Amount = m.Amount
 
                 }).ToList() ?? new List<MilestoneDto>(),
 
@@ -477,6 +484,7 @@ namespace Freelancing.Controllers
 
             var project = new FixedPriceProject
             {
+                Price = dto.Price,
                 SubcategoryId = dto.SubcategoryID,
                 Title = dto.Title,
                 Description = dto.Description,
@@ -486,7 +494,7 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "96668C77-FEBC-46A6-8B60-AF2AE1B7191B"
+                ClientId = "3611f18e-2097-4b01-bcb3-0fcf8045af03"
 
             };
 
@@ -512,7 +520,7 @@ namespace Freelancing.Controllers
             {
                 foreach (var milestonedto in dto.Milestones)
                 {
-
+                  
                     await _milestoneService.CreateAsync(new MilestoneCreateDTO()
                     {
                         Title = milestonedto.Title,
@@ -534,17 +542,21 @@ namespace Freelancing.Controllers
             {
                 Id = createdProject.Id,
                 Title = createdProject.Title,
+                Price = createdProject.Price,
+
                 Description = createdProject.Description,
                 Currency = createdProject.currency,
                 ExpectedDuration = createdProject.ExpectedDuration,
+                Price=createdProject.Price,
                 //SubcategoryName = createdProject.Subcategory?.Name,
+
                 SubcategoryID = createdProject.SubcategoryId,
                 ExperienceLevel = createdProject.experienceLevel,
                 ProjectSkills = createdProject.ProjectSkills.Select(ps => ps.Skill.Name).ToList(),
                 ProposalsCount = createdProject.Proposals.Count,
                 Milestones = createdProject.Milestones?.Select(m => new MilestoneDto
                 {
-
+                    Description=m.Description,
                     Title = m.Title,
                     startdate = m.StartDate,
                     enddate = m.EndDate,
@@ -654,7 +666,9 @@ namespace Freelancing.Controllers
                     Title = m.Title,
                     startdate = m.StartDate,
                     enddate = m.EndDate,
-                    Status = m.Status
+                    Status = m.Status,
+                    Description = m.Description,
+                    Amount = m.Amount
                 }).ToList() ?? new List<MilestoneDto>(),
                 ProjectSkills = project.ProjectSkills != null
                     ? project.ProjectSkills
