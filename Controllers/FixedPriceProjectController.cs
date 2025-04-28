@@ -78,6 +78,56 @@ namespace Freelancing.Controllers
 		}
 
 
+		[HttpGet("userfixedpriceprojects/{userId}")]
+		public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> userfixedpriceprojects(string userId)
+		{
+			var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
+			//var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return NotFound("User not found.");
+			}
+			if (user.GetType() == typeof(Client))
+			{
+				projects = projects.Where(p => p.ClientId == userId).ToList();
+			}
+			else if (user.GetType() == typeof(Freelancer))
+			{
+				projects = projects.Where(p => p.FreelancerId == userId).ToList();
+			}
+			else
+			{
+				return BadRequest("Invalid user type.");
+			}
+			return Ok(projects.Select(p => new GetAllFixedProjectDto
+			{
+				Id = p.Id,
+				Title = p.Title,
+				Description = p.Description,
+				Currency = p.currency,
+				ExpectedDuration = p.ExpectedDuration,
+				SubcategoryID = p.SubcategoryId,
+				ExperienceLevel = p.experienceLevel, // Convert enum to string if needed
+				ProjectSkills = p.ProjectSkills != null
+					? p.ProjectSkills.Where(ps => ps.Skill != null).Select(ps => ps.Skill.Name).ToList()
+					: new List<string>(),
+				Milestones = p.Milestones?.Select(m => new MilestoneDto
+				{
+					Title = m.Title,
+					startdate = m.StartDate,
+					enddate = m.EndDate,
+					Status = m.Status,
+				}).ToList() ?? new List<MilestoneDto>(),
+				ProposalsCount = p.Proposals.Count
+			}).ToList());
+
+
+		}
+
+
+
+
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> GetAllFixedPriceProjects(
                  [FromQuery] int pageNumber = 1,

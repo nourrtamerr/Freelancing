@@ -84,12 +84,35 @@ namespace Freelancing.Controllers
             return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));
         }
 
+		[HttpGet("GetForUser/{userId}")]
+		public async Task<IActionResult> GetFreelancerbiddingprojects(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int PageSize = 300)
+		{
+			userRole role;
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			var currentuser = await _userManager.FindByIdAsync(userId);
+			if (currentuser.GetType() == typeof(Client))
+			{
+				role = userRole.Client;
+			}
+			else if (currentuser.GetType() == typeof(Freelancer))
+			{
+				role = userRole.Freelancer;
+			}
+			else
+			{
+				throw new Exception("User is not a client or freelancer");
+			}
+
+			return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));
+		}
 
 
-        //[HttpPost("Filter")]
-        //public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
-        //{
-        //    return Ok(await _biddingProjectService.Filter(pdto, PageNumber, PageSize));
-        //}
-    }
+
+		//[HttpPost("Filter")]
+		//public async Task<IActionResult> Filter(BiddingProjectFilterDTO pdto, int PageNumber, int PageSize)
+		//{
+		//    return Ok(await _biddingProjectService.Filter(pdto, PageNumber, PageSize));
+		//}
+	}
 }

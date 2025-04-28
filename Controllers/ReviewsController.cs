@@ -36,7 +36,7 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<GetReviewByRevieweeIdDto>>> GetReviewsByRevieweeId(string revieweeId)
         {
             var reviews = await reviewService.GetReviewsByRevieweeIdAsync(revieweeId);
-            if (reviews == null || reviews.Count == 0)
+            if (reviews == null )
             {
                 return NotFound();
             }
