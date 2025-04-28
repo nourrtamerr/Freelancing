@@ -7,7 +7,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class UserSkillsController:ControllerBase
     {
         private readonly IUserSkillService skillService;
