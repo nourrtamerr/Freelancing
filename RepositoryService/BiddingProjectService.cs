@@ -4,6 +4,7 @@ using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -195,7 +196,10 @@ namespace Freelancing.RepositoryService
                                         .Include(b=>b.Freelancer).ThenInclude(f=>f.subscriptionPlan)
                                         .Include(b=>b.Client.City).ThenInclude(c=>c.Country)
                                         .FirstOrDefaultAsync(b => b.Id == id);
-
+            if (project == null)
+            {
+                return null;
+            }
             var projectDto = _mapper.Map<BiddingProjectGetByIdDTO>(project);
 
             projectDto.ClientOtherProjectsIdsNotAssigned = _context.project.Where(p=>!p.IsDeleted && p.ClientId == project.ClientId && p.FreelancerId==null && p.Id!=id).Select(p=>p.Id).ToList();
@@ -245,7 +249,7 @@ namespace Freelancing.RepositoryService
 
             var createdProject = _mapper.Map<BiddingProject>(project);
             createdProject.ClientId = ClinetId;
-            createdProject.ClientId =  "3611f18e-2097-4b01-bcb3-0fcf8045af03";
+            createdProject.ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1";
 
 
 

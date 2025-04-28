@@ -60,7 +60,7 @@ namespace Freelancing.Controllers
                 //});
                 return Ok(new
                 {
-                    ClientId = project.ClientId ?? "3611f18e-2097-4b01-bcb3-0fcf8045af03",
+                    ClientId = project.ClientId ?? "63d89bb1-7a13-4e02-bf19-14701398e3a1",
                     project.Subcategory.Name,
                     p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
                 });

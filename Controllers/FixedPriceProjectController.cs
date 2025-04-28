@@ -493,7 +493,7 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "3611f18e-2097-4b01-bcb3-0fcf8045af03"
+                ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1"
 
             };
 
