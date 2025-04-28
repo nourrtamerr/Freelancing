@@ -49,22 +49,23 @@ public abstract class Project
 	public ExperienceLevel experienceLevel { get; set; }
 	public virtual List<Proposal> Proposals { get; set; } = new List<Proposal>();
 	public virtual List<ProjectSkill> ProjectSkills { get; set; }
+	public virtual List<Review> Reviews { get; set; }
 
 	public bool IsDeleted { get; set; } = false;
 }
 
+public enum projectStatus
+{
+	Pending,
+	Working,
+	Completed
+}
 
 public enum ExperienceLevel
 {
 	Entry,
 	Intermediate,
 	Expert
-}
-public enum projectStatus
-{
-	Pending,
-	Working,
-	Completed
 }
 public enum Currency
 {

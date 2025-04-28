@@ -43,6 +43,9 @@ namespace Freelancing.Migrations
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -90,6 +93,9 @@ namespace Freelancing.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -164,6 +170,10 @@ namespace Freelancing.Migrations
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -652,6 +662,12 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -664,6 +680,8 @@ namespace Freelancing.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("RevieweeId");
 
@@ -1178,19 +1196,20 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "3c78089f-d7e4-4e05-bf9e-b82d1a1de373",
+                            ConcurrencyStamp = "097a6efb-5b41-462a-9b45-0e6102fd2793",
                             DateOfBirth = new DateOnly(1, 1, 1),
+                            Description = "",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             IsVerified = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECSjevHPE/SdOLxC1FKQQoktgnxJLPirsNQxI/Ey2tqsG0QAp2RuaRhsnykw+dbLkg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAe7TOlV/qE4Xj+rR8lG4+X/geXAh4osZsPqkVxC3sunNlYxU0fe6xzDulcMh5o3/g==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 18, 0, 24, 25, 557, DateTimeKind.Local).AddTicks(5303),
-                            SecurityStamp = "defe2304-2681-468c-85d1-ac957d40273f",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 27, 3, 5, 5, 899, DateTimeKind.Local).AddTicks(4044),
+                            SecurityStamp = "8ca6ffac-e23c-44c2-8ede-4cabe2559ba9",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1538,6 +1557,12 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Freelancing.Models.Review", b =>
                 {
+                    b.HasOne("Project", "Project")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("AppUser", "Reviewee")
                         .WithMany("Reviewed")
                         .HasForeignKey("RevieweeId")
@@ -1549,6 +1574,8 @@ namespace Freelancing.Migrations
                         .HasForeignKey("ReviewerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Project");
 
                     b.Navigation("Reviewee");
 
@@ -1922,6 +1949,8 @@ namespace Freelancing.Migrations
                     b.Navigation("ProjectSkills");
 
                     b.Navigation("Proposals");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Freelancer", b =>

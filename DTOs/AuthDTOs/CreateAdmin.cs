@@ -32,7 +32,6 @@ namespace Freelancing.DTOs.AuthDTOs
 		[ImageExtension]
 		[NotMapped]
 		public IFormFile? ProfilePicture { set; get; }
-		[JsonConverter(typeof(JsonStringEnumConverter))]
-		public userRole Role { set; get; }
+
 	}
 }

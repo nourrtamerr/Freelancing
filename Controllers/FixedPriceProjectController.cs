@@ -1,8 +1,10 @@
 ﻿using Freelancing.DTOs;
 using Freelancing.DTOs.MilestoneDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -15,20 +17,68 @@ namespace Freelancing.Controllers
         private readonly IFixedProjectService _fixedProjectService;
         private readonly ApplicationDbContext _dbContext;
         private readonly IMilestoneService _milestoneService;
-     
-        public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService)
+        private readonly UserManager<AppUser> _userManager;
+
+		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager)
         {
             _fixedProjectService = fixedProjectService;
             _dbContext = dbContext;
             _milestoneService = milestoneService;
-        }
+			_userManager = userManager;
+		}
 
 
 
+        [HttpGet("myfixedpriceprojects")]
+        [Authorize]
+		public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> myfixedpriceprojects()
+        {
+			var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return NotFound("User not found.");
+			}
+            if (user.GetType() == typeof(Client))
+            {
+				projects = projects.Where(p => p.ClientId == userId).ToList();
+            }
+			else if (user.GetType() == typeof(Freelancer))
+			{
+				projects = projects.Where(p => p.FreelancerId == userId).ToList();
+			}
+			else
+			{
+				return BadRequest("Invalid user type.");
+			}
+            return Ok(projects.Select(p => new GetAllFixedProjectDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                Currency = p.currency,
+                ExpectedDuration = p.ExpectedDuration,
+                SubcategoryID = p.SubcategoryId,
+                ExperienceLevel = p.experienceLevel, // Convert enum to string if needed
+                ProjectSkills = p.ProjectSkills != null
+                    ? p.ProjectSkills.Where(ps => ps.Skill != null).Select(ps => ps.Skill.Name).ToList()
+                    : new List<string>(),
+                Milestones = p.Milestones?.Select(m => new MilestoneDto
+                {
+                    Title = m.Title,
+                    startdate = m.StartDate,
+                    enddate = m.EndDate,
+                    Status = m.Status,
+                }).ToList() ?? new List<MilestoneDto>(),
+                ProposalsCount = p.Proposals.Count
+            }).ToList());
 
 
+		}
 
-        [HttpGet]
+
+		[HttpGet]
         public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> GetAllFixedPriceProjects(
                  [FromQuery] int pageNumber = 1,
                  [FromQuery] int pageSize = 10,

@@ -32,6 +32,7 @@ namespace Freelancing.Controllers
                 Name = e.Name,
                 IssueDate = e.IssueDate,
                 IsDeleted = e.IsDeleted,
+                issuer=e.Issuer,
                 FreelancerName = e.Freelancer.UserName
             });
             return Ok(certificatesDTOlist);
@@ -51,7 +52,8 @@ namespace Freelancing.Controllers
                 Name = e.Name,
                 IssueDate = e.IssueDate,
                 IsDeleted = e.IsDeleted,
-                FreelancerName = e.Freelancer.UserName
+				issuer = e.Issuer,
+				FreelancerName = e.Freelancer.UserName
             });
             return Ok(certificatesDTOlist);
         }
@@ -67,7 +69,8 @@ namespace Freelancing.Controllers
                 Name = selectedcertificate.Name,
                 IsDeleted = selectedcertificate.IsDeleted,
                 IssueDate = selectedcertificate.IssueDate,
-                FreelancerName = selectedcertificate.Freelancer.UserName,
+				issuer = selectedcertificate.Issuer,
+				FreelancerName = selectedcertificate.Freelancer.UserName,
             };
             return Ok(certificateDTO);
         }
@@ -86,7 +89,8 @@ namespace Freelancing.Controllers
                 Name = certificateDTO.Name,
                 IssueDate = certificateDTO.IssueDate,
                 IsDeleted = false,
-                FreelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+				Issuer = certificateDTO.Issuer,
+				FreelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier)
             };
             var created = await _certificatesService.CreateCertificateAsync(certificate);
             if (created)
@@ -97,7 +101,9 @@ namespace Freelancing.Controllers
                     {
                         createdCertificate.Id,
                         createdCertificate.Name,
-                        createdCertificate.IssueDate,
+						createdCertificate.Issuer,
+
+						createdCertificate.IssueDate,
                         createdCertificate.IsDeleted,
                         createdCertificate.Freelancer.UserName                                                
                     }
@@ -114,7 +120,9 @@ namespace Freelancing.Controllers
             {
                 selected.IssueDate = certificateDTO.IssueDate;
                 selected.Name = certificateDTO.Name;
-                var updated = await _certificatesService.UpdateCertificateAsync(selected);
+                selected.Issuer = certificateDTO.Issuer;
+
+				var updated = await _certificatesService.UpdateCertificateAsync(selected);
                 if (updated)
                 {
                 return Ok(new { msg = "certificate updated successfully"});

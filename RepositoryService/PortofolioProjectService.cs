@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-    public class PortofolioProjectService(ApplicationDbContext context, IMapper _mapper) : IPortofolioProject
+    public class PortofolioProjectService(ApplicationDbContext context,IPortofolioProjectImage _images, IMapper _mapper) : IPortofolioProject
     {
 
         public async Task<List<PortofolioProject>> GetAllAync()
@@ -24,7 +24,7 @@ namespace Freelancing.RepositoryService
             var freelancer = context.freelancers.SingleOrDefault(f => f.Id == id);
             if(freelancer is not null)
             {
-                var PortfolioProjects= await context.PortofolioProjects.Where(p => p.FreelancerId == id).ToListAsync();
+                var PortfolioProjects= await context.PortofolioProjects.Include(p=>p.Images).Where(p => p.FreelancerId == id&&!p.IsDeleted).ToListAsync();
                 return PortfolioProjects;
             }
             throw new KeyNotFoundException("Invalid Freelancer Id");
@@ -34,19 +34,30 @@ namespace Freelancing.RepositoryService
 
 
 
-        public async Task<PortofolioProject> AddAsync(PortofolioProjectDTO portofolioProject)
+        public async Task<PortofolioProject> AddAsync(CreatePortfolioProjectDTO portofolioProject, string freelancerid)
         {
             PortofolioProject p = new PortofolioProject()
             {
                 Title = portofolioProject.Title,
                 Description = portofolioProject.Description,
                 CreatedAt = portofolioProject.CreatedAt,
-                Images = portofolioProject.Images,
-                FreelancerId = portofolioProject.FreelancerId
+                FreelancerId = freelancerid
             };
             await context.PortofolioProjects.AddAsync(p);
             await context.SaveChangesAsync();
-            return p;
+            if (portofolioProject.Images is not null)
+            {
+                foreach (var item in portofolioProject.Images)
+                {
+                    await _images.AddAsync(new PortofolioProjectImageDTO()
+
+                    {
+                        PreviousProjectId = p.Id,
+                        Image = item.Save2()
+                    });
+                }
+            }
+			return p;
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -69,11 +80,11 @@ namespace Freelancing.RepositoryService
             var p = context.PortofolioProjects.SingleOrDefault(p => p.Id == portofolioProject.Id);
             if (p is not null)
             {
-                //p.Title = portofolioProject.Title;
-                //p.Description = portofolioProject.Description;
-                //p.CreatedAt = portofolioProject.CreatedAt;
+                p.Title = portofolioProject.Title;
+                p.Description = portofolioProject.Description;
+                p.CreatedAt = portofolioProject.CreatedAt;
                 //p.Images = portofolioProject.Images;
-                _mapper.Map(portofolioProject, p);
+                //_mapper.Map(portofolioProject, p);
 
                 await context.SaveChangesAsync();
                 return p;

@@ -42,7 +42,7 @@ namespace Freelancing
             });
             #endregion
             #region Configuring identity
-            builder.Services.AddIdentity<AppUser, IdentityRole>()
+             builder.Services.AddIdentity<AppUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 			builder.Services.AddAuthentication((options) =>
@@ -105,7 +105,7 @@ namespace Freelancing
 					op.AppSecret = "9b2593ba5d2a3d86957ec93831791298";
 				});
 
-
+		
 
 			builder.Services.Configure<IdentityOptions>(options =>
 			{
@@ -247,7 +247,11 @@ namespace Freelancing
 				FileProvider = new PhysicalFileProvider(uploadsPath),
 				RequestPath = "/files"
 			}); //enabling wwwroot with the localhost/files url 
-
+			app.UseStaticFiles(new StaticFileOptions
+			{
+				FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")),
+				RequestPath = "/projectimages"
+			});
 
 			using (var scope = app.Services.CreateScope())//seeding roles and a user
 			{
