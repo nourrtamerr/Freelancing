@@ -32,14 +32,39 @@ namespace Freelancing.Controllers
         }
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
+        //{
+        //    var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        //    return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
+        //}
+
         [HttpPost]
         public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
-            var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+            try
+            {
+                var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            return Ok(new {project.ClientId,project.Subcategory.Name,p=project.ProjectSkills.Select(ps=>ps.Skill.Name).ToList()});
+                //return Ok(new
+                //{
+                //    project.ClientId,
+                //    project.Subcategory.Name,
+                //    p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
+                //});
+                return Ok(new
+                {
+                    ClientId = project.ClientId ?? "3611f18e-2097-4b01-bcb3-0fcf8045af03",
+                    project.Subcategory.Name,
+                    p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, details = ex.StackTrace });
+            }
         }
-
 
         [HttpPut("/{id}")]
         public async Task<IActionResult> Update(int id,[FromBody]BiddingProjectCreateUpdateDTO p)
