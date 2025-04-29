@@ -1,19 +1,47 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectsController(IProjectService context) : ControllerBase
+    public class ProjectsController(IProjectService context, UserManager<AppUser>userManager) : ControllerBase
     {
         [HttpGet]
         public async Task<ActionResult<List<Project>>> GetAllProjects()
         {
             var projects = await context.GetAllProjectsDtoAsync();
             return Ok(projects);
+
+        }
+
+
+        [HttpGet("MyProjects")]
+        public async Task<ActionResult<List<Project>>> MyProjects()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await userManager.FindByIdAsync(userId);
+
+            var projects = await context.GetAllProjectsDtoAsync();
+
+            if (user is Client)
+            {
+                projects = projects.Where(p => p.ClientId == userId).ToList();
+
+            }
+            else if (user is Freelancer)
+            {
+                projects = projects.Where(p => p.FreelancerId == userId).ToList();
+
+            }
+            else {
+                return BadRequest(new { message = "Admins dont have projects" });
+            }
+
+                return Ok(projects);
 
         }
 

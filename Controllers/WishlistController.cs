@@ -17,6 +17,11 @@ namespace Freelancing.Controllers
 			_context.FreelancerWishlists.Where(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
 			return Ok(new { message = "Get Wishlist" });
 		}
+
+
+
+
+
 		[HttpPost]
 		[Authorize(Roles = "Freelancer")]
 		public IActionResult AddToWishlist(int projectid)
@@ -31,6 +36,7 @@ namespace Freelancing.Controllers
 			//{
 			//	return BadRequest(new { message = "Project is not  completed" });
 			//}
+
 			if(_context.FreelancerWishlists.Any(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid))
 			{
 				return BadRequest(new { message = "Project already in wishlist" });
@@ -43,6 +49,10 @@ namespace Freelancing.Controllers
 			_context.FreelancerWishlists.Add(wishlist);
 			return Ok(new { id= wishlist.Id });
 		}
+
+
+
+
 
 		[HttpDelete]
 		[Authorize(Roles = "Freelancer")]
