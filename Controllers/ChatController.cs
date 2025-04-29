@@ -18,22 +18,28 @@ namespace Freelancing.Controllers
         private readonly IChatRepositoryService _chatRepository;
         private readonly IMapper _mapper;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _NotifhubContext;
         private readonly ApplicationDbContext _context;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly UserManager<AppUser> _usermanager;
 
-        public ChatController(
+		public ChatController(
             IChatRepositoryService chatRepository,
             IMapper mapper,
             IHubContext<ChatHub> hubContext,
+            IHubContext<NotificationHub> NotifhubContext,
             ApplicationDbContext context,
-            CloudinaryService cloudinaryService)
+            CloudinaryService cloudinaryService,
+            UserManager<AppUser> usermanager)
         {
             _chatRepository = chatRepository;
             _mapper = mapper;
             _hubContext = hubContext;
             _context = context;
             _cloudinaryService = cloudinaryService;
-        }
+            _usermanager = usermanager;
+            _NotifhubContext = NotifhubContext;
+		}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetChat(int id)
@@ -51,7 +57,13 @@ namespace Freelancing.Controllers
         [HttpGet("conversation/{userId1}/{userId2}")]
         public async Task<IActionResult> GetConversation(string userId1, string userId2)
         {
-            var chats = await _chatRepository.GetConversationAsync(userId1, userId2);
+			var user1 = await _usermanager.FindByNameAsync(userId1);
+			var user2 = await _usermanager.FindByNameAsync(userId2);
+            if(user1==null||user2==null)
+            {
+                return BadRequest(new { error = "invalidusers" });
+            }
+			var chats = await _chatRepository.GetConversationAsync(user1.Id, user2.Id);
             if (chats == null || !chats.Any())
             {
                 return NotFound();
@@ -61,16 +73,16 @@ namespace Freelancing.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateChat([FromBody] CreateChatDto createChatDto)
+        public async Task<IActionResult> CreateChat([FromForm] CreateChatDto createChatDto)
         {
-            if (createChatDto.Image == "")
-            {
-                createChatDto.Image = null;
-            }
+            //if (createChatDto.Image == "")
+            //{
+            //    createChatDto.Image = null;
+            //}
 
             try
             {
-                if (string.IsNullOrEmpty(createChatDto.Message) && string.IsNullOrEmpty(createChatDto.Image))
+                if (string.IsNullOrEmpty(createChatDto.Message) && createChatDto.Image==null)
                 {
                     return BadRequest(new { error = "Either a message or an image is required." });
                 }
@@ -89,20 +101,26 @@ namespace Freelancing.Controllers
                 }
 
                 string imageUrl = null;
-                if (!string.IsNullOrEmpty(createChatDto.Image))
+                if (createChatDto.Image!=null)
                 {
                     try
                     {
-                        imageUrl = await _cloudinaryService.UploadBase64ImageAsync(createChatDto.Image);
+                        imageUrl = createChatDto.Image.Save();
                     }
                     catch
                     {
                         return BadRequest(new { error = "Invalid image format." });
                     }
                 }
+                var user = await _usermanager.FindByNameAsync(createChatDto.ReceiverId);
+                if(user is null)
+                {
+                    return BadRequest(new { error = "user not found" });
+                }    
 
                 var chat = _mapper.Map<Chat>(createChatDto);
                 chat.SenderId = senderId;
+                chat.ReceiverId = user.Id;
                 chat.SentAt = DateTime.UtcNow;
                 chat.isRead = false;
                 chat.ImageUrl = imageUrl;
@@ -112,8 +130,18 @@ namespace Freelancing.Controllers
 
                 await _hubContext.Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
                     .SendAsync("ReceiveMessage", chatDto);
+				await _NotifhubContext.Clients.Users(chatDto.ReceiverId).SendAsync("ReceiveNotification", 
+                    new NotificationDto()
+                    {
+                        Id=1,
+                        IsRead=false,
+                        Message=chatDto.Message+"has been sent to you",
+                        UserId=chatDto.ReceiverId
+                    });
 
-                return CreatedAtAction(nameof(GetChat), new { id = chatDto.Id }, chatDto);
+
+
+				return CreatedAtAction(nameof(GetChat), new { id = chatDto.Id }, chatDto);
             }
             catch (Exception ex)
             {

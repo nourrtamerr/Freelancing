@@ -31,6 +31,18 @@ namespace Freelancing.Controllers
 		{
 			return Ok(new { str = "hh" });
 		}
+
+		[HttpGet("getIdByUserName/{username}")]
+		[Authorize]
+		public async Task<IActionResult> getIdByUserName(string username)
+		{
+			var user = await _userManager.FindByNameAsync(username);
+			if (user is null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(new { id=user.Id});
+		}
 		[HttpGet("FreeAgents")]
 		public async Task<IActionResult> getAllFreelancers()
 		{
