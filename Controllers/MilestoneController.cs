@@ -94,9 +94,15 @@ namespace Freelancing.Controllers
 
             return Ok(await _milestoneService.RemoveFile(FileId));
         }
+		[HttpDelete("RemoveMilestoneFilesByName/{Name}")]
+		public async Task<IActionResult> RemoveMilestoneFilesByName(string Name)
+		{
+
+			return Ok(await _milestoneService.RemoveFilebyName(Name));
+		}
 
 
-        [HttpGet("GetFilesByMilestoneId/{MilestoneId}")]
+		[HttpGet("GetFilesByMilestoneId/{MilestoneId}")]
         public async Task<IActionResult> GetFilesByMilestoneId(int MilestoneId)
         {
             return Ok((await _milestoneService.GetFilesByMilestoneId(MilestoneId)).Select(f=>new { f.id,f.fileName }));

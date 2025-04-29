@@ -9,8 +9,9 @@ namespace Freelancing.IRepositoryService
         Task<MilestoneGetByIdOrProjectIdDTO> GetByIdAsync(int id);
 
         Task<List<MilestoneGetByIdOrProjectIdDTO>> GetByProjectId(int ProjectId);
+        Task<bool> RemoveFilebyName(string name);
 
-        Task<MilestoneCreateDTO> CreateAsync(MilestoneCreateDTO milestone);
+		Task<MilestoneCreateDTO> CreateAsync(MilestoneCreateDTO milestone);
 
         /*Task<Milestone> UpdateStatusAsync(MilestoneGetAllDTO milestone);*/ //for status only => httppatch
 

@@ -168,7 +168,20 @@ namespace Freelancing.RepositoryService
             return false;
         }
 
-        public async Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId)
+		public async Task<bool> RemoveFilebyName(string name)
+		{
+			var file = context.MilestoneFiles.FirstOrDefault(f => f.fileName.EndsWith(name));
+			if (file is not null)
+			{
+				context.MilestoneFiles.Remove(file);
+				await context.SaveChangesAsync();
+				SaveImage.Delete(file.fileName);
+				return true;
+			}
+			return false;
+		}
+
+		public async Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId)
         {
             var milestone =await context.Milestones.Include(m=>m.MilestoneFiles).FirstOrDefaultAsync(m => m.Id == MilsestoneId);
             if(milestone is not null)
