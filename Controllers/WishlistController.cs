@@ -1,28 +1,46 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Freelancing.DTOs.ProposalDTOS;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class WishlistController(ApplicationDbContext _context) : ControllerBase
-    {
-        [HttpGet]
-		[Authorize(Roles ="Freelancer")]
+	[Route("api/[controller]")]
+	[ApiController]
+	public class WishlistController(ApplicationDbContext _context) : ControllerBase
+	{
+		[HttpGet]
+		[Authorize(Roles = "Freelancer")]
 		public IActionResult GetmyWishlist()
 		{
 			// Logic to get the wishlist
-			_context.FreelancerWishlists.Where(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
-			return Ok(new { message = "Get Wishlist" });
+			var wishlist = _context.FreelancerWishlists.Include(P => P.Project).Include(p => p.Freelancer).Where(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
+			
+			return Ok(
+				wishlist.Select(w => new
+				{
+					w.ProjectId,
+					w.Project.Title,
+					currency=w.Project.currency.ToString(),
+					w.Project.CreatedAt,
+					w.Project.experienceLevel,
+					price = w.Project is FixedPriceProject
+			 ? (w.Project as FixedPriceProject).Price
+			 : w.Project is BiddingProject
+			   ? (w.Project as BiddingProject).BidCurrentPrice
+			   : 0,
+			   type= w.Project is FixedPriceProject
+			 ? "FixedPrice": "Bidding"
+			  
+				}
+				)
+
+
+				);
 		}
-
-
-
-
-
-		[HttpPost]
+		[HttpPost("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
 		public IActionResult AddToWishlist(int projectid)
 		{
@@ -36,8 +54,7 @@ namespace Freelancing.Controllers
 			//{
 			//	return BadRequest(new { message = "Project is not  completed" });
 			//}
-
-			if(_context.FreelancerWishlists.Any(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid))
+			if (_context.FreelancerWishlists.Any(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid))
 			{
 				return BadRequest(new { message = "Project already in wishlist" });
 			}
@@ -47,14 +64,11 @@ namespace Freelancing.Controllers
 				ProjectId = projectid
 			};
 			_context.FreelancerWishlists.Add(wishlist);
-			return Ok(new { id= wishlist.Id });
+			_context.SaveChanges();
+			return Ok(new { id = wishlist.Id });
 		}
 
-
-
-
-
-		[HttpDelete]
+		[HttpDelete("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
 		public IActionResult RemoveFromWishlist(int projectid)
 		{
