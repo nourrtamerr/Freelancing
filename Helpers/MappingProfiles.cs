@@ -17,7 +17,10 @@ namespace Freelancing.Helpers
             #region AuthMappings
             CreateMap<RegisterDTO, Client>()
                .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+
+
             CreateMap<Client, RegisterDTO>();
+
             CreateMap<Freelancer, RegisterDTO>();
             CreateMap<RegisterDTO, Freelancer>()
                 .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
@@ -71,20 +74,20 @@ namespace Freelancing.Helpers
             .ForMember(dest=>dest.role,opt=>opt.MapFrom(src=>(src.GetType()==typeof(Admin)?Accountrole.Admin :src.GetType()==typeof(Freelancer)?Accountrole.Freelancer:Accountrole.Client)))
             .ForMember(dest=>dest.Country,opt=>opt.MapFrom(src=>(src.City.Country.Name)))
             .ForMember(dest=>dest.City,opt=>opt.MapFrom(src=>(src.City.Name)))
+
             .AfterMap((src, dest) =>
 			{
-				if (src is Freelancer freelancer)
-				{
-					dest.isAvailable = freelancer.isAvailable;
-					dest.Balance = (int?)freelancer.Balance;
-				}
-                if(src is Client client)
-				{
-					dest.PaymentVerified = client.PaymentVerified;
-					dest.Balance = (int?)client.Balance;
-
-				}
-			});
+                if (src is Freelancer freelancer)
+                {
+                    dest.isAvailable = freelancer.isAvailable;
+                    dest.Balance = freelancer.Balance; // Default to 0 if null
+                }
+                if (src is Client client)
+                {
+                    dest.PaymentVerified = client.PaymentVerified;
+                    dest.Balance = client.Balance; // Default to 0 if null
+                }
+            });
 
             CreateMap<ViewClientDTO, Client>();
             CreateMap<AppUser, UsersViewDTO>()
@@ -94,11 +97,12 @@ namespace Freelancing.Helpers
                 if (src is Freelancer freelancer)
                 {
                     dest.isAvailable = freelancer.isAvailable;
-                    dest.Balance = (int?)freelancer.Balance;
+                    dest.Balance = freelancer.Balance;
                 }
                 if (src is Client client)
                 {
                     dest.PaymentVerified = client.PaymentVerified;
+                    dest.Balance = client.Balance;
                 }
             })
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name))

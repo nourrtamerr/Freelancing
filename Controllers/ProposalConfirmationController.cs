@@ -146,7 +146,8 @@ namespace Freelancing.Controllers
                     var Amount = proposal.suggestedMilestones.Sum(m => m.Amount);
                    
                     var url = Pay(proposalId, PaymentMethod.CreditCard, card.Cardnumber + "," + card.cvv);
-                    return Redirect(url);
+                    //return Redirect(url);
+                    return Ok();
                 }
                 return BadRequest("proposal not found");
             }
@@ -197,7 +198,9 @@ namespace Freelancing.Controllers
         [HttpGet("Success")]
         public async Task<IActionResult> Success(string session_id,int proposalId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userId = Request.Cookies["UserSessionId"];
 
             var client = context.clients.FirstOrDefault(c => c.Id == userId);
 
