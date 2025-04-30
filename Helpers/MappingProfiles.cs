@@ -278,14 +278,9 @@ namespace Freelancing.Helpers
                     : 0
             ))
 
-            .ForMember(dest=>dest.ClientOtherProjectsIdsNotAssigned, opt=> opt.Ignore())
-            .ForMember(dest=>dest.ClientProjectsTotalCount, opt=>opt.Ignore())
+            .ForMember(dest => dest.ClientOtherProjectsIdsNotAssigned, opt => opt.Ignore())
+            .ForMember(dest => dest.ClientProjectsTotalCount, opt => opt.Ignore())
 
-                //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src ,dest)=>
-                //    src.Client.Reviewed != null && src.Client.Reviewed != null && src.Client.Reviewed.Any()
-                //        ? src.Client.Reviewed.Average(r => r.Rating)
-                //        : 0
-                //))
 
                 .ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src, dest) =>
                 src.Client != null && src.Client.Reviewed != null && src.Client.Reviewed.Any()
@@ -293,7 +288,7 @@ namespace Freelancing.Helpers
                     : 0
                 ))
 
-                .ForMember(dest=>dest.ClinetAccCreationDate, opt=>opt.MapFrom(src=>src.Client.AccountCreationDate.ToString()))
+                .ForMember(dest => dest.ClinetAccCreationDate, opt => opt.MapFrom(src => src.Client.AccountCreationDate.ToString()))
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src, dest) =>
                 //{
@@ -305,33 +300,32 @@ namespace Freelancing.Helpers
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.Ignore())
 
-                .ForMember(dest=>dest.ClientCity, opt=>opt.MapFrom(src=>src.Client.City.Name))
+                .ForMember(dest => dest.ClientCity, opt => opt.MapFrom(src => src.Client.City.Name))
 
-                .ForMember(dest=>dest.ClientCountry, opt=>opt.MapFrom(src=>src.Client.City.Country.Name))
+                .ForMember(dest => dest.ClientCountry, opt => opt.MapFrom(src => src.Client.City.Country.Name))
 
-                .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.MapFrom(src =>
-                    src.Freelancer!=null
-                    ?src.Freelancer.subscriptionPlan.name
-                    : "Freelancer not found"
-                ))
+                //    .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.MapFrom(src =>
+                //        src.Freelancer!=null
+                //        ?src.Freelancer.subscriptionPlan.name
+                //        : "Freelancer not found"
+                //    ))
 
-                //.ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom(src =>
-                //    src.Freelancer.subscriptionPlan.TotalNumber != null
-                //    ?src.Freelancer.subscriptionPlan.TotalNumber
-                //    : 0
+
+                //    .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom((src, dest) =>
+                //    src.Freelancer != null && src.Freelancer.subscriptionPlan != null
+                //        ? src.Freelancer.subscriptionPlan.TotalNumber
+                //        : 0
                 //))
 
-                .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom((src, dest) =>
-                src.Freelancer != null && src.Freelancer.subscriptionPlan != null
-                    ? src.Freelancer.subscriptionPlan.TotalNumber
-                    : 0
-            ))
+                //    .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.MapFrom(src =>
+                //        src.Freelancer!=null
+                //        ?src.Freelancer.RemainingNumberOfBids
+                //        :0
+                //    ));
 
-                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.MapFrom(src =>
-                    src.Freelancer!=null
-                    ?src.Freelancer.RemainingNumberOfBids
-                    :0
-                ));
+                .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.Ignore())
+                .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.Ignore());
 
 
 

@@ -33,8 +33,17 @@ namespace Freelancing.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Pass userId to service
+            var result = await _biddingProjectService.GetBiddingProjectByIdAsync(id, userId);
+
+            return result != null ? Ok(result) : NotFound();
+
+
+            //return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
         }
+        
 
 
         //[HttpPost]
