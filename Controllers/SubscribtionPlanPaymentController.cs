@@ -9,6 +9,7 @@ using Stripe;
 using System.Collections.Generic;
 using Freelancing.Helpers;
 using Stripe.Checkout;
+using CloudinaryDotNet;
 
 namespace Freelancing.Controllers
 {
@@ -32,7 +33,8 @@ namespace Freelancing.Controllers
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+                // var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null) return Unauthorized("User not authenticated.");
 
                 // Check if user is a Freelancer or Client
@@ -54,14 +56,17 @@ namespace Freelancing.Controllers
                 // If it's a free plan, activate it immediately for both freelancers and clients
                 if (plan.Price == 0)
                 {
-                    if (freelancer != null)
+                    
+
+                    if (freelancer != null  )
                     {
                         freelancer.subscriptionPlanId = plan.Id;
                         freelancer.RemainingNumberOfBids = plan.TotalNumber;
-                    
+
                     }
                     else if (client != null)
                     {
+                        client.RemainingNumberOfProjects = plan.TotalNumber;
                         client.subscriptionPlanId = plan.Id;
                     }
 
@@ -69,9 +74,12 @@ namespace Freelancing.Controllers
                     return Ok(new { message = "Free plan activated successfully." });
                 }
 
-
-
                 // var url = $"{Request.Scheme}://{Request.Host}/Stripe/create-checkout-session?Amount={plan.Price}";
+
+                
+
+
+               
                 var PaymentSuccessUrl = Url.ActionLink("PaymentSuccess", "SubscribtionPlanPayment", new
                 {
                     sessionId = "{CHECKOUT_SESSION_ID}",
@@ -84,6 +92,7 @@ namespace Freelancing.Controllers
                     redirectionurl = PaymentSuccessUrl,
                 });
 
+            return Redirect(url);
 
             }
             catch (StripeException ex)
@@ -97,13 +106,21 @@ namespace Freelancing.Controllers
                 return StatusCode(500, new { error = "An error occurred while creating the payment session." });
             }
 
-            return Ok();
         }
+
+
+       
+
+
+
+
+
         [HttpGet("payment-success")]
         public IActionResult PaymentSuccess(string sessionId, int planid)
         {
             try
             {
+
                 var sessionService = new SessionService();
                 var session = sessionService.Get(sessionId);
                 if (session == null)
