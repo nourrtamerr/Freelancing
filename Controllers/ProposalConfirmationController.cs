@@ -158,6 +158,9 @@ namespace Freelancing.Controllers
 
 
 
+
+
+
         [HttpGet("ClientPayFromStripe")]
         public async Task<IActionResult> ClientPayFromStripe(int proposalId)
         {
