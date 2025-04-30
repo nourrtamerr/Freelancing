@@ -24,9 +24,7 @@ namespace Freelancing.Controllers
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 			var user = await userManager.FindByIdAsync(userId);
-
 			var projects = await context.GetAllProjectsDtoAsync();
-
 			if (user is Client)
 			{
 				projects = projects.Where(p => p.ClientId == userId).ToList();

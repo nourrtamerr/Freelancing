@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs;
+using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.MilestoneDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +19,16 @@ namespace Freelancing.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMilestoneService _milestoneService;
         private readonly UserManager<AppUser> _userManager;
-
-		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager)
+        private readonly INotificationRepositoryService notificationrepo;
+        private readonly IConfiguration _configuration;
+		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
         {
             _fixedProjectService = fixedProjectService;
             _dbContext = dbContext;
             _milestoneService = milestoneService;
 			_userManager = userManager;
+            notificationrepo = _notificationrepo;
+            _configuration = configuration;
 		}
 
 
@@ -499,7 +503,31 @@ namespace Freelancing.Controllers
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
 
-            if (dto.ProjectSkills.Any())
+
+            var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancers = await _userManager.Users.OfType<Freelancer>().ToListAsync();
+			foreach (var freelancer in freelancers)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"New Fixed Pricee Project Posted{_configuration["AppSettings:AngularAppUrl"] + $"/fixed-project/{project.Id}"}",
+					UserId = freelancer.Id
+				});
+
+			}
+			if ((await _fixedProjectService.GetAllFixedPriceProjectsAsyncByClientId(userid)).Count() == 1)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"Congratulations on your first fiexprices project Post{_configuration["AppSettings:AngularAppUrl"] + $"/details/{project.Id}"}",
+					UserId = userid
+				});
+			}
+			;
+
+			if (dto.ProjectSkills.Any())
             {
                 foreach (var skillId in dto.ProjectSkills)
                 {

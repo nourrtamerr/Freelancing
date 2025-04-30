@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
 using Freelancing.Filters;
+using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +14,15 @@ namespace Freelancing.Controllers
     {
         private readonly IReviewRepositoryService reviewService;
         private readonly IMapper mapper;
+        private readonly INotificationRepositoryService _notifications;
 
-        public ReviewsController(IReviewRepositoryService reviewService, IMapper mapper)
+		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper)
         {
             this.reviewService = reviewService;
             this.mapper = mapper;
-        }
+            _notifications = notifications;
+
+		}
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ReviewDto>> GetReview(int id)
@@ -65,7 +69,13 @@ namespace Freelancing.Controllers
             }
             var review = mapper.Map<Review>(reviewDto);
             var createdReview = await reviewService.CreateReviewAsync(review);
-            var createdReviewDto = mapper.Map<ReviewDto>(createdReview);
+            await _notifications.CreateNotificationAsync(new()
+            {
+                isRead = false,
+                Message = $"you got reviewed by userid {review.ReviewerId}",
+                UserId = review.RevieweeId
+            });
+			var createdReviewDto = mapper.Map<ReviewDto>(createdReview);
             return CreatedAtAction(nameof(GetReview), new { id = createdReview.id }, createdReviewDto);
         }
         [HttpPut("{id}")]

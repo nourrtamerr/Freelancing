@@ -18,10 +18,10 @@ namespace Freelancing.RepositoryService
             return milestoneDTOs;
         }
 
-        public async Task<MilestoneGetByIdOrProjectIdDTO> GetByIdAsync(int id)
+        public async Task<MilestoneGetAllDTO> GetByIdAsync(int id)
         {
             var milestone = await context.Milestones.SingleOrDefaultAsync(m => m.Id == id);
-            var milestoneDTO = mapper.Map<MilestoneGetByIdOrProjectIdDTO>(milestone);
+            var milestoneDTO = mapper.Map<MilestoneGetAllDTO>(milestone);
             return milestoneDTO;
         }
 

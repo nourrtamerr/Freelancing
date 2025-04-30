@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs.ProposalDTOS;
+using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class WishlistController(ApplicationDbContext _context) : ControllerBase
+	public class WishlistController(INotificationRepositoryService _notifications,ApplicationDbContext _context) : ControllerBase
 	{
 		[HttpGet]
 		[Authorize(Roles = "Freelancer")]
@@ -42,10 +43,10 @@ namespace Freelancing.Controllers
 		}
 		[HttpPost("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
-		public IActionResult AddToWishlist(int projectid)
+		public async Task<IActionResult> AddToWishlist(int projectid)
 		{
 			// Logic to get the wishlist
-			var project = _context.project.FirstOrDefault(p => p.Id == projectid);
+			var project = _context.project.Include(p=>p.Freelancer).FirstOrDefault(p => p.Id == projectid);
 			if (project == null)
 			{
 				return BadRequest(new { message = "Project not found" });
@@ -63,8 +64,19 @@ namespace Freelancing.Controllers
 				FreelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier),
 				ProjectId = projectid
 			};
+
+
 			_context.FreelancerWishlists.Add(wishlist);
+
+
 			_context.SaveChanges();
+			project = _context.project.Include(p => p.Freelancer).FirstOrDefault(p => p.Id == projectid);
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"your project with id {project.Id} was added to wishwishlist  by userid {project.Freelancer.UserName}",
+				UserId = project.ClientId
+			});
 			return Ok(new { id = wishlist.Id });
 		}
 

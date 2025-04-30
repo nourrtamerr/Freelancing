@@ -7,6 +7,7 @@ using Humanizer;
 ////using Freelancing.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Checkout;
 using Stripe.V2;
 using System.Security.Claims;
 
@@ -15,7 +16,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProposalConfirmationController(IConfiguration configuration, IClientService clientService, IMapper mapper, ApplicationDbContext context) : ControllerBase
+    public class ProposalConfirmationController(INotificationRepositoryService _notification,IConfiguration configuration, IClientService clientService, IMapper mapper, ApplicationDbContext context) : ControllerBase
     {
 
 
@@ -180,7 +181,7 @@ namespace Freelancing.Controllers
                 if (proposal is not null)
                 {
                     var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                    var SuccessUrl = $"{baseUrl}/api/ProposalConfirmation/Success?session_id={{CHECKOUT_SESSION_ID}}&proposalId={proposalId}";
+                    var SuccessUrl = $"{baseUrl}/api/ProposalConfirmation/Success?session_id={{CHECKOUT_SESSION_ID}}&proposalId={proposalId}&";
                     var url = Url.ActionLink("CreateCheckoutSession", "Stripe", new { Amount = proposal.suggestedMilestones.Sum(m => m.Amount), redirectionurl = SuccessUrl });
                     return Redirect(url);
 
@@ -198,11 +199,20 @@ namespace Freelancing.Controllers
         [HttpGet("Success")]
         public async Task<IActionResult> Success(string session_id,int proposalId)
         {
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			//var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var userId = Request.Cookies["UserSessionId"];
-
-            var client = context.clients.FirstOrDefault(c => c.Id == userId);
+			//var userId = Request.Cookies["UserSessionId"];
+			var sessionService = new SessionService();
+			var session = sessionService.Get(session_id, new SessionGetOptions
+			{
+				Expand = new List<string> { "line_items.data.price.product" }
+			});
+			if (!session.Metadata.TryGetValue("userId", out var userId))
+			{
+                // This userId is unique per session
+                return BadRequest("payment failed");
+			}
+			var client = context.clients.FirstOrDefault(c => c.Id == userId);
 
             if(client is Client)
             {
@@ -243,7 +253,20 @@ namespace Freelancing.Controllers
 
 
                     var url = Pay(proposalId, PaymentMethod.Stripe, session_id);
-                    return Redirect(url);
+       
+					await _notification.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Payment successful for proposal Proposal with id `{proposalId}` please check it",
+						UserId = userId
+					});
+					await _notification.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Your proposal with id `{proposalId}` has been confirmed, please check your projects at {configuration["AppSettings:AngularAppUrl"]}/myProjects",
+						UserId = proposal.FreelancerId
+					});
+					return Redirect(url);
                 }
                 return BadRequest("Proposal not found");
             }

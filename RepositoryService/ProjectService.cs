@@ -26,7 +26,20 @@ namespace Freelancing.RepositoryService
 
 		public async Task<List<Project>> GetAllProjectsAsync()
 		{
-			return await _context.Set<Project>().ToListAsync();
+			var biddingProjects = await _context.Set<BiddingProject>()
+									.Include(m => m.Milestones)
+									.Where(p => !p.IsDeleted)
+									.ToListAsync();
+
+			var fixedProjects = await _context.Set<FixedPriceProject>()
+				.Include(m => m.Milestones)
+				.Where(p => !p.IsDeleted)
+				.ToListAsync();
+
+			var projects = biddingProjects.Cast<Project>()
+				.Concat(fixedProjects.Cast<Project>())
+				.ToList();
+			return projects;
 		}
 
 		public async Task<Project> GetProjectByIdAsync(int id)
@@ -52,10 +65,12 @@ namespace Freelancing.RepositoryService
 			//var z = _context.project;
 			//var h = _context.project.ToList();
 			var biddingProjects = await _context.Set<BiddingProject>()
+									.Include(m=>m.Milestones)
 									.Where(p => !p.IsDeleted)
 									.ToListAsync();
 
 			var fixedProjects = await _context.Set<FixedPriceProject>()
+				.Include(m => m.Milestones)
 				.Where(p => !p.IsDeleted)
 				.ToListAsync();
 
