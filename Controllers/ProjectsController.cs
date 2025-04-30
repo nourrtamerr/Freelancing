@@ -23,6 +23,10 @@ namespace Freelancing.Controllers
 		public async Task<ActionResult<List<Project>>> MyProjects()
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			if(userId is null)
+			{
+				return BadRequest();
+			}
 			var user = await userManager.FindByIdAsync(userId);
 			var projects = await context.GetAllProjectsDtoAsync();
 			if (user is Client)

@@ -65,6 +65,12 @@ namespace Freelancing.RepositoryService
                 }
 
                 await context.SaveChangesAsync();
+                if(milestone.Project.Status==projectStatus.Completed)
+                {
+                    milestone.Project.EndDate = DateTime.Now;
+                    context.Update(milestone.Project);
+                    context.SaveChanges();
+                }
                 var milestoneDto = mapper.Map<MilestoneGetAllDTO>(milestone);
                 return milestoneDto;
             }

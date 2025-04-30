@@ -99,7 +99,7 @@ namespace Freelancing.Controllers
         [HttpPost("UploadMilestoneFiles/{MilestoneId}")]
         public async Task<IActionResult> UploadMilestoneFiles([FromForm] List<IFormFile> files, int MilestoneId)
         {
-            await _milestoneService.UploadFile(files, MilestoneId);
+            //await _milestoneService.UploadFile(files, MilestoneId);
             var project = await _projects.GetProjectByIdAsync((await _milestoneService.GetByIdAsync(MilestoneId)).ProjectId);
 			await _notifications.CreateNotificationAsync(new()
 			{
