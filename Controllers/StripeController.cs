@@ -66,7 +66,7 @@ namespace Freelancing.Controllers
 		[HttpGet("create-checkout-session")]
 		public ActionResult<Freelancing.Models.Stripe.PaymentResponse> CreateCheckoutSession(string Amount, string redirectionurl,bool payout=false)
 		{
-
+			
 			try
 			{
 				var baseUrl = $"{Request.Scheme}://{Request.Host}";
@@ -78,9 +78,13 @@ namespace Freelancing.Controllers
 				var successUrl = redirectionurl;
 				var cancelUrl = $"{baseUrl}/api/Stripe/cancel";
 				StripeConfiguration.ApiKey = _stripesettings.SecretKey;
-
+				string userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 				var options = new SessionCreateOptions
 				{
+					Metadata = new Dictionary<string, string>
+						{
+							{ "userId", userid }
+						},
 					PaymentMethodTypes = new List<string>
 					{
 						"card"
@@ -96,8 +100,12 @@ namespace Freelancing.Controllers
                             ProductData = new SessionLineItemPriceDataProductDataOptions
 							{
 								Name = "Product Name",
-								Description = "Product Description"
-							}
+								Description = "Product Description",
+								Metadata = new Dictionary<string, string>
+								{
+									{ "userId", userid }
+								}
+							},
 						},
 						Quantity = 1
 					}
@@ -114,9 +122,18 @@ namespace Freelancing.Controllers
 				options.SuccessUrl = redirectionurl;
 				session.SuccessUrl = redirectionurl;
 
+                Response.Cookies.Append("UserSessionId", User.FindFirstValue(ClaimTypes.NameIdentifier), new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,  // Ensure it's secure if you're using HTTPS
+                    SameSite = SameSiteMode.Lax,  // Adjust depending on your needs
+                    Expires = DateTime.UtcNow.AddMinutes(30)  // Set an expiry time
+                });
 
-				
-				return Ok(new { session.Url });
+
+
+
+                return Ok(new { session.Url });
 				//return Redirect( session.Url);
 
 			}
@@ -152,6 +169,10 @@ namespace Freelancing.Controllers
 				Capabilities = new AccountCapabilitiesOptions
 				{
 					Transfers = new AccountCapabilitiesTransfersOptions { Requested = true }
+				},
+				Metadata = new Dictionary<string, string>
+				{
+					{ "userId", userId }
 				}
 			});
 			if(freelancer is not null)
@@ -168,6 +189,7 @@ namespace Freelancing.Controllers
 				RefreshUrl = $"{Request.Scheme}://{Request.Host}/api/stripe/create-connected-account?amountInCents={amountInCents}",
 				ReturnUrl = $"{Request.Scheme}://{Request.Host}/api/stripe/onboarding-complete?accountId={account.Id}&amountInCents={amountInCents}",
 				Type = "account_onboarding"
+				
 			});
 			return Ok(new { link.Url });
 
@@ -219,11 +241,17 @@ namespace Freelancing.Controllers
 
 
 		
-		[Authorize]
+		//[Authorize]
 		[HttpGet("transfer-to-freelancer")]
 		public IActionResult TransferToFreelancer(string connectedAccountId, long amountInCents)
 		{
-			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+			var accountService = new AccountService();
+			var account = accountService.Get(connectedAccountId);
+			//var account = new AccountService().Get(connectedAccountId);
+			if (!account.Metadata.TryGetValue("userId", out var userid))
+				return BadRequest("userId not found in metadata");
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userid);
 			var client = _context.clients.FirstOrDefault(f => f.Id == userid);
 
@@ -243,6 +271,10 @@ namespace Freelancing.Controllers
 					//Destination = freelancer?.StripeAccountId??client.StripeAccountId
 				},
 				ApplicationFeeAmount = amountInCents*(long)0.2,
+				Metadata = new Dictionary<string, string>
+			{
+				{ "userId", userid }
+			}
 			};
 
 			var service = new PaymentIntentService();
@@ -266,7 +298,7 @@ namespace Freelancing.Controllers
 			////fake test mode 
 
 			//string session_id= Guid.NewGuid().ToString();
-			var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.ClientSecret, amount = amountInCents / 1000 });
+			var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.Id, amount = amountInCents / 1000 });
 			//// Redirect to frontend success page
 
 			return Redirect(url);

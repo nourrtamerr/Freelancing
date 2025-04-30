@@ -13,5 +13,5 @@ public enum PaymentMethod
 	CreditCard,
 	Stripe,
     Balance
-	//Paypal
 }
+	//Paypal
