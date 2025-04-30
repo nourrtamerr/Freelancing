@@ -217,9 +217,11 @@ namespace Freelancing
 
 
 			builder.Services.AddAutoMapper(typeof(ReviewProfile), typeof(BanProfile), typeof(NotificationProfile), typeof(ChatProfile) ,typeof(SkillProfile) ,typeof(UserSkillProfile),typeof(ProjectSkillProfile));
+            builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
+            builder.Services.AddHttpClient<IAIService, AIService>();
 
-			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			builder.Services.AddControllers()
 			.AddJsonOptions(options =>
 			{

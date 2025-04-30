@@ -12,8 +12,9 @@ namespace Freelancing.Controllers
     [ApiController]
     public class FreelancerWithdrawalController(IConfiguration configuration,ApplicationDbContext _context,UserManager<AppUser> _freelancers) : ControllerBase
     {
-		[HttpPost("WithdrawCard")]
+        [HttpPost("WithdrawCard")]
 		[Authorize]
+
 		public async Task<IActionResult> WithdrawCard(CardPaymentDTO dto)
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
