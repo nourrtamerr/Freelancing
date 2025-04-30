@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
@@ -330,15 +331,39 @@ namespace Freelancing.RepositoryService
 
         //----------------------------------------------------------------------------------------------------
 
-        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, BiddingProjectFilterDTO filters)
+        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, userRole role)
         {
-            var projects = await _context.biddingProjects
+            List<BiddingProject> projects;
+
+            switch (role)
+            {
+                case userRole.Client:
+                    {
+                        projects = await _context.biddingProjects
                 .Include(b => b.Proposals)
                 .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
                 .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                 .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
                 .Include(b => b.Client.City).ThenInclude(c => c.Country)
-                .Where(u => u.FreelancerId == id && !u.IsDeleted).ToListAsync();
+                 .Where(u => u.ClientId == id && !u.IsDeleted).ToListAsync();
+                    }
+                    break;
+                case userRole.Freelancer:
+                    {
+                        projects = await _context.biddingProjects
+                .Include(b => b.Proposals)
+                .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
+                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+                .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
+                .Include(b => b.Client.City).ThenInclude(c => c.Country)
+                 .Where(u => u.FreelancerId == id && !u.IsDeleted).ToListAsync();
+                    }
+                    break;
+                default:
+                    projects = new();
+                    break;
+            }
+
             var projectss = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
             return projectss;
         }

@@ -7,7 +7,7 @@ namespace Freelancing.IRepositoryService
     public interface IBiddingProjectService
     {
         Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsync(BiddingProjectFilterDTO biddingProjectFilters, int pageNumber, int PageSize);
-        Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, BiddingProjectFilterDTO biddingProjectFilters);
+        Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, userRole role);
         Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByclientId(string id,BiddingProjectFilterDTO biddingProjectFilters);
         Task<BiddingProjectGetByIdDTO> GetBiddingProjectByIdAsync(int id, string userId);
         Task<BiddingProject> CreateBiddingProjectAsync(BiddingProjectCreateUpdateDTO project, string ClinetId);

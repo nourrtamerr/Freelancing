@@ -59,6 +59,7 @@ namespace Freelancing.Controllers
         }
 
         [HttpGet("freelancer")]
+        [Authorize(Roles = "Freelancer")]
         public async Task<IActionResult> GetAllCertificatesByFreelancerId()
         {
 

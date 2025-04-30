@@ -1,5 +1,8 @@
-﻿using Freelancing.IRepositoryService;
+﻿using Freelancing.DTOs;
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
+using Freelancing.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
@@ -8,16 +11,29 @@ namespace Freelancing.RepositoryService
     {
 
         private readonly ApplicationDbContext _context;
-        public NotificationRepositoryService(ApplicationDbContext context)
+        private readonly IHubContext<NotificationHub> _NotifhubContext;
+
+		public NotificationRepositoryService(ApplicationDbContext context,IHubContext<NotificationHub> NotifhubContext)
         {
-            _context = context;
-        }
+
+			_context = context;
+            _NotifhubContext = NotifhubContext;
+
+		}
         public async Task<Notification> CreateNotificationAsync(Notification notification)
         {
             notification.isRead = false;
             _context.Notifications.Add(notification);
            await _context.SaveChangesAsync();
-            return notification;
+			await _NotifhubContext.Clients.Users(notification.UserId).SendAsync("ReceiveNotification",
+					new NotificationDto()
+					{
+						Id = 1,
+						IsRead = false,
+						Message = notification.Message,
+						UserId = notification.UserId
+					});
+			return notification;
         }
         public async Task DeleteNotificationAsync(int id)
         {

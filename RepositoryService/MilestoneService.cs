@@ -18,10 +18,10 @@ namespace Freelancing.RepositoryService
             return milestoneDTOs;
         }
 
-        public async Task<MilestoneGetByIdOrProjectIdDTO> GetByIdAsync(int id)
+        public async Task<MilestoneGetAllDTO> GetByIdAsync(int id)
         {
             var milestone = await context.Milestones.SingleOrDefaultAsync(m => m.Id == id);
-            var milestoneDTO = mapper.Map<MilestoneGetByIdOrProjectIdDTO>(milestone);
+            var milestoneDTO = mapper.Map<MilestoneGetAllDTO>(milestone);
             return milestoneDTO;
         }
 
@@ -65,6 +65,12 @@ namespace Freelancing.RepositoryService
                 }
 
                 await context.SaveChangesAsync();
+                if(milestone.Project.Status==projectStatus.Completed)
+                {
+                    milestone.Project.EndDate = DateTime.Now;
+                    context.Update(milestone.Project);
+                    context.SaveChanges();
+                }
                 var milestoneDto = mapper.Map<MilestoneGetAllDTO>(milestone);
                 return milestoneDto;
             }
@@ -168,7 +174,20 @@ namespace Freelancing.RepositoryService
             return false;
         }
 
-        public async Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId)
+		public async Task<bool> RemoveFilebyName(string name)
+		{
+			var file = context.MilestoneFiles.FirstOrDefault(f => f.fileName.EndsWith(name));
+			if (file is not null)
+			{
+				context.MilestoneFiles.Remove(file);
+				await context.SaveChangesAsync();
+				SaveImage.Delete(file.fileName);
+				return true;
+			}
+			return false;
+		}
+
+		public async Task<List<MilestoneFile>> GetFilesByMilestoneId(int MilsestoneId)
         {
             var milestone =await context.Milestones.Include(m=>m.MilestoneFiles).FirstOrDefaultAsync(m => m.Id == MilsestoneId);
             if(milestone is not null)

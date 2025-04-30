@@ -31,6 +31,18 @@ namespace Freelancing.Controllers
 		{
 			return Ok(new { str = "hh" });
 		}
+
+		[HttpGet("getIdByUserName/{username}")]
+		[Authorize]
+		public async Task<IActionResult> getIdByUserName(string username)
+		{
+			var user = await _userManager.FindByNameAsync(username);
+			if (user is null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(new { id=user.Id});
+		}
 		[HttpGet("FreeAgents")]
 		public async Task<IActionResult> getAllFreelancers()
 		{
@@ -320,12 +332,7 @@ namespace Freelancing.Controllers
 			return Ok(new { User.Identity.IsAuthenticated, UserName = User.FindFirstValue(ClaimTypes.Name) });
 		}
 
-		[HttpPost("Testingformdata")]
-		public IActionResult Test([FromForm] string test)
-		{
-			int x = 5;
-			return Ok("Success");
-		}
+		
 		[HttpPut("EditProfile")]
 		[Authorize]
 		public async Task<IActionResult> editProfile([FromForm]EditProfileDTO dto)
@@ -755,6 +762,12 @@ namespace Freelancing.Controllers
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
+				await _notifications.CreateNotificationAsync(new Notification()
+				{
+					isRead = false,
+					Message = $"Welcome to Worktern, {user.UserName} , We hope you have a nice stay",
+					UserId = user.Id
+				});
 				var url = configuration["AppSettings:AngularAppUrl"] + "/home?pleaseLogin";
 				return Redirect(url);
 

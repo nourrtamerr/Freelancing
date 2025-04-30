@@ -12,6 +12,7 @@ using Freelancing.Services;
 using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace Freelancing
@@ -69,7 +70,7 @@ namespace Freelancing
 				{
 					OnMessageReceived = context =>
 					{
-						if (context.Request.Path.StartsWithSegments("/chathub"))
+						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification"))
 						{
 							var accessToken = context.Request.Query["access_token"];
 							context.Token = accessToken;
@@ -128,6 +129,7 @@ namespace Freelancing
 			builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<StripeSettings>>().Value);
 			builder.Services.AddHttpClient();
 
+			builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 			builder.Services.AddSwaggerGen(c =>
             {
@@ -279,6 +281,8 @@ namespace Freelancing
 			app.UseMiddleware<BanCheckMiddleware>();
 			app.MapControllers();
 			app.MapHub<ChatHub>("/chathub");
+			app.MapHub<NotificationHub>("/notification");
+			//app.MapHub<NotificationHub>("/chathub");
 			app.Run();
 		}
 	}
