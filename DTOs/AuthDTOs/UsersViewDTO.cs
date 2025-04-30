@@ -19,7 +19,7 @@
 		public bool IsVerified { get; set; }
 		public DateOnly AccountCreationDate { get; set; }
 		public bool emailConfirmed { get; set; }
-		public int? Balance { set; get; }
+		public decimal Balance { set; get; }
 		public bool? isAvailable { get; set; }
 		public bool? PaymentVerified { get; set; }
 	}

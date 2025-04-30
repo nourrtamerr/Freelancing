@@ -30,6 +30,7 @@ namespace Freelancing.Controllers
                 Name = category.Name,
                 IsDeleted = false,
             };
+
             var createdCategory = await _categoryService.CreateCategoryAsync(newCategory);
             return Ok ( new 
             {

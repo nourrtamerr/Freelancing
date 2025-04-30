@@ -4,7 +4,7 @@ using Freelancing.IRepositoryService;
 
 namespace Freelancing.RepositoryService
 {
-	public class ProjectService(ApplicationDbContext _context,IMapper mapper) : IProjectService
+	public class ProjectService(ApplicationDbContext _context, IMapper mapper) : IProjectService
 	{
 		public async Task<Project> CreateProjectAsync(Project project)
 		{
@@ -16,7 +16,7 @@ namespace Freelancing.RepositoryService
 		public async Task<bool> DeleteProjectAsync(int id)
 		{
 			var project = await GetProjectByIdAsync(id);
-			if(project is not null)
+			if (project is not null)
 			{
 				project.IsDeleted = true;
 				_context.Update(project);
@@ -26,7 +26,20 @@ namespace Freelancing.RepositoryService
 
 		public async Task<List<Project>> GetAllProjectsAsync()
 		{
-			return await _context.Set<Project>().ToListAsync();
+			var biddingProjects = await _context.Set<BiddingProject>()
+									.Include(m => m.Milestones)
+									.Where(p => !p.IsDeleted)
+									.ToListAsync();
+
+			var fixedProjects = await _context.Set<FixedPriceProject>()
+				.Include(m => m.Milestones)
+				.Where(p => !p.IsDeleted)
+				.ToListAsync();
+
+			var projects = biddingProjects.Cast<Project>()
+				.Concat(fixedProjects.Cast<Project>())
+				.ToList();
+			return projects;
 		}
 
 		public async Task<Project> GetProjectByIdAsync(int id)
@@ -41,23 +54,37 @@ namespace Freelancing.RepositoryService
 			{
 				_context.Update(project);
 			}
-            return proj;
-        }
+			return proj;
+		}
 
 
-        public async Task<List<ProjectDTO>> GetAllProjectsDtoAsync()
-        {
-            var projects = await _context.Set<Project>()
-                                 .Where(p => !p.IsDeleted)
-                                 .ToListAsync();
-            return mapper.Map<List<ProjectDTO>>(projects);
-        }
+		public async Task<List<ProjectDTO>> GetAllProjectsDtoAsync()
+		{
+			//var x = _context;
+			//var y = _context.Set<Project>();
+			//var z = _context.project;
+			//var h = _context.project.ToList();
+			var biddingProjects = await _context.Set<BiddingProject>()
+									.Include(m=>m.Milestones)
+									.Where(p => !p.IsDeleted)
+									.ToListAsync();
 
-        public async Task<ProjectDTO> GetProjectDtoByIdAsync(int id)
-        {
-            var project = await _context.Set<Project>()
-                                 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
-            return mapper.Map<ProjectDTO>(project);
-        }
-    }
+			var fixedProjects = await _context.Set<FixedPriceProject>()
+				.Include(m => m.Milestones)
+				.Where(p => !p.IsDeleted)
+				.ToListAsync();
+
+			var projects = biddingProjects.Cast<Project>()
+				.Concat(fixedProjects.Cast<Project>())
+				.ToList();
+			return mapper.Map<List<ProjectDTO>>(projects);
+		}
+
+		public async Task<ProjectDTO> GetProjectDtoByIdAsync(int id)
+		{
+			var project = await _context.Set<Project>()
+								 .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+			return mapper.Map<ProjectDTO>(project);
+		}
+	}
 }

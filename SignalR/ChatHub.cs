@@ -21,10 +21,11 @@ namespace Freelancing.SignalR
 
         public async Task SendMessage(ChatDto chatDto)
         {
-            var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-        ?? Context.User.FindFirst("sub")?.Value;
+			//var senderId = Context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+			//  ?? Context.User.FindFirst("sub")?.Value;
+			var senderId = Context.UserIdentifier;
 
-            if (chatDto == null || string.IsNullOrEmpty(chatDto.ReceiverId))
+			if (chatDto == null || string.IsNullOrEmpty(chatDto.ReceiverId))
             {
                 throw new HubException("Invalid message data");
             }
@@ -35,7 +36,11 @@ namespace Freelancing.SignalR
 
         public override async Task OnConnectedAsync()
         {
-            var userId = Context.UserIdentifier;
+
+
+			var userId = Context.UserIdentifier;
+			Console.WriteLine($"Connected userId: {userId}");
+
             var connectionId = Context.ConnectionId;
 
             var existingConnection = await _context.UserConnections
@@ -81,4 +86,12 @@ namespace Freelancing.SignalR
             await base.OnDisconnectedAsync(exception);
         }
     }
+	public class CustomUserIdProvider : IUserIdProvider
+	{
+		public string GetUserId(HubConnectionContext connection)
+		{
+			// Assuming your JWT uses the NameIdentifier (sub or userId) claim
+			return connection.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		}
+	}
 }
