@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using Freelancing.Services;
 using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
+using Freelancing.Helpers;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace Freelancing
@@ -29,7 +31,10 @@ namespace Freelancing
                 options.AddPolicy("AllowAll", policy =>
                 {
                     policy
-                        .WithOrigins("http://127.0.0.1:5500")
+					//.AllowAnyOrigin()
+                        .WithOrigins("http://localhost:4200")
+
+                  //  .WithOrigins("http://127.0.0.1:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
@@ -65,7 +70,7 @@ namespace Freelancing
 				{
 					OnMessageReceived = context =>
 					{
-						if (context.Request.Path.StartsWithSegments("/chathub"))
+						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification"))
 						{
 							var accessToken = context.Request.Query["access_token"];
 							context.Token = accessToken;
@@ -124,6 +129,7 @@ namespace Freelancing
 			builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<StripeSettings>>().Value);
 			builder.Services.AddHttpClient();
 
+			builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 			builder.Services.AddSwaggerGen(c =>
             {
@@ -257,6 +263,7 @@ namespace Freelancing
 				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
 				await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+			
 			}
 
 
@@ -276,6 +283,8 @@ namespace Freelancing
 			app.UseMiddleware<BanCheckMiddleware>();
 			app.MapControllers();
 			app.MapHub<ChatHub>("/chathub");
+			app.MapHub<NotificationHub>("/notification");
+			//app.MapHub<NotificationHub>("/chathub");
 			app.Run();
 		}
 	}

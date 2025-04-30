@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Freelancing.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Freelancing.DTOs
 {
@@ -21,8 +22,9 @@ namespace Freelancing.DTOs
         public string ReceiverId { get; set; }
 
         [MaxLength(1000)]
-        public string? Message { get; set; } 
+        public string? Message { get; set; }
+        [ImageExtension]
 
-        public string? Image { get; set; } 
+        public IFormFile? Image { get; set; } 
     }
 }

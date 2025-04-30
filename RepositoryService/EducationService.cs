@@ -51,10 +51,10 @@ namespace Freelancing.RepositoryService
                 .Include(c => c.Freelancer) 
                 .Where(c=>c.Freelancer.UserName == username&&!c.IsDeleted)
                 .ToListAsync();
-            if (educations.Count == 0)
-            {
-                return null;
-            }
+            //if (educations.Count == 0)
+            //{
+            //    return null;
+            //}
                 return educations;
         }
 

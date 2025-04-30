@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs.ProposalDTOS;
 using Freelancing.Filters;
+using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,7 +13,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProposalController(UserManager<AppUser> usermanager,IMapper _mapper,IproposalService _proposals,IProjectService _projects) : ControllerBase
+    public class ProposalController(IProjectService _project,INotificationRepositoryService _notifications,UserManager<AppUser> usermanager,IMapper _mapper,IproposalService _proposals,IProjectService _projects) : ControllerBase
     {
         // GET: api/<ProposalController>
         [HttpGet]
@@ -45,10 +46,21 @@ namespace Freelancing.Controllers
 			
 				return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(user.Id)));
 		}
+		
+		[HttpGet("getbyfreelancerId")]
+		public async Task<IActionResult> GetProposalsbyfreelancerid()
+		{
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+            {
+                return BadRequest("usr not found");
+            }
+            return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(userId)));
+        }
 
 		// POST api/<ProposalController>
 		[HttpPost]
-        [Authorize(Roles = "Freelancer")]
+        //[Authorize(Roles = "Freelancer")]
         public async Task<IActionResult> Post([FromBody]CreateProposalDTO dto)
         {
             //var proposal = _mapper.Map<Proposal>(dto);
@@ -56,11 +68,11 @@ namespace Freelancing.Controllers
 
 			if (project is null)
             {
-				return BadRequest("Project not found");
+				return BadRequest(new {message= "The project no longer exists" });
 			}
             if(project.FreelancerId is not null)
             {
-                return BadRequest("Project is already assigned to a freelancer");
+                return BadRequest(new { message = "This project has already been assigned to another freelancer" });
             }
             dto.type=project.GetType()==typeof(FixedPriceProject)? projectType.fixedprice : projectType.bidding;
             if (dto.type == projectType.fixedprice)
@@ -76,16 +88,25 @@ namespace Freelancing.Controllers
 				{
 					if (prjct.minimumPrice > dto.Price || prjct.maximumprice <dto.Price)
 					{
-						return BadRequest("not within bid limits");
+						return BadRequest( new {message= "Your bid amount must be between the minimum and maximum price range" });
 					}
 					if (prjct.BiddingEndDate < DateTime.Now )
-					{
-						return BadRequest("bid is over");
+					 {
+						return BadRequest(new { message = "The bidding period for this project has ended" });
 					}
 				}
+
 			}
+			var proposal=await _proposals.CreateProposalAsync(dto, "c2e230ae-7389-4ee3-8f26-862ca2625233" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"freelancer {proposal.FreelancerName} made a proposal proposal has been made to  project with id `{proposal.ProjectId}` please check it",
+				UserId = project.ClientId
+			});
+			
 			return Ok(
-				await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier))
+				await _proposals.CreateProposalAsync(dto, "c2e230ae-7389-4ee3-8f26-862ca2625233" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/)
 				);
         }
 
@@ -141,5 +162,7 @@ namespace Freelancing.Controllers
 			await _proposals.DeleteProposalAsync(id);
 			return Ok(new { Message = "Deleted" });
 		}
+
+
     }
 }

@@ -17,7 +17,10 @@ namespace Freelancing.Helpers
             #region AuthMappings
             CreateMap<RegisterDTO, Client>()
                .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
+
+
             CreateMap<Client, RegisterDTO>();
+
             CreateMap<Freelancer, RegisterDTO>();
             CreateMap<RegisterDTO, Freelancer>()
                 .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
@@ -71,20 +74,20 @@ namespace Freelancing.Helpers
             .ForMember(dest=>dest.role,opt=>opt.MapFrom(src=>(src.GetType()==typeof(Admin)?Accountrole.Admin :src.GetType()==typeof(Freelancer)?Accountrole.Freelancer:Accountrole.Client)))
             .ForMember(dest=>dest.Country,opt=>opt.MapFrom(src=>(src.City.Country.Name)))
             .ForMember(dest=>dest.City,opt=>opt.MapFrom(src=>(src.City.Name)))
+
             .AfterMap((src, dest) =>
 			{
-				if (src is Freelancer freelancer)
-				{
-					dest.isAvailable = freelancer.isAvailable;
-					dest.Balance = (int?)freelancer.Balance;
-				}
-                if(src is Client client)
-				{
-					dest.PaymentVerified = client.PaymentVerified;
-					dest.Balance = (int?)client.Balance;
-
-				}
-			});
+                if (src is Freelancer freelancer)
+                {
+                    dest.isAvailable = freelancer.isAvailable;
+                    dest.Balance = freelancer.Balance; // Default to 0 if null
+                }
+                if (src is Client client)
+                {
+                    dest.PaymentVerified = client.PaymentVerified;
+                    dest.Balance = client.Balance; // Default to 0 if null
+                }
+            });
 
             CreateMap<ViewClientDTO, Client>();
             CreateMap<AppUser, UsersViewDTO>()
@@ -94,11 +97,12 @@ namespace Freelancing.Helpers
                 if (src is Freelancer freelancer)
                 {
                     dest.isAvailable = freelancer.isAvailable;
-                    dest.Balance = (int?)freelancer.Balance;
+                    dest.Balance = freelancer.Balance;
                 }
                 if (src is Client client)
                 {
                     dest.PaymentVerified = client.PaymentVerified;
+                    dest.Balance = client.Balance;
                 }
             })
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City.Name))
@@ -274,14 +278,9 @@ namespace Freelancing.Helpers
                     : 0
             ))
 
-            .ForMember(dest=>dest.ClientOtherProjectsIdsNotAssigned, opt=> opt.Ignore())
-            .ForMember(dest=>dest.ClientProjectsTotalCount, opt=>opt.Ignore())
+            .ForMember(dest => dest.ClientOtherProjectsIdsNotAssigned, opt => opt.Ignore())
+            .ForMember(dest => dest.ClientProjectsTotalCount, opt => opt.Ignore())
 
-                //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src ,dest)=>
-                //    src.Client.Reviewed != null && src.Client.Reviewed != null && src.Client.Reviewed.Any()
-                //        ? src.Client.Reviewed.Average(r => r.Rating)
-                //        : 0
-                //))
 
                 .ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src, dest) =>
                 src.Client != null && src.Client.Reviewed != null && src.Client.Reviewed.Any()
@@ -289,7 +288,7 @@ namespace Freelancing.Helpers
                     : 0
                 ))
 
-                .ForMember(dest=>dest.ClinetAccCreationDate, opt=>opt.MapFrom(src=>src.Client.AccountCreationDate.ToString()))
+                .ForMember(dest => dest.ClinetAccCreationDate, opt => opt.MapFrom(src => src.Client.AccountCreationDate.ToString()))
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom((src, dest) =>
                 //{
@@ -301,33 +300,32 @@ namespace Freelancing.Helpers
 
                 //.ForMember(dest => dest.ClientRating, opt => opt.Ignore())
 
-                .ForMember(dest=>dest.ClientCity, opt=>opt.MapFrom(src=>src.Client.City.Name))
+                .ForMember(dest => dest.ClientCity, opt => opt.MapFrom(src => src.Client.City.Name))
 
-                .ForMember(dest=>dest.ClientCountry, opt=>opt.MapFrom(src=>src.Client.City.Country.Name))
+                .ForMember(dest => dest.ClientCountry, opt => opt.MapFrom(src => src.Client.City.Country.Name))
 
-                .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.MapFrom(src =>
-                    src.Freelancer!=null
-                    ?src.Freelancer.subscriptionPlan.name
-                    : "Freelancer not found"
-                ))
+                //    .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.MapFrom(src =>
+                //        src.Freelancer!=null
+                //        ?src.Freelancer.subscriptionPlan.name
+                //        : "Freelancer not found"
+                //    ))
 
-                //.ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom(src =>
-                //    src.Freelancer.subscriptionPlan.TotalNumber != null
-                //    ?src.Freelancer.subscriptionPlan.TotalNumber
-                //    : 0
+
+                //    .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom((src, dest) =>
+                //    src.Freelancer != null && src.Freelancer.subscriptionPlan != null
+                //        ? src.Freelancer.subscriptionPlan.TotalNumber
+                //        : 0
                 //))
 
-                .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.MapFrom((src, dest) =>
-                src.Freelancer != null && src.Freelancer.subscriptionPlan != null
-                    ? src.Freelancer.subscriptionPlan.TotalNumber
-                    : 0
-            ))
+                //    .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.MapFrom(src =>
+                //        src.Freelancer!=null
+                //        ?src.Freelancer.RemainingNumberOfBids
+                //        :0
+                //    ));
 
-                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.MapFrom(src =>
-                    src.Freelancer!=null
-                    ?src.Freelancer.RemainingNumberOfBids
-                    :0
-                ));
+                .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.Ignore())
+                .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.Ignore());
 
 
 
@@ -335,10 +333,14 @@ namespace Freelancing.Helpers
             //.ForMember(dest=>dest.Subcategory, opt=>opt.MapFrom(src=>src.Subcategory.Name.ToString()))
 
             CreateMap<BiddingProjectCreateUpdateDTO, BiddingProject>()
+//.ForMember(dest => dest.SubcategoryId, opt => opt.Ignore()) 
+//.ForMember(dest => dest.Subcategory, opt => opt.Ignore())
+//.ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
+.ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => src.ExperienceLevel))
               //.ForMember(dest => dest.SubcategoryId, opt => opt.Ignore()) 
               //.ForMember(dest => dest.Subcategory, opt => opt.Ignore())
               //.ForMember(dest => dest.ProjectSkills, opt => opt.Ignore())
-              .ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => (ExperienceLevel)src.ExperienceLevel))
+              //.ForMember(dest => dest.experienceLevel, opt => opt.MapFrom(src => (ExperienceLevel)src.ExperienceLevel))
               .ForMember(dest => dest.currency, opt => opt.MapFrom(src => (Currency)src.currency))
               .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
               .ForMember(dest => dest.ProjectSkills, opt => opt.MapFrom(src => src.ProjectSkillsIds.Select(ps => new ProjectSkill() { SkillId = ps })))

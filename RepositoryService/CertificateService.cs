@@ -32,6 +32,14 @@ namespace Freelancing.RepositoryService
                 .ToListAsync();
             return certificates;
         }
+        public async Task<IEnumerable<Certificate>> GetAllCertificatesByFreelancerId(string id)
+        {
+           var certificates = await context.certificates
+                .Include(c=>c.Freelancer)
+                .Where(c=>c.Freelancer.Id == id && !c.IsDeleted)
+                .ToListAsync();
+            return certificates;
+        }
 
         public async Task<IEnumerable<Certificate>> GetAllUserCertificatesAsync()
         {

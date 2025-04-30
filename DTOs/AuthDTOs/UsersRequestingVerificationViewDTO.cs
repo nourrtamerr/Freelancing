@@ -2,6 +2,7 @@
 {
 	public class UsersRequestingVerificationViewDTO
 	{
+		public string Id { set; get; }
 		public string firstname { get; set; }
 		public string lastname { get; set; }
 		public DateOnly DateOfBirth { get; set; }

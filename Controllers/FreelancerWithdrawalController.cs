@@ -1,8 +1,11 @@
 ﻿using Freelancing.DTOs;
 using Freelancing.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 using Stripe.V2;
 using System.Security.Claims;
 
@@ -10,7 +13,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FreelancerWithdrawalController(IConfiguration configuration,ApplicationDbContext _context,UserManager<AppUser> _freelancers) : ControllerBase
+    public class FreelancerWithdrawalController(INotificationRepositoryService _notifications,IConfiguration configuration,ApplicationDbContext _context,UserManager<AppUser> _freelancers) : ControllerBase
     {
         [HttpPost("WithdrawCard")]
 		[Authorize]
@@ -26,7 +29,7 @@ namespace Freelancing.Controllers
 			var user = await _freelancers.FindByIdAsync(userid);
 			if (user is Freelancer freelancer1)
 			{
-				freelancer1.Balance = freelancer1.Balance + dto.amount;
+				freelancer1.Balance = freelancer1.Balance - dto.amount;
 				Withdrawal withdrawal = new Withdrawal()
 				{
 					Amount = dto.amount,
@@ -38,6 +41,7 @@ namespace Freelancing.Controllers
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
+
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 				return Redirect(url);
 
@@ -60,6 +64,14 @@ namespace Freelancing.Controllers
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 				return Redirect(url);
 			}
+
+
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"Withdrawal completed with amount of {dto.amount} using credit card please check your balance",
+				UserId = userid
+			});
 			return BadRequest("not a correct client");
 		}
 		[HttpPost("AddFundsCard")]
@@ -88,7 +100,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
-				return Redirect(url);
+				return Ok(url);
 
 			}
 			if (user is Client client1)
@@ -107,10 +119,17 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
-				return Redirect(url);
+				return Ok(url);
 			}
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"Funding completed with amount of {dto.amount} using credit card please check your balance",
+				UserId = userid
+			});
 			return BadRequest("not a correct client");
 		}
+
 		#region stripe
 		[HttpGet("AddFundsStripe")]
 		[Authorize]
@@ -149,8 +168,19 @@ namespace Freelancing.Controllers
 		[HttpGet("fundssuccess")]
 		public async Task<IActionResult> fundsSuccess(string session_id, string amount)
 		{
-			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var freelancer = await _freelancers.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var sessionService = new SessionService();
+			var session = sessionService.Get(session_id, new SessionGetOptions
+			{
+				Expand = new List<string> { "line_items.data.price.product" }
+			});
+			if (!session.Metadata.TryGetValue("userId", out var userId))
+			{
+				// This userId is unique per session
+				return BadRequest("payment failed");
+			}
+
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = await _freelancers.FindByIdAsync(userId);
 
 			if (freelancer is Freelancer current)
 			{
@@ -164,13 +194,19 @@ namespace Freelancing.Controllers
 					{
 						Amount = x,
 						Date = DateTime.Now,
-						FreelancerId = userid,
+						FreelancerId = userId,
 						TransactionId = session_id,
 						PaymentMethod = PaymentMethod.Stripe
 					};
 					_context.Withdrawals.Add(withdrawal);
 					await _freelancers.UpdateAsync(current);
 					_context.SaveChanges();
+					await _notifications.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Funding completed with amount of {amount} using stripe please check your balance",
+						UserId = userId
+					});
 					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 					return Redirect(url);
 				}
@@ -178,6 +214,7 @@ namespace Freelancing.Controllers
 				{
 					return BadRequest("incorrect amount");
 				}
+
 			}
 			else if (freelancer is Client current2)
 			{
@@ -190,7 +227,7 @@ namespace Freelancing.Controllers
 					{
 						Amount = x,
 						Date = DateTime.Now,
-						ClientId = userid,
+						ClientId = userId,
 						TransactionId = session_id,
 						PaymentMethod = PaymentMethod.Stripe
 					};
@@ -214,7 +251,7 @@ namespace Freelancing.Controllers
 
 
 		[HttpGet("StripeWithdraw")]
-		[Authorize]
+		//[Authorize]
 		public async Task<IActionResult> StripeWithdraw(int money, string email)
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -236,7 +273,7 @@ namespace Freelancing.Controllers
 				}
 
 			}
-			if (freelancer is Client client1)
+			else if (freelancer is Client client1)
 			{
 				if (client1.Balance < money)
 				{
@@ -279,8 +316,17 @@ namespace Freelancing.Controllers
 		[HttpGet("Success")]
 		public async Task<IActionResult> Success(string session_id, string amount)
 		{
-			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var freelancer = await _freelancers.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var sessionService = new PaymentIntentService();
+			var retrievedPaymentIntent = sessionService.Get(session_id);
+		
+			if (!retrievedPaymentIntent.Metadata.TryGetValue("userId", out var userid))
+			{
+				// This userId is unique per session
+				return BadRequest("payment failed");
+			}
+	
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = await _freelancers.FindByIdAsync(userid);
 
 			if (freelancer is Freelancer current)
 			{
@@ -301,6 +347,12 @@ namespace Freelancing.Controllers
 					_context.Withdrawals.Add(withdrawal);
 					await _freelancers.UpdateAsync(current);
 					_context.SaveChanges();
+					await _notifications.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
+						UserId = userid
+					});
 					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 					return Redirect(url);
 				}
@@ -308,6 +360,7 @@ namespace Freelancing.Controllers
 				{
 					return BadRequest("incorrect amount");
 				}
+
 			}
 			else if (freelancer is Client current2)
 			{
@@ -327,9 +380,16 @@ namespace Freelancing.Controllers
 					_context.Withdrawals.Add(withdrawal);
 					await _freelancers.UpdateAsync(current2);
 					_context.SaveChanges();
+					await _notifications.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
+						UserId = userid
+					});
 					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 					return Redirect(url);
 				}
+
 				else
 				{
 					return BadRequest("incorrect amount");

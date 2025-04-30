@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs;
+using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.MilestoneDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +19,16 @@ namespace Freelancing.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMilestoneService _milestoneService;
         private readonly UserManager<AppUser> _userManager;
-
-		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager)
+        private readonly INotificationRepositoryService notificationrepo;
+        private readonly IConfiguration _configuration;
+		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
         {
             _fixedProjectService = fixedProjectService;
             _dbContext = dbContext;
             _milestoneService = milestoneService;
 			_userManager = userManager;
+            notificationrepo = _notificationrepo;
+            _configuration = configuration;
 		}
 
 
@@ -78,6 +82,56 @@ namespace Freelancing.Controllers
 		}
 
 
+		[HttpGet("userfixedpriceprojects/{userId}")]
+		public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> userfixedpriceprojects(string userId)
+		{
+			var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
+			//var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return NotFound("User not found.");
+			}
+			if (user.GetType() == typeof(Client))
+			{
+				projects = projects.Where(p => p.ClientId == userId).ToList();
+			}
+			else if (user.GetType() == typeof(Freelancer))
+			{
+				projects = projects.Where(p => p.FreelancerId == userId).ToList();
+			}
+			else
+			{
+				return BadRequest("Invalid user type.");
+			}
+			return Ok(projects.Select(p => new GetAllFixedProjectDto
+			{
+				Id = p.Id,
+				Title = p.Title,
+				Description = p.Description,
+				Currency = p.currency,
+				ExpectedDuration = p.ExpectedDuration,
+				SubcategoryID = p.SubcategoryId,
+				ExperienceLevel = p.experienceLevel, // Convert enum to string if needed
+				ProjectSkills = p.ProjectSkills != null
+					? p.ProjectSkills.Where(ps => ps.Skill != null).Select(ps => ps.Skill.Name).ToList()
+					: new List<string>(),
+				Milestones = p.Milestones?.Select(m => new MilestoneDto
+				{
+					Title = m.Title,
+					startdate = m.StartDate,
+					enddate = m.EndDate,
+					Status = m.Status,
+				}).ToList() ?? new List<MilestoneDto>(),
+				ProposalsCount = p.Proposals.Count
+			}).ToList());
+
+
+		}
+
+
+
+
 		[HttpGet]
         public async Task<ActionResult<IEnumerable<GetAllFixedProjectDto>>> GetAllFixedPriceProjects(
                  [FromQuery] int pageNumber = 1,
@@ -102,6 +156,7 @@ namespace Freelancing.Controllers
                  [FromQuery] int? maxDuration = null,
                  [FromQuery] List<int> skillIds = null
             )
+        
         {
             if (!ModelState.IsValid)
             {
@@ -210,6 +265,7 @@ namespace Freelancing.Controllers
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
+                Price=p.Price,
                 Currency = p.currency,
                 ExpectedDuration = p.ExpectedDuration,
                 SubcategoryID = p.SubcategoryId,
@@ -221,6 +277,7 @@ namespace Freelancing.Controllers
                 {
                     Title = m.Title,
                     startdate = m.StartDate,
+                    
                     enddate = m.EndDate,
                     Status = m.Status,
                 }).ToList() ?? new List<MilestoneDto>(),
@@ -376,15 +433,43 @@ namespace Freelancing.Controllers
                 return NotFound($"Fixed price project with ID {id} not found.");
             }
 
-           
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
             var projectDto = new GetAllFixedProjectDto
             {
                 Id = project.Id,
                 Title = project.Title,
+                Price = project.Price,
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
-              
+
+                ClientId = project.ClientId,
+                ClientRating = project.Client?.Reviewed?.Average(r => r?.Rating ?? 0) ?? 0,
+                ClientTotalNumberOfReviews = project.Client?.Reviewed?.Count() ?? 0,
+                ClientIsverified = project.Client.IsVerified,
+                ClientCountry = project.Client.City.Country.Name,
+                ClientCity = project.Client.City.Name,
+                PostedFrom=(int) (DateTime.Now - project.CreatedAt).TotalMinutes,
+
+                ClinetAccCreationDate = project.Client.AccountCreationDate.ToString(),
+                FreelancersubscriptionPlan = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
+                FreelancerTotalNumber = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
+                FreelancerRemainingNumberOfBids = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
+
+                // Safely get other projects
+                ClientOtherProjectsIdsNotAssigned = project.ClientId != null
+            ? await _dbContext.project
+                .Where(p => !p.IsDeleted && p.ClientId == project.ClientId && p.FreelancerId == null && p.Id != id)
+                .Select(p => p.Id)
+                .ToListAsync()
+            : new List<int>(),
+
+                ClientProjectsTotalCount = project.ClientId != null
+            ? await _dbContext.project.CountAsync(p => !p.IsDeleted && p.ClientId == project.ClientId)
+            : 0,
+
                 SubcategoryID = project.SubcategoryId,
                 ExperienceLevel = project.experienceLevel,
                 Milestones = project.Milestones?.Select(m => new MilestoneDto
@@ -394,16 +479,19 @@ namespace Freelancing.Controllers
                     startdate = m.StartDate,
                     enddate = m.EndDate,
                     Status = m.Status,
+                    Description = m.Description,
+                    Amount = m.Amount
 
                 }).ToList() ?? new List<MilestoneDto>(),
 
-              
+
 
                 ProjectSkills = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList(),
 
 
 
                 ProposalsCount = project.Proposals.Count
+
             };
 
 
@@ -427,6 +515,7 @@ namespace Freelancing.Controllers
 
             var project = new FixedPriceProject
             {
+                Price = dto.Price,
                 SubcategoryId = dto.SubcategoryID,
                 Title = dto.Title,
                 Description = dto.Description,
@@ -436,13 +525,37 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "96668C77-FEBC-46A6-8B60-AF2AE1B7191B"
+                ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1"
 
             };
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
 
-            if (dto.ProjectSkills.Any())
+
+            var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancers = await _userManager.Users.OfType<Freelancer>().ToListAsync();
+			foreach (var freelancer in freelancers)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"New Fixed Pricee Project Posted{_configuration["AppSettings:AngularAppUrl"] + $"/fixed-project/{project.Id}"}",
+					UserId = freelancer.Id
+				});
+
+			}
+			if ((await _fixedProjectService.GetAllFixedPriceProjectsAsyncByClientId(userid)).Count() == 1)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"Congratulations on your first fiexprices project Post{_configuration["AppSettings:AngularAppUrl"] + $"/details/{project.Id}"}",
+					UserId = userid
+				});
+			}
+			;
+
+			if (dto.ProjectSkills.Any())
             {
                 foreach (var skillId in dto.ProjectSkills)
                 {
@@ -462,7 +575,7 @@ namespace Freelancing.Controllers
             {
                 foreach (var milestonedto in dto.Milestones)
                 {
-
+                  
                     await _milestoneService.CreateAsync(new MilestoneCreateDTO()
                     {
                         Title = milestonedto.Title,
@@ -484,17 +597,20 @@ namespace Freelancing.Controllers
             {
                 Id = createdProject.Id,
                 Title = createdProject.Title,
+                Price = createdProject.Price,
+
                 Description = createdProject.Description,
                 Currency = createdProject.currency,
                 ExpectedDuration = createdProject.ExpectedDuration,
                 //SubcategoryName = createdProject.Subcategory?.Name,
+
                 SubcategoryID = createdProject.SubcategoryId,
                 ExperienceLevel = createdProject.experienceLevel,
                 ProjectSkills = createdProject.ProjectSkills.Select(ps => ps.Skill.Name).ToList(),
                 ProposalsCount = createdProject.Proposals.Count,
                 Milestones = createdProject.Milestones?.Select(m => new MilestoneDto
                 {
-
+                    Description=m.Description,
                     Title = m.Title,
                     startdate = m.StartDate,
                     enddate = m.EndDate,
@@ -604,7 +720,9 @@ namespace Freelancing.Controllers
                     Title = m.Title,
                     startdate = m.StartDate,
                     enddate = m.EndDate,
-                    Status = m.Status
+                    Status = m.Status,
+                    Description = m.Description,
+                    Amount = m.Amount
                 }).ToList() ?? new List<MilestoneDto>(),
                 ProjectSkills = project.ProjectSkills != null
                     ? project.ProjectSkills

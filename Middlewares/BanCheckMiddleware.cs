@@ -28,10 +28,11 @@ namespace Freelancing.Middlewares
             }
 
             var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userId)) {
+            if (!string.IsNullOrEmpty(userId))
+            {
 
                 var activeBans = await dbContext.Bans.Where(b => b.BannedUserId == userId
-                                && b.BanEndDate > DateTime.UtcNow).Select(b=> new {b.Description ,b.BanEndDate } ).FirstOrDefaultAsync();
+                                && b.BanEndDate > DateTime.UtcNow).Select(b => new { b.Description, b.BanEndDate }).FirstOrDefaultAsync();
 
 
                 if (activeBans is not null)

@@ -15,6 +15,7 @@ namespace Freelancing.Models
 		{
 			//this.ChangeTracker.LazyLoadingEnabled = true;
 		}
+		public DbSet<FreelancerWishlist> FreelancerWishlists { get; set; } 
 		public DbSet<Admin> Admins { get; set; }
 		public DbSet<Client> clients { get; set; }
 		public DbSet<Freelancer> freelancers { get; set; }

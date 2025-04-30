@@ -461,6 +461,30 @@ namespace Freelancing.Migrations
                     b.ToTable("freelancerLanguages");
                 });
 
+            modelBuilder.Entity("Freelancing.Models.FreelancerWishlist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FreelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FreelancerId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("FreelancerWishlists");
+                });
+
             modelBuilder.Entity("Freelancing.Models.MilestoneFile", b =>
                 {
                     b.Property<int>("id")
@@ -1196,7 +1220,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "097a6efb-5b41-462a-9b45-0e6102fd2793",
+                            ConcurrencyStamp = "cec641ed-0a83-4d1a-803b-94b397851929",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1205,11 +1229,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAe7TOlV/qE4Xj+rR8lG4+X/geXAh4osZsPqkVxC3sunNlYxU0fe6xzDulcMh5o3/g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE8yituCwpOQea8vzXfidzRdLYiKw20/1H4KxZna1CY6zo67QO50dtgTIo5v0KqVGA==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 27, 3, 5, 5, 899, DateTimeKind.Local).AddTicks(4044),
-                            SecurityStamp = "8ca6ffac-e23c-44c2-8ede-4cabe2559ba9",
+                            RefreshTokenExpiryDate = new DateTime(2025, 4, 29, 2, 11, 27, 794, DateTimeKind.Local).AddTicks(3953),
+                            SecurityStamp = "10ae568e-5647-43ff-a028-1e2429ee3e34",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1471,6 +1495,25 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("freelancer");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.FreelancerWishlist", b =>
+                {
+                    b.HasOne("Freelancing.Models.Freelancer", "Freelancer")
+                        .WithMany()
+                        .HasForeignKey("FreelancerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Freelancer");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestoneFile", b =>

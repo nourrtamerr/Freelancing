@@ -58,6 +58,27 @@ namespace Freelancing.Controllers
             return Ok(certificatesDTOlist);
         }
 
+        [HttpGet("freelancer")]
+        [Authorize(Roles = "Freelancer")]
+        public async Task<IActionResult> GetAllCertificatesByFreelancerId()
+        {
+
+            var freelancerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerId(freelancerId);
+            if (certificateslist == null)
+            {
+                return BadRequest(new { msg = "there is no certificates for this freelancer" });
+            }
+            var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
+            {
+                Id = e.Id,
+                Name = e.Name,
+                IssueDate = e.IssueDate,
+                IsDeleted = e.IsDeleted,
+            }
+            );
+            return Ok(certificatesDTOlist);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCertificateByID(int id) {
             var selectedcertificate =await _certificatesService.GetCertificateByIDAsync(id);
