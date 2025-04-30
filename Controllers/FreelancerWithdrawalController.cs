@@ -128,6 +128,7 @@ namespace Freelancing.Controllers
 			});
 			return BadRequest("not a correct client");
 		}
+
 		#region stripe
 		[HttpGet("AddFundsStripe")]
 		[Authorize]
@@ -177,8 +178,8 @@ namespace Freelancing.Controllers
 				return BadRequest("payment failed");
 			}
 
-			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var freelancer = await _freelancers.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = await _freelancers.FindByIdAsync(userId);
 
 			if (freelancer is Freelancer current)
 			{
@@ -192,7 +193,7 @@ namespace Freelancing.Controllers
 					{
 						Amount = x,
 						Date = DateTime.Now,
-						FreelancerId = userid,
+						FreelancerId = userId,
 						TransactionId = session_id,
 						PaymentMethod = PaymentMethod.Stripe
 					};
@@ -203,7 +204,7 @@ namespace Freelancing.Controllers
 					{
 						isRead = false,
 						Message = $"Funding completed with amount of {amount} using stripe please check your balance",
-						UserId = userid
+						UserId = userId
 					});
 					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
 					return Redirect(url);
@@ -225,7 +226,7 @@ namespace Freelancing.Controllers
 					{
 						Amount = x,
 						Date = DateTime.Now,
-						ClientId = userid,
+						ClientId = userId,
 						TransactionId = session_id,
 						PaymentMethod = PaymentMethod.Stripe
 					};
@@ -249,7 +250,7 @@ namespace Freelancing.Controllers
 
 
 		[HttpGet("StripeWithdraw")]
-		[Authorize]
+		//[Authorize]
 		public async Task<IActionResult> StripeWithdraw(int money, string email)
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -317,14 +318,14 @@ namespace Freelancing.Controllers
 			var sessionService = new PaymentIntentService();
 			var retrievedPaymentIntent = sessionService.Get(session_id);
 		
-			if (!retrievedPaymentIntent.Metadata.TryGetValue("userId", out var userId))
+			if (!retrievedPaymentIntent.Metadata.TryGetValue("userId", out var userid))
 			{
 				// This userId is unique per session
 				return BadRequest("payment failed");
 			}
 	
-			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var freelancer = await _freelancers.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancer = await _freelancers.FindByIdAsync(userid);
 
 			if (freelancer is Freelancer current)
 			{
