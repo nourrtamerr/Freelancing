@@ -28,7 +28,7 @@ namespace Freelancing.Controllers
 			var user = await _freelancers.FindByIdAsync(userid);
 			if (user is Freelancer freelancer1)
 			{
-				freelancer1.Balance = freelancer1.Balance + dto.amount;
+				freelancer1.Balance = freelancer1.Balance - dto.amount;
 				Withdrawal withdrawal = new Withdrawal()
 				{
 					Amount = dto.amount,
@@ -99,7 +99,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
-				return Redirect(url);
+				return Ok(url);
 
 			}
 			if (user is Client client1)
@@ -118,7 +118,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
-				return Redirect(url);
+				return Ok(url);
 			}
 			await _notifications.CreateNotificationAsync(new()
 			{
