@@ -13,7 +13,7 @@ namespace Freelancing.Controllers
 	public class WishlistController(INotificationRepositoryService _notifications,ApplicationDbContext _context) : ControllerBase
 	{
 		[HttpGet]
-		[Authorize(Roles = "Freelancer")]
+		//[Authorize(Roles = "Freelancer")]
 		public IActionResult GetmyWishlist()
 		{
 			// Logic to get the wishlist
