@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static NuGet.Packaging.PackagingConstants;
 
@@ -19,12 +21,14 @@ namespace Freelancing.RepositoryService
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly ISubcategoryService _subcategoryService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public BiddingProjectService(ApplicationDbContext context, IMapper mapper, ISubcategoryService subcategoryService)
+        public BiddingProjectService(ApplicationDbContext context, IMapper mapper, ISubcategoryService subcategoryService, UserManager<AppUser> userManager)
         {
             _context = context;
             _mapper = mapper;
             _subcategoryService = subcategoryService;
+            _userManager = userManager;
         }
 
 
@@ -187,7 +191,7 @@ namespace Freelancing.RepositoryService
 
         //----------------------------------------------------------------------------------------------------
 
-        public async Task<BiddingProjectGetByIdDTO> GetBiddingProjectByIdAsync(int id)
+        public async Task<BiddingProjectGetByIdDTO> GetBiddingProjectByIdAsync(int id, string userId)
         {
             var project = await _context.biddingProjects
                                         .Include(b => b.Proposals)
@@ -200,10 +204,25 @@ namespace Freelancing.RepositoryService
             {
                 return null;
             }
+
+            
+
+
+
+
             var projectDto = _mapper.Map<BiddingProjectGetByIdDTO>(project);
 
             projectDto.ClientOtherProjectsIdsNotAssigned = _context.project.Where(p=>!p.IsDeleted && p.ClientId == project.ClientId && p.FreelancerId==null && p.Id!=id).Select(p=>p.Id).ToList();
             projectDto.ClientProjectsTotalCount = _context.project.Where(p => !p.IsDeleted && p.ClientId == project.ClientId).Count();
+
+            var freelancer = await _context.freelancers
+        .Include(f => f.subscriptionPlan)
+        .FirstOrDefaultAsync(f => f.Id == userId);
+
+            projectDto.FreelancersubscriptionPlan = freelancer?.subscriptionPlan?.name ?? string.Empty;
+            projectDto.FreelancerTotalNumber = freelancer?.subscriptionPlan?.TotalNumber ?? 0;
+            projectDto.FreelancerRemainingNumberOfBids = freelancer?.RemainingNumberOfBids ?? 0;
+
 
             return projectDto;
 
@@ -249,7 +268,7 @@ namespace Freelancing.RepositoryService
 
             var createdProject = _mapper.Map<BiddingProject>(project);
             createdProject.ClientId = ClinetId;
-            createdProject.ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1";
+            //createdProject.ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1";
 
 
 
@@ -312,15 +331,39 @@ namespace Freelancing.RepositoryService
 
         //----------------------------------------------------------------------------------------------------
 
-        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, BiddingProjectFilterDTO filters)
+        public async Task<List<BiddingProjectGetAllDTO>> GetAllBiddingProjectsAsyncByfreelancerId(string id, userRole role)
         {
-            var projects = await _context.biddingProjects
+            List<BiddingProject> projects;
+
+            switch (role)
+            {
+                case userRole.Client:
+                    {
+                        projects = await _context.biddingProjects
                 .Include(b => b.Proposals)
                 .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
                 .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                 .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
                 .Include(b => b.Client.City).ThenInclude(c => c.Country)
-                .Where(u => u.FreelancerId == id && !u.IsDeleted).ToListAsync();
+                 .Where(u => u.ClientId == id && !u.IsDeleted).ToListAsync();
+                    }
+                    break;
+                case userRole.Freelancer:
+                    {
+                        projects = await _context.biddingProjects
+                .Include(b => b.Proposals)
+                .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
+                .Include(b => b.Client).ThenInclude(c => c.Reviewed)
+                .Include(b => b.Freelancer).ThenInclude(f => f.subscriptionPlan)
+                .Include(b => b.Client.City).ThenInclude(c => c.Country)
+                 .Where(u => u.FreelancerId == id && !u.IsDeleted).ToListAsync();
+                    }
+                    break;
+                default:
+                    projects = new();
+                    break;
+            }
+
             var projectss = _mapper.Map<List<BiddingProjectGetAllDTO>>(projects);
             return projectss;
         }

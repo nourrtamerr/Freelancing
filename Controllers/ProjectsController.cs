@@ -23,10 +23,12 @@ namespace Freelancing.Controllers
 		public async Task<ActionResult<List<Project>>> MyProjects()
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			if(userId is null)
+			{
+				return BadRequest();
+			}
 			var user = await userManager.FindByIdAsync(userId);
-
 			var projects = await context.GetAllProjectsDtoAsync();
-
 			if (user is Client)
 			{
 				projects = projects.Where(p => p.ClientId == userId).ToList();
@@ -56,12 +58,15 @@ namespace Freelancing.Controllers
 			var projects = await context.GetAllProjectsAsync();
 			var prs = projects.Where(p => p.FreelancerId == userId);
 			var clients = projects.Where(p => p.FreelancerId == userId).Select(p => p.ClientId).Distinct().Count();
+			var completed = prs.Where(p => p.Status == projectStatus.Completed).Count();
+				//pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
+			var working = prs.Where(p => p.Status == projectStatus.Working).Count();
 			return Ok(new
 			{
 				clients,
-				completed = prs.Where(p => p.Status == projectStatus.Completed).Count(),
+				completed = completed,
 				//pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
-				working = prs.Where(p => p.Status == projectStatus.Working).Count()
+				working = working
 			});
 
 		}

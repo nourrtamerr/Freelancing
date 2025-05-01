@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs;
+using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.MilestoneDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +19,16 @@ namespace Freelancing.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMilestoneService _milestoneService;
         private readonly UserManager<AppUser> _userManager;
-
-		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager)
+        private readonly INotificationRepositoryService notificationrepo;
+        private readonly IConfiguration _configuration;
+		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
         {
             _fixedProjectService = fixedProjectService;
             _dbContext = dbContext;
             _milestoneService = milestoneService;
 			_userManager = userManager;
+            notificationrepo = _notificationrepo;
+            _configuration = configuration;
 		}
 
 
@@ -429,7 +433,9 @@ namespace Freelancing.Controllers
                 return NotFound($"Fixed price project with ID {id} not found.");
             }
 
-           
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
             var projectDto = new GetAllFixedProjectDto
             {
                 Id = project.Id,
@@ -438,6 +444,33 @@ namespace Freelancing.Controllers
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
+
+                ClientId = project.ClientId,
+                ClientRating = project.Client?.Reviewed != null && project.Client.Reviewed.Any()
+	                            ? project.Client.Reviewed.Average(r => r?.Rating ?? 0)
+	                            : 0,
+                ClientTotalNumberOfReviews = project.Client?.Reviewed?.Count() ?? 0,
+                ClientIsverified = project.Client.IsVerified,
+                ClientCountry = project.Client.City.Country.Name,
+                ClientCity = project.Client.City.Name,
+                PostedFrom=(int) (DateTime.Now - project.CreatedAt).TotalMinutes,
+
+                ClinetAccCreationDate = project.Client.AccountCreationDate.ToString(),
+                FreelancersubscriptionPlan = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
+                FreelancerTotalNumber = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
+                FreelancerRemainingNumberOfBids = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
+
+                // Safely get other projects
+                ClientOtherProjectsIdsNotAssigned = project.ClientId != null
+            ? await _dbContext.project
+                .Where(p => !p.IsDeleted && p.ClientId == project.ClientId && p.FreelancerId == null && p.Id != id)
+                .Select(p => p.Id)
+                .ToListAsync()
+            : new List<int>(),
+
+                ClientProjectsTotalCount = project.ClientId != null
+            ? await _dbContext.project.CountAsync(p => !p.IsDeleted && p.ClientId == project.ClientId)
+            : 0,
 
                 SubcategoryID = project.SubcategoryId,
                 ExperienceLevel = project.experienceLevel,
@@ -453,13 +486,14 @@ namespace Freelancing.Controllers
 
                 }).ToList() ?? new List<MilestoneDto>(),
 
-              
+
 
                 ProjectSkills = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList(),
 
 
 
                 ProposalsCount = project.Proposals.Count
+
             };
 
 
@@ -473,12 +507,18 @@ namespace Freelancing.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles ="Client")]
         public async Task<ActionResult<GetAllFixedProjectDto>> CreateFixedPriceProject([FromBody] CreateFixedProjectDTO dto)
 
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+            var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if (!(user is Client))
+            {
+                return BadRequest(new { message = "Only clients can post projects" });
             }
 
             var project = new FixedPriceProject
@@ -493,13 +533,37 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1"
+                ClientId = user.Id
 
-            };
+			};
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
 
-            if (dto.ProjectSkills.Any())
+
+            var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var freelancers = await _userManager.Users.OfType<Freelancer>().ToListAsync();
+			foreach (var freelancer in freelancers)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"New Fixed Pricee Project Posted{_configuration["AppSettings:AngularAppUrl"] + $"/fixed-project/{project.Id}"}",
+					UserId = freelancer.Id
+				});
+
+			}
+			if ((await _fixedProjectService.GetAllFixedPriceProjectsAsyncByClientId(userid)).Count() == 1)
+			{
+				await notificationrepo.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"Congratulations on your first fiexprices project Post{_configuration["AppSettings:AngularAppUrl"] + $"/details/{project.Id}"}",
+					UserId = userid
+				});
+			}
+			;
+
+			if (dto.ProjectSkills.Any())
             {
                 foreach (var skillId in dto.ProjectSkills)
                 {

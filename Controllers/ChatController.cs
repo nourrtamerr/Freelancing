@@ -22,6 +22,7 @@ namespace Freelancing.Controllers
         private readonly ApplicationDbContext _context;
         private readonly CloudinaryService _cloudinaryService;
         private readonly UserManager<AppUser> _usermanager;
+        private readonly INotificationRepositoryService _notifserivcee;
 
 		public ChatController(
             IChatRepositoryService chatRepository,
@@ -30,7 +31,8 @@ namespace Freelancing.Controllers
             IHubContext<NotificationHub> NotifhubContext,
             ApplicationDbContext context,
             CloudinaryService cloudinaryService,
-            UserManager<AppUser> usermanager)
+            UserManager<AppUser> usermanager,
+            INotificationRepositoryService notifserivcee)
         {
             _chatRepository = chatRepository;
             _mapper = mapper;
@@ -39,6 +41,7 @@ namespace Freelancing.Controllers
             _cloudinaryService = cloudinaryService;
             _usermanager = usermanager;
             _NotifhubContext = NotifhubContext;
+            _notifserivcee = notifserivcee;
 		}
 
         [HttpGet("{id}")]
@@ -130,14 +133,15 @@ namespace Freelancing.Controllers
 
                 await _hubContext.Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
                     .SendAsync("ReceiveMessage", chatDto);
-				await _NotifhubContext.Clients.Users(chatDto.ReceiverId).SendAsync("ReceiveNotification", 
-                    new NotificationDto()
-                    {
-                        Id=1,
-                        IsRead=false,
-                        Message=chatDto.Message+"has been sent to you",
-                        UserId=chatDto.ReceiverId
-                    });
+
+                var name=(await _usermanager.FindByIdAsync(chatDto.SenderId))?.UserName;
+                await _notifserivcee.CreateNotificationAsync(new()
+                {
+                    isRead = false,
+                    Message = $"You received a message from {name ?? "undefined user"}",
+                    UserId = chatDto.ReceiverId,
+                });
+				
 
 
 

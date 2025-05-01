@@ -6,7 +6,7 @@ namespace Freelancing.IRepositoryService
     {
         Task<List<MilestoneGetAllDTO>> GetAllAsync();
 
-        Task<MilestoneGetByIdOrProjectIdDTO> GetByIdAsync(int id);
+        Task<MilestoneGetAllDTO> GetByIdAsync(int id);
 
         Task<List<MilestoneGetByIdOrProjectIdDTO>> GetByProjectId(int ProjectId);
         Task<bool> RemoveFilebyName(string name);

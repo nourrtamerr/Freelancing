@@ -342,12 +342,7 @@ namespace Freelancing.Controllers
 			return Ok(new { User.Identity.IsAuthenticated, UserName = User.FindFirstValue(ClaimTypes.Name) });
 		}
 
-		[HttpPost("Testingformdata")]
-		public IActionResult Test([FromForm] string test)
-		{
-			int x = 5;
-			return Ok("Success");
-		}
+		
 		[HttpPut("EditProfile")]
 		[Authorize]
 		public async Task<IActionResult> editProfile([FromForm]EditProfileDTO dto)
@@ -780,6 +775,12 @@ namespace Freelancing.Controllers
 			if (result.Succeeded)
 			{
 				var url = configuration["AppSettings:AngularAppUrl"] + "/login?pleaseLogin";
+				await _notifications.CreateNotificationAsync(new Notification()
+				{
+					isRead = false,
+					Message = $"Welcome to Worktern, {user.UserName} , We hope you have a nice stay",
+					UserId = user.Id
+				});
 				return Redirect(url);
 
 

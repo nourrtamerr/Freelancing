@@ -1,4 +1,5 @@
 ﻿using Freelancing.DTOs.MilestoneDTOs;
+using Freelancing.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -11,11 +12,16 @@ namespace Freelancing.Controllers
     public class MilestoneController : ControllerBase
     {
         private readonly IMilestoneService _milestoneService;
-
-        public MilestoneController(IMilestoneService milestoneService)
+        private readonly INotificationRepositoryService _notifications;
+        private readonly IConfiguration _configuration;
+		private readonly IProjectService _projects;
+		public MilestoneController(IProjectService projects,IMilestoneService milestoneService, INotificationRepositoryService notifications,IConfiguration configuration)
         {
             _milestoneService = milestoneService;
-        }
+            _notifications = notifications;
+            _configuration = configuration;
+            _projects = projects;
+		}
 
 
         [HttpGet]
@@ -47,6 +53,7 @@ namespace Freelancing.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(MilestoneCreateDTO milestoneDto)
         {
+
             return Ok(await _milestoneService.CreateAsync(milestoneDto));
         }
 
@@ -57,7 +64,17 @@ namespace Freelancing.Controllers
         [HttpPatch("UpdateStatus/{MilestoneId}")]
         public async Task<IActionResult> Patch(int MilestoneId, [FromBody]int StatusId)
         {
-            return Ok(await _milestoneService.UpdateStatusAsync(MilestoneId, StatusId));
+
+            var updatedmilestones=await _milestoneService.UpdateStatusAsync(MilestoneId, StatusId);
+
+            var project=await _projects.GetProjectByIdAsync(updatedmilestones.ProjectId);
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"Milestone Finished for the project `{project.Title}` please proceed for the next milestone",
+				UserId = project.FreelancerId
+			});
+			return Ok(await _milestoneService.UpdateStatusAsync(MilestoneId, StatusId));
         }
 
 
@@ -82,8 +99,15 @@ namespace Freelancing.Controllers
         [HttpPost("UploadMilestoneFiles/{MilestoneId}")]
         public async Task<IActionResult> UploadMilestoneFiles([FromForm] List<IFormFile> files, int MilestoneId)
         {
-            
-            return Ok(await _milestoneService.UploadFile(files, MilestoneId));
+            //await _milestoneService.UploadFile(files, MilestoneId);
+            var project = await _projects.GetProjectByIdAsync((await _milestoneService.GetByIdAsync(MilestoneId)).ProjectId);
+			await _notifications.CreateNotificationAsync(new()
+			{
+				isRead = false,
+				Message = $"Milestone Filed uploaded for the project `{project.Title}` please check it",
+				UserId = project.ClientId
+			});
+			return Ok(await _milestoneService.UploadFile(files, MilestoneId));
         }
 
 

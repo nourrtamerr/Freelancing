@@ -20,7 +20,14 @@ namespace Freelancing.RepositoryService
         public async Task<FixedPriceProject> CreateFixedPriceProjectAsync(FixedPriceProject project)
         {
             await _context.fixedPriceProjects.AddAsync(project);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.ToString());
+            }
              return await GetFixedPriceProjectByIdAsync(project.Id);
         }
 
@@ -69,6 +76,9 @@ namespace Freelancing.RepositoryService
         .Include(p => p.Milestones)
         .Include(p => p.Proposals)
         .Include(p => p.Subcategory)
+        .Include(p=>p.Client).ThenInclude(c=>c.Reviewed)
+        .Include(p=>p.Client).ThenInclude(c=>c.City).ThenInclude(c=>c.Country)
+        .Include(p=>p.Freelancer).ThenInclude(f=>f.subscriptionPlan)
         .FirstOrDefaultAsync(p => p.Id == id);
         }
 

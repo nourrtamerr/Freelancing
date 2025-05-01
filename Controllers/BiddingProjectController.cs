@@ -1,5 +1,6 @@
 ﻿using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
+using Freelancing.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,13 +13,15 @@ namespace Freelancing.Controllers
     {
         private readonly IBiddingProjectService _biddingProjectService;
 		private readonly UserManager<AppUser> _userManager;
+		private readonly INotificationRepositoryService notificationrepo;
+        private readonly IConfiguration _configuration;
 
-
-		public BiddingProjectController(IBiddingProjectService biddingProjectService,UserManager<AppUser>  userManager)
+		public BiddingProjectController(IBiddingProjectService biddingProjectService,UserManager<AppUser>  userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
         {
             _biddingProjectService = biddingProjectService;
             _userManager = userManager;
-
+            notificationrepo = _notificationrepo;
+            _configuration = configuration;
 		}
 
 
@@ -33,8 +36,17 @@ namespace Freelancing.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Pass userId to service
+            var result = await _biddingProjectService.GetBiddingProjectByIdAsync(id, userId);
+
+            return result != null ? Ok(result) : NotFound();
+
+
+            //return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
         }
+        
 
 
         //[HttpPost]
@@ -50,18 +62,41 @@ namespace Freelancing.Controllers
         {
             try
             {
-                var project = await _biddingProjectService.CreateBiddingProjectAsync(p, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                //return Ok(new
-                //{
-                //    project.ClientId,
-                //    project.Subcategory.Name,
-                //    p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
-                //});
-                return Ok(new
+				var project = await _biddingProjectService.CreateBiddingProjectAsync(p, userid);
+                var freelancers= await _userManager.Users.OfType<Freelancer>().ToListAsync();
+				foreach (var freelancer in freelancers)
+                {
+                    await notificationrepo.CreateNotificationAsync(new()
+                    {
+                        isRead = false,
+                        Message = $"New Bidding Project Posted{_configuration["AppSettings:AngularAppUrl"] + $"/details/{project.Id}"}",
+                        UserId = freelancer.Id
+					});
+
+                }
+                if((await _biddingProjectService.GetmyBiddingProjectsAsync(userid, userRole.Client,1,5000)).Count() ==1)
+                {
+					await notificationrepo.CreateNotificationAsync(new()
+					{
+						isRead = false,
+						Message = $"Congratulations on your first Bidding project Post{_configuration["AppSettings:AngularAppUrl"] + $"/details/{project.Id}"}",
+						UserId = userid
+					});
+				};
+
+				//return Ok(new
+				//{
+				//    project.ClientId,
+				//    project.Subcategory.Name,
+				//    p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
+				//});
+				return Ok(new
                 {
                     ClientId = project.ClientId ?? "63d89bb1-7a13-4e02-bf19-14701398e3a1",
                     project.Subcategory.Name,
+                    project.Id,
                     p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()
                 });
             }
@@ -94,6 +129,10 @@ namespace Freelancing.Controllers
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentuser = await _userManager.FindByIdAsync(userid);
+            if(currentuser==null)
+            {
+                return BadRequest();
+            }
             if (currentuser.GetType() == typeof(Client))
             {
                 role = userRole.Client;
