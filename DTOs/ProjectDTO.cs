@@ -1,4 +1,6 @@
-﻿namespace Freelancing.DTOs
+﻿using Freelancing.DTOs.ProposalDTOS;
+
+namespace Freelancing.DTOs
 {
     public class ProjectDTO
     {
@@ -10,7 +12,8 @@
         public int ExpectedDuration { get; set; }
         public string ClientId { get; set; }
         public string? FreelancerId { get; set; }
-        public projectStatus Status { get; set; }
+		public projectType projectType { set; get; }
+		public projectStatus Status { get; set; }
         public ExperienceLevel ExperienceLevel { get; set; }
         public bool IsDeleted { get; set; }
     }

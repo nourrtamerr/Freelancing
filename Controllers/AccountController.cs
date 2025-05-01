@@ -522,17 +522,17 @@ namespace Freelancing.Controllers
 				{
 					if (myuser.EmailConfirmed == true)
 					{
-						return BadRequest("Email already exists");
+						return BadRequest(new { message = "Email Already exists." });
 					}
 					else
 					{
-						return BadRequest("Email already exists but not confirmed");
+						return BadRequest(new { Message = "Email already exists but not confirmed" });
 					}
 				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
 			{
-				return BadRequest("User Name already exists");
+				return BadRequest(new { Message = "User Name already exists" });
 			}
 
 			#endregion
@@ -545,6 +545,7 @@ namespace Freelancing.Controllers
 				Freelancer freelancer = _mapper.Map<Freelancer>(dto);
 				freelancer.RefreshToken = JWTHelpers.CreateRefreshToken();
 				freelancer.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				freelancer.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(freelancer, dto.Password);
 				//await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
@@ -554,6 +555,7 @@ namespace Freelancing.Controllers
 				Client client = _mapper.Map<Client>(dto);
 				client.RefreshToken = JWTHelpers.CreateRefreshToken();
 				client.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				client.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(client, dto.Password);
 				//await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;

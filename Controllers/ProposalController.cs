@@ -48,6 +48,7 @@ namespace Freelancing.Controllers
 		}
 		
 		[HttpGet("getbyfreelancerId")]
+		[Authorize]
 		public async Task<IActionResult> GetProposalsbyfreelancerid()
 		{
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

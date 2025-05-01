@@ -71,10 +71,11 @@ namespace Freelancing.Controllers
 
 			_context.SaveChanges();
 			project = _context.project.Include(p => p.Freelancer).FirstOrDefault(p => p.Id == projectid);
+			//User.FindFirstValue(ClaimTypes.Name);
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
-				Message = $"your project with id {project.Id} was added to wishwishlist  by userid {project.Freelancer.UserName}",
+				Message = $"your project with id {project.Id} was added to wishwishlist  by userid {User.FindFirstValue(ClaimTypes.Name)}",
 				UserId = project.ClientId
 			});
 			return Ok(new { id = wishlist.Id });

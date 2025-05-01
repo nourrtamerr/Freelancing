@@ -64,6 +64,8 @@ namespace Freelancing.RepositoryService
 			var proposal = await _context.Proposals
 						   .Include(p => p.suggestedMilestones)
 						   .Include(p => p.Freelancer)
+						   .Include(p=>p.Project)
+						   .ThenInclude(p=>p.Freelancer)
 						   .ThenInclude(f => f.UserSkills)
 						   .ThenInclude(us => us.Skill)
 						   .Include(p => p.Freelancer)
@@ -71,11 +73,18 @@ namespace Freelancing.RepositoryService
 						   .Include(f => f.Freelancer.Reviewed)
 						   .Where(p => p.FreelancerId == freelancerId)
 			.ToListAsync();
+			var proposalsdto = new List<ProposalViewDTO>();
+			foreach(var prpsl in proposal)
+			{
+				var mp = _mapper.Map<ProposalViewDTO>(prpsl);
+				var project = _context.project.Find(prpsl.ProjectId);
+				mp.proposalStatus = project.FreelancerId==null? proposalstatus.Pending:project.Freelancer.Id==prpsl.FreelancerId?proposalstatus.Accepted:proposalstatus.Rejected;
+				mp.projecttype = project.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding;
+				proposalsdto.Add(mp);
+				
+			}
 
-			
-			var proposalDto = _mapper.Map<List<ProposalViewDTO>>(proposal);
-
-			return proposalDto;
+			return proposalsdto;
 		}
 
         public async Task<List<ProposalViewDTO>> GetProposalsByProjectIdAsync(int projectId)

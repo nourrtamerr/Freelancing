@@ -457,9 +457,9 @@ namespace Freelancing.Controllers
                 PostedFrom=(int) (DateTime.Now - project.CreatedAt).TotalMinutes,
 
                 ClinetAccCreationDate = project.Client.AccountCreationDate.ToString(),
-                FreelancersubscriptionPlan = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
-                FreelancerTotalNumber = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
-                FreelancerRemainingNumberOfBids = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
+                FreelancersubscriptionPlan = _dbContext.freelancers.Include(f=>f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
+                FreelancerTotalNumber = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
+                FreelancerRemainingNumberOfBids = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
 
                 // Safely get other projects
                 ClientOtherProjectsIdsNotAssigned = project.ClientId != null

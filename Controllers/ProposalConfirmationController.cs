@@ -47,7 +47,11 @@ namespace Freelancing.Controllers
                 });
                 context.project.Update(project);
                 context.SaveChanges();
-                var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+
+				context.freelancers.FirstOrDefault(f => f.Id == (context.Proposals.Find(proposalId).FreelancerId)).RemainingNumberOfBids--;
+				context.SaveChanges();
+				var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+
                 return url;
             }
             return "Project not found";
@@ -256,7 +260,7 @@ namespace Freelancing.Controllers
 
 
                     var url = Pay(proposalId, PaymentMethod.Stripe, session_id);
-       
+                   
 					await _notification.CreateNotificationAsync(new()
 					{
 						isRead = false,
