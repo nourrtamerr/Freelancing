@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Freelancing.DTOs.ProposalDTOS;
 using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Freelancing.RepositoryService
 {
@@ -120,8 +122,15 @@ namespace Freelancing.RepositoryService
         {
             var proposal=_mapper.Map<Proposal>(proposaldto);
             proposal.FreelancerId = freelancerId;
-			await _context.Proposals.AddAsync(proposal);
-            await _context.SaveChangesAsync();
+			try
+			{
+				await _context.Proposals.AddAsync(proposal);
+				await _context.SaveChangesAsync();
+			}
+			catch(Exception err)
+			{
+				throw new Exception(err.ToString());
+			}
             return await GetProposalByIdAsync(proposal.Id);
         }
 
