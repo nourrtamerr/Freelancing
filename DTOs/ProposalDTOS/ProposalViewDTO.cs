@@ -15,7 +15,8 @@ namespace Freelancing.DTOs.ProposalDTOS
 		public string FreelancerProfilePicture { set; get; }
 		public List<string> Freelancerskills { set; get; }
 		public List<string> FreelancerLanguages { set; get; }
-
+		public proposalstatus proposalStatus { set; get; }
+		public projectType projecttype { set; get; }
 		public bool IsVerified { get; set; }
 		public string Country { get; set; }
 
@@ -23,5 +24,11 @@ namespace Freelancing.DTOs.ProposalDTOS
 
 		public List<MilestoneViewDTO> suggestedMilestones { get; set; }
 		public Rank rank{ set; get; }
+	}
+	public enum proposalstatus
+	{
+		Pending,
+		Accepted,
+		Rejected
 	}
 }

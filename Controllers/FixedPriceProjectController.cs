@@ -444,9 +444,12 @@ namespace Freelancing.Controllers
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
+                FreelancerId=project.FreelancerId,
 
                 ClientId = project.ClientId,
-                ClientRating = project.Client?.Reviewed?.Average(r => r?.Rating ?? 0) ?? 0,
+                ClientRating = project.Client?.Reviewed != null && project.Client.Reviewed.Any()
+	                            ? project.Client.Reviewed.Average(r => r?.Rating ?? 0)
+	                            : 0,
                 ClientTotalNumberOfReviews = project.Client?.Reviewed?.Count() ?? 0,
                 ClientIsverified = project.Client.IsVerified,
                 ClientCountry = project.Client.City.Country.Name,
@@ -454,9 +457,9 @@ namespace Freelancing.Controllers
                 PostedFrom=(int) (DateTime.Now - project.CreatedAt).TotalMinutes,
 
                 ClinetAccCreationDate = project.Client.AccountCreationDate.ToString(),
-                FreelancersubscriptionPlan = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
-                FreelancerTotalNumber = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
-                FreelancerRemainingNumberOfBids = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
+                FreelancersubscriptionPlan = _dbContext.freelancers.Include(f=>f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
+                FreelancerTotalNumber = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
+                FreelancerRemainingNumberOfBids = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
 
                 // Safely get other projects
                 ClientOtherProjectsIdsNotAssigned = project.ClientId != null
@@ -505,12 +508,18 @@ namespace Freelancing.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles ="Client")]
         public async Task<ActionResult<GetAllFixedProjectDto>> CreateFixedPriceProject([FromBody] CreateFixedProjectDTO dto)
 
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+            var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if (!(user is Client))
+            {
+                return BadRequest(new { message = "Only clients can post projects" });
             }
 
             var project = new FixedPriceProject
@@ -525,9 +534,9 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1"
+                ClientId = user.Id
 
-            };
+			};
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
 

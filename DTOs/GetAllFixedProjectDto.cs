@@ -44,5 +44,8 @@
         public List<int> ClientOtherProjectsIdsNotAssigned { get; set; }
         public int ClientProjectsTotalCount { get; set; }
 
+        public string? FreelancerId { get; set; }
+
+
     }
 }

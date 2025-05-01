@@ -129,6 +129,10 @@ namespace Freelancing.Controllers
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentuser = await _userManager.FindByIdAsync(userid);
+            if(currentuser==null)
+            {
+                return BadRequest();
+            }
             if (currentuser.GetType() == typeof(Client))
             {
                 role = userRole.Client;

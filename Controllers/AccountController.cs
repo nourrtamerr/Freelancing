@@ -33,7 +33,7 @@ namespace Freelancing.Controllers
 		}
 
 		[HttpGet("getIdByUserName/{username}")]
-		[Authorize]
+	
 		public async Task<IActionResult> getIdByUserName(string username)
 		{
 			var user = await _userManager.FindByNameAsync(username);
@@ -182,6 +182,16 @@ namespace Freelancing.Controllers
 				return BadRequest("not found");
 			}
 			return Ok(await _freelancersmanager.GetByIDAsync(user.Id));
+		}
+		[HttpGet("usernameById")]
+		public async Task<IActionResult> getUserNameById(string id)
+		{
+			var user = (await _userManager.FindByIdAsync(id));
+			if (user == null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(new { userName = user.UserName });
 		}
 		[HttpGet("Clients/{username}")]
 		public async Task<IActionResult> getClientsById(string username)
@@ -512,17 +522,17 @@ namespace Freelancing.Controllers
 				{
 					if (myuser.EmailConfirmed == true)
 					{
-						return BadRequest("Email already exists");
+						return BadRequest(new { message = "Email Already exists." });
 					}
 					else
 					{
-						return BadRequest("Email already exists but not confirmed");
+						return BadRequest(new { Message = "Email already exists but not confirmed" });
 					}
 				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
 			{
-				return BadRequest("User Name already exists");
+				return BadRequest(new { Message = "User Name already exists" });
 			}
 
 			#endregion
@@ -535,6 +545,7 @@ namespace Freelancing.Controllers
 				Freelancer freelancer = _mapper.Map<Freelancer>(dto);
 				freelancer.RefreshToken = JWTHelpers.CreateRefreshToken();
 				freelancer.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				freelancer.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(freelancer, dto.Password);
 				//await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
@@ -544,6 +555,7 @@ namespace Freelancing.Controllers
 				Client client = _mapper.Map<Client>(dto);
 				client.RefreshToken = JWTHelpers.CreateRefreshToken();
 				client.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				client.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(client, dto.Password);
 				//await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
@@ -686,6 +698,8 @@ namespace Freelancing.Controllers
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
+
+
                 return BadRequest(new { message = "Invalid user." });
             }
 
@@ -762,13 +776,13 @@ namespace Freelancing.Controllers
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
+				var url = configuration["AppSettings:AngularAppUrl"] + "/login?pleaseLogin";
 				await _notifications.CreateNotificationAsync(new Notification()
 				{
 					isRead = false,
 					Message = $"Welcome to Worktern, {user.UserName} , We hope you have a nice stay",
 					UserId = user.Id
 				});
-				var url = configuration["AppSettings:AngularAppUrl"] + "/home?pleaseLogin";
 				return Redirect(url);
 
 
