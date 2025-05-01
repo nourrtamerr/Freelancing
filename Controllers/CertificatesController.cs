@@ -67,7 +67,7 @@ namespace Freelancing.Controllers
             var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerId(freelancerId);
             if (certificateslist == null)
             {
-                return BadRequest(new { msg = "there is no certificates for this freelancer" });
+                return BadRequest(new { message = "there is no certificates for this freelancer" });
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {
