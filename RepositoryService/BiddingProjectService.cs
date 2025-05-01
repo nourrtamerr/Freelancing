@@ -59,7 +59,7 @@ namespace Freelancing.RepositoryService
                                                 .Include(b => b.Proposals)
                                                 .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                                                 .Include(b=>b.Client).ThenInclude(c=>c.City).ThenInclude(c=>c.Country)                                             
-                                                .Where(b => !b.IsDeleted).AsQueryable();
+                                                .Where(b => !b.IsDeleted && b.FreelancerId == null).AsQueryable();
 
             if (filters.minPrice > 0)
             {

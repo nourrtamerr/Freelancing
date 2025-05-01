@@ -221,6 +221,10 @@ namespace Freelancing.Helpers
                 .ForMember(dest => dest.ClientCountry, opt => opt.MapFrom(src => src.Client.City.Country.Name))
                 .ForMember(dest => dest.NumOfBids, opt => opt.MapFrom(src => src.Proposals.Count()))
                 .ForMember(dest=>dest.ClientIsVerified, opt=>opt.MapFrom(src=>src.Client.IsVerified))
+
+                .ForMember(dest=>dest.BiddingStartDate, opt=>opt.MapFrom(src=>src.BiddingStartDate.ToString()))
+                .ForMember(dest=>dest.BiddingEndDate, opt=>opt.MapFrom(src=>src.BiddingEndDate.ToString()))
+
                 //.ForMember(dest => dest.ClientRating, opt => opt.MapFrom(src => src.Client.Reviewed.Average(r => r.Rating)))
                 ;
 
@@ -325,7 +329,8 @@ namespace Freelancing.Helpers
 
                 .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.Ignore())
                 .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.Ignore());
+                .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.Ignore())
+                .ForMember(dest=>dest.FreelancerId, opt=>opt.MapFrom(src=>src.FreelancerId));
 
 
 

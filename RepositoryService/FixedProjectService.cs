@@ -34,7 +34,7 @@ namespace Freelancing.RepositoryService
             .ThenInclude(ps => ps.Skill)
         .Include(p => p.Milestones)
         .Include(p => p.Proposals)
-        .Include(p => p.Subcategory).Where(p=>!p.IsDeleted).ToListAsync();
+        .Include(p => p.Subcategory).Where(p=>!p.IsDeleted && p.Status == projectStatus.Pending).ToListAsync();
         }
 
         public async Task<List<FixedPriceProject>> GetAllFixedPriceProjectsAsyncByFreelancerId(string id)

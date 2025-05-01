@@ -444,6 +444,7 @@ namespace Freelancing.Controllers
                 Description = project.Description,
                 Currency = project.currency,
                 ExpectedDuration = project.ExpectedDuration,
+                FreelancerId=project.FreelancerId,
 
                 ClientId = project.ClientId,
                 ClientRating = project.Client?.Reviewed?.Average(r => r?.Rating ?? 0) ?? 0,
