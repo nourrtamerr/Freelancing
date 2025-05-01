@@ -22,7 +22,7 @@ namespace Freelancing.Controllers
 		[HttpGet("MyProjects")]
 		public async Task<ActionResult<List<Project>>> MyProjects()
 		{
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userId is null)
 			{
 				return BadRequest();
