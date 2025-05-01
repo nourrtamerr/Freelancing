@@ -114,7 +114,7 @@ namespace Freelancing.Controllers
                     #endregion
 
                     var url = Pay(proposalId, PaymentMethod.Balance, Guid.NewGuid().ToString());
-                    return Redirect(url);
+                    return Ok();
                 }
                 return BadRequest("proposal not found");
             }
@@ -154,6 +154,9 @@ namespace Freelancing.Controllers
             }
             return BadRequest("Client not found");
         }
+
+
+
 
 
 

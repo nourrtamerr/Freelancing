@@ -97,7 +97,7 @@ namespace Freelancing.Controllers
 				}
 
 			}
-			var proposal=await _proposals.CreateProposalAsync(dto, "c2e230ae-7389-4ee3-8f26-862ca2625233" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			var proposal=await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier) /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
@@ -106,8 +106,7 @@ namespace Freelancing.Controllers
 			});
 			
 			return Ok(
-				await _proposals.CreateProposalAsync(dto, "c2e230ae-7389-4ee3-8f26-862ca2625233" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/)
-				);
+				proposal);
         }
 
         // PUT api/<ProposalController>/5

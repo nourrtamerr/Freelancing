@@ -133,7 +133,8 @@ namespace Freelancing.Models
 				firstname = "Admin",
 				lastname = "User",
 				RefreshToken = "",
-				RefreshTokenExpiryDate = DateTime.Now
+				Title= "Admin",
+                RefreshTokenExpiryDate = DateTime.Now
 			};
 
 			modelBuilder.Entity<Admin>().HasData(admin);

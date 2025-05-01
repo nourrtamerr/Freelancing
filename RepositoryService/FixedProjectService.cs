@@ -20,7 +20,14 @@ namespace Freelancing.RepositoryService
         public async Task<FixedPriceProject> CreateFixedPriceProjectAsync(FixedPriceProject project)
         {
             await _context.fixedPriceProjects.AddAsync(project);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.ToString());
+            }
              return await GetFixedPriceProjectByIdAsync(project.Id);
         }
 

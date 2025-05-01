@@ -447,7 +447,9 @@ namespace Freelancing.Controllers
                 FreelancerId=project.FreelancerId,
 
                 ClientId = project.ClientId,
-                ClientRating = project.Client?.Reviewed?.Average(r => r?.Rating ?? 0) ?? 0,
+                ClientRating = project.Client?.Reviewed != null && project.Client.Reviewed.Any()
+	                            ? project.Client.Reviewed.Average(r => r?.Rating ?? 0)
+	                            : 0,
                 ClientTotalNumberOfReviews = project.Client?.Reviewed?.Count() ?? 0,
                 ClientIsverified = project.Client.IsVerified,
                 ClientCountry = project.Client.City.Country.Name,
@@ -506,12 +508,18 @@ namespace Freelancing.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles ="Client")]
         public async Task<ActionResult<GetAllFixedProjectDto>> CreateFixedPriceProject([FromBody] CreateFixedProjectDTO dto)
 
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+            var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			if (!(user is Client))
+            {
+                return BadRequest(new { message = "Only clients can post projects" });
             }
 
             var project = new FixedPriceProject
@@ -526,9 +534,9 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1"
+                ClientId = user.Id
 
-            };
+			};
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
 
