@@ -203,5 +203,33 @@ namespace Freelancing.Controllers
 
             return Ok(onlineUsers);
         }
+
+        [HttpGet("conversations/{username}")]
+        public async Task<IActionResult> GetConversations(string username)
+        {
+            // Find the user by username
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                return NotFound($"User {username} not found");
+            }
+
+            // Get all messages where the user is either the sender or receiver
+            var messages = await _context.Chats
+                .Where(m => m.SenderId == user.Id || m.ReceiverId == user.Id)
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .OrderByDescending(m => m.SentAt)
+                .ToListAsync();
+
+            // Group messages by the other participant's ID and take the latest message
+            var conversations = messages
+                .GroupBy(m => m.SenderId == user.Id ? m.ReceiverId : m.SenderId)
+                .Select(g => g.OrderByDescending(m => m.SentAt).First())
+                .Select(m => _mapper.Map<ChatDto>(m)) // Map to ChatDto
+                .ToList();
+
+            return Ok(conversations);
+        }
     }
 }
