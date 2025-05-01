@@ -43,7 +43,33 @@ namespace Freelancing.Controllers
 			}
 			return Ok(new { id=user.Id});
 		}
-		[HttpGet("FreeAgents")]
+        [HttpGet("getImagebyUserName")]
+        public async Task<IActionResult> getImagebyUserName(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user is null)
+            {
+                return BadRequest("not found");
+            }
+
+            if (user.ProfilePicture is null)
+            {
+                return BadRequest("no image");
+            }
+
+            var fileName = Path.GetFileName(user.ProfilePicture);
+            var imagePath = Path.Combine(_env.ContentRootPath, "MyPrivateUploads", fileName);
+
+            if (!System.IO.File.Exists(imagePath))
+            {
+                return NotFound("Image not found");
+            }
+            return Ok(new { fileName });
+        }
+
+
+
+        [HttpGet("FreeAgents")]
 		public async Task<IActionResult> getAllFreelancers()
 		{
 			return Ok(await _freelancersmanager.GetAllAsync());
