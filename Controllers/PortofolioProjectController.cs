@@ -47,7 +47,7 @@ namespace Freelancing.Controllers
 			var p = await portofolioProjectContext.GetByFreelancerId(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			if (p == null)
 			{
-				return NotFound();
+				return BadRequest(new {Message="Only for freelancers"});
 			}
 			var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
 			return Ok(DTO.Select(p=> new

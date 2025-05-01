@@ -27,7 +27,11 @@ namespace Freelancing.RepositoryService
                 var PortfolioProjects= await context.PortofolioProjects.Include(p=>p.Images).Where(p => p.FreelancerId == id&&!p.IsDeleted).ToListAsync();
                 return PortfolioProjects;
             }
-            throw new KeyNotFoundException("Invalid Freelancer Id");
+            else
+            {
+                return null;
+            }
+                throw new KeyNotFoundException("Invalid Freelancer Id");
 
         }
 
