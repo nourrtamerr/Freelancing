@@ -669,7 +669,7 @@ namespace Freelancing.Controllers
 			var user = (await _userManager.FindByNameAsync(dto.UserName));
 			if (user is null || dto.RefreshToken != user.RefreshToken || user.RefreshTokenExpiryDate < DateTime.UtcNow)
 			{
-				return BadRequest("Ineligible for refresh token");
+				return BadRequest(new{ Message= "Ineligible for refresh token" });
 			}
 			user.RefreshToken = JWTHelpers.CreateRefreshToken();
 			user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
