@@ -33,7 +33,7 @@ namespace Freelancing.Controllers
 		}
 
 		[HttpGet("getIdByUserName/{username}")]
-		[Authorize]
+	
 		public async Task<IActionResult> getIdByUserName(string username)
 		{
 			var user = await _userManager.FindByNameAsync(username);
@@ -182,6 +182,16 @@ namespace Freelancing.Controllers
 				return BadRequest("not found");
 			}
 			return Ok(await _freelancersmanager.GetByIDAsync(user.Id));
+		}
+		[HttpGet("usernameById")]
+		public async Task<IActionResult> getUserNameById(string id)
+		{
+			var user = (await _userManager.FindByIdAsync(id));
+			if (user == null)
+			{
+				return BadRequest("not found");
+			}
+			return Ok(new { userName = user.UserName });
 		}
 		[HttpGet("Clients/{username}")]
 		public async Task<IActionResult> getClientsById(string username)
@@ -691,6 +701,8 @@ namespace Freelancing.Controllers
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
+
+
                 return BadRequest(new { message = "Invalid user." });
             }
 
@@ -767,7 +779,7 @@ namespace Freelancing.Controllers
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
-				var url = configuration["AppSettings:AngularAppUrl"] + "/home?pleaseLogin";
+				var url = configuration["AppSettings:AngularAppUrl"] + "/login?pleaseLogin";
 				return Redirect(url);
 
 
