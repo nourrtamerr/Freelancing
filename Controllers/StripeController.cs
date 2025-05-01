@@ -122,13 +122,13 @@ namespace Freelancing.Controllers
 				options.SuccessUrl = redirectionurl;
 				session.SuccessUrl = redirectionurl;
 
-                Response.Cookies.Append("UserSessionId", User.FindFirstValue(ClaimTypes.NameIdentifier), new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,  // Ensure it's secure if you're using HTTPS
-                    SameSite = SameSiteMode.Lax,  // Adjust depending on your needs
-                    Expires = DateTime.UtcNow.AddMinutes(30)  // Set an expiry time
-                });
+                //Response.Cookies.Append("UserSessionId", User.FindFirstValue(ClaimTypes.NameIdentifier), new CookieOptions
+                //{
+                //    HttpOnly = true,
+                //    Secure = true,  // Ensure it's secure if you're using HTTPS
+                //    SameSite = SameSiteMode.Lax,  // Adjust depending on your needs
+                //    Expires = DateTime.UtcNow.AddMinutes(30)  // Set an expiry time
+                //});
 
 
 
