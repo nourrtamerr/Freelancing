@@ -449,7 +449,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest(new { Message = "error occured" });
 			}
-			return Ok("Added to Admin");
+			return Ok(`new { Message = "Added to Admin" });
 		}
 		[HttpPost("RemoveAdmin")]
 		[Authorize(Roles = "Admin")]
@@ -469,7 +469,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest(new { Message = "error occured" });
 			}
-			return Ok("Removed from Admin");
+			return Ok(new { Message = "Removed from Admin" });
 		}
 		[HttpPost("CreateAdminAccount")]
 		[Authorize(Roles = "Admin")]
@@ -650,11 +650,11 @@ namespace Freelancing.Controllers
 
 			if (user == null || !await _userManager.CheckPasswordAsync(user, LoginUser.loginPassword))
 			{
-				return Unauthorized("Invalid email or password.");
+				return Unauthorized(new { Message = "Invalid email or password." });
 			}
 			if (!await _userManager.IsEmailConfirmedAsync(user))
 			{
-				return BadRequest("You must confirm your email before logging in");
+				return BadRequest(new { Message = "You must confirm your email before logging in" });
 			}
 
 			user.RefreshToken = JWTHelpers.CreateRefreshToken();
@@ -707,7 +707,7 @@ namespace Freelancing.Controllers
             }
             else
             {
-                return BadRequest("Email is invalid");
+                return BadRequest(new { Message = "Email is invalid" });
             }
         }
 
@@ -727,7 +727,7 @@ namespace Freelancing.Controllers
             {
 
 
-                return BadRequest(new { message = "Invalid user." });
+                return BadRequest(new { Message = "Invalid user." });
             }
 
             var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
@@ -766,11 +766,11 @@ namespace Freelancing.Controllers
 			var newuser = await _userManager.FindByEmailAsync(emailToBeCONFIRMED);
 			if (newuser is null)
 			{
-				return BadRequest("Email is not registered");
+				return BadRequest(new { Message = "Email is not registered" });
 			}
 			if (newuser.EmailConfirmed)
 			{
-				return BadRequest("Email is already confirmed");
+				return BadRequest(new { Message = "Email is already confirmed" });
 			}
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(newuser);
 			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token }, Request.Scheme);
@@ -791,7 +791,7 @@ namespace Freelancing.Controllers
 		{
 			if (userId == null || token == null)
 			{
-				return BadRequest("Invalid email confirmation request.");
+				return BadRequest(new { Message = "Invalid email confirmation request." });
 			}
 
 			var user = await _userManager.FindByIdAsync(userId);
