@@ -61,6 +61,14 @@ namespace Freelancing.RepositoryService
             {
                 milestone.Status = (MilestoneStatus)StatusId;
                 if(milestone.Status== MilestoneStatus.Completed){
+                    milestone.EndDate = DateTime.Now;
+                    var project = context.project.Include(p=>p.Milestones).FirstOrDefault(P=>P.Id==milestone.ProjectId);
+                    var nextmilestone = project.Milestones.OrderBy(m=>m.Id).SkipWhile(m => m.Id != milestone.Id).Skip(1).FirstOrDefault();
+
+
+                    if (nextmilestone is not null) {
+                        nextmilestone.StartDate = DateTime.Now;
+                    }
                     freelancer.Balance += milestone.Amount;
                 }
 

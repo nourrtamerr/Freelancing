@@ -74,7 +74,7 @@ namespace Freelancing.Controllers
 				Message = $"Milestone Finished for the project `{project.Title}` please proceed for the next milestone",
 				UserId = project.FreelancerId
 			});
-			return Ok(await _milestoneService.UpdateStatusAsync(MilestoneId, StatusId));
+			return Ok(updatedmilestones);
         }
 
 

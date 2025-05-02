@@ -4,6 +4,7 @@ using Freelancing.DTOs.MilestoneDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -42,7 +43,7 @@ namespace Freelancing.Controllers
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 			{
-				return NotFound("User not found.");
+				return BadRequest(new { Message = "User not found." });
 			}
             if (user.GetType() == typeof(Client))
             {
@@ -54,7 +55,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				return BadRequest("Invalid user type.");
+				return BadRequest(new { Message = "Invalid user type." });
 			}
             return Ok(projects.Select(p => new GetAllFixedProjectDto
             {
@@ -90,7 +91,7 @@ namespace Freelancing.Controllers
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 			{
-				return NotFound("User not found.");
+				return BadRequest(new { Message = "User not found." });
 			}
 			if (user.GetType() == typeof(Client))
 			{
@@ -102,7 +103,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				return BadRequest("Invalid user type.");
+				return BadRequest(new { Message = "Invalid user type." });
 			}
 			return Ok(projects.Select(p => new GetAllFixedProjectDto
 			{
@@ -160,14 +161,14 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = ModelState });
             }
 
             var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
 
-            if (projects == null || !projects.Any())
+            if (projects == null)
             {
-                return NotFound("No fixed price projects found.");
+                return BadRequest(new { Message = "No fixed price projects found." });
             }
 
             //// Filter by experience level if specified
@@ -316,14 +317,14 @@ namespace Freelancing.Controllers
         //{
         //    if (!ModelState.IsValid)
         //    {
-        //        return BadRequest(ModelState);
+        //        return BadRequest(new { Message =ModelState});
         //    }
 
         //    var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
 
         //    if (projects == null || !projects.Any())
         //    {
-        //        return NotFound("No fixed price projects found.");
+        //        return BadRequest(new { Message ="No fixed price projects found."});
         //    }
 
         //    var projectDtos = projects.Select(p => new GetAllFixedProjectDto
@@ -376,29 +377,29 @@ namespace Freelancing.Controllers
         //{
         //    if (!ModelState.IsValid)
         //    {
-        //        return BadRequest(ModelState);
+        //        return BadRequest(new { Message =ModelState});
         //    }
 
         //    var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
 
         //    if (projects == null || !projects.Any())
         //    {
-        //        return NotFound("No fixed price projects found.");
+        //        return BadRequest(new { Message ="No fixed price projects found."});
         //    }
-          
+
 
         //    var projectDto = projects.Select(p => new GetAllFixedProjectDto
         //    {
-                
+
         //        Id = p.Id,
         //        Title = p.Title,
         //        Description = p.Description,
         //        Currency = p.currency,
         //        ExpectedDuration = p.ExpectedDuration,
         //        SubcategoryID = p.SubcategoryId,
-               
+
         //        ExperienceLevel = p.experienceLevel,
-              
+
         //        ProjectSkills = p.ProjectSkills != null
         //? p.ProjectSkills
         //    .Where(ps => ps.Skill != null)
@@ -428,7 +429,7 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = ModelState });
             }
 
             var project = await _fixedProjectService.GetFixedPriceProjectByIdAsync(id);
@@ -461,9 +462,9 @@ namespace Freelancing.Controllers
                 PostedFrom=(int) (DateTime.Now - project.CreatedAt).TotalMinutes,
 
                 ClinetAccCreationDate = project.Client.AccountCreationDate.ToString(),
-                FreelancersubscriptionPlan = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
-                FreelancerTotalNumber = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
-                FreelancerRemainingNumberOfBids = _dbContext.freelancers.FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
+                FreelancersubscriptionPlan = _dbContext.freelancers.Include(f=>f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.name ?? "",
+                FreelancerTotalNumber = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.subscriptionPlan?.TotalNumber ?? 0,
+                FreelancerRemainingNumberOfBids = _dbContext.freelancers.Include(f => f.subscriptionPlan).FirstOrDefault(f => f.Id == userId)?.RemainingNumberOfBids ?? 0,
 
                 // Safely get other projects
                 ClientOtherProjectsIdsNotAssigned = project.ClientId != null
@@ -518,12 +519,12 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = ModelState });
             }
             var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			if (!(user is Client))
             {
-                return BadRequest(new { message = "Only clients can post projects" });
+                return BadRequest(new { Message = "Only clients can post projects" });
             }
 
             var project = new FixedPriceProject
@@ -651,20 +652,20 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = ModelState });
             }
 
             var project = await _fixedProjectService.GetFixedPriceProjectByIdAsync(id);
             if (project == null)
             {
-                return NotFound($"Fixed price project with ID {id} not found.");
+                return BadRequest(new { Message = $"Fixed price project with ID {id} not found." });
             }
 
             // Optional: Check Subcategory exists
             var subcategory = await _dbContext.Subcategories.FindAsync(dto.SubcategoryID);
             if (subcategory == null)
             {
-                return BadRequest($"Subcategory with ID {dto.SubcategoryID} does not exist.");
+                return BadRequest(new { Message = $"Subcategory with ID {dto.SubcategoryID} does not exist." });
             }
 
             // Update main fields
@@ -759,13 +760,13 @@ namespace Freelancing.Controllers
 
             if (project == null)
             {
-                return NotFound($"Fixed price project with ID {id} not found.");
+                return BadRequest(new { Message = $"Fixed price project with ID {id} not found." });
             }
 
           await  _fixedProjectService.DeleteFixedPriceProjectAsync(id);
             await _dbContext.SaveChangesAsync();
 
-            return Ok($"Fixed price project with ID {id} has been deleted successfully.");
+            return Ok(new { Message = $"Fixed price project with ID {id} has been deleted successfully." });
         }
 
 

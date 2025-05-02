@@ -47,7 +47,11 @@ namespace Freelancing.Controllers
                 });
                 context.project.Update(project);
                 context.SaveChanges();
-                var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+
+				context.freelancers.FirstOrDefault(f => f.Id == (context.Proposals.Find(proposalId).FreelancerId)).RemainingNumberOfBids--;
+				context.SaveChanges();
+				var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+
                 return url;
             }
             return "Project not found";
@@ -69,7 +73,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -82,7 +86,7 @@ namespace Freelancing.Controllers
                     var Amount = proposal.suggestedMilestones.Sum(m => m.Amount);
                     if (C.Balance < Amount)
                     {
-                        return BadRequest("Not enough balance");
+                        return BadRequest(new { Message = "Not enough balance" });
                     }
                     C.Balance -= Amount;
 
@@ -116,9 +120,9 @@ namespace Freelancing.Controllers
                     var url = Pay(proposalId, PaymentMethod.Balance, Guid.NewGuid().ToString());
                     return Ok();
                 }
-                return BadRequest("proposal not found");
+                return BadRequest(new { Message = "proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
         }
 
 
@@ -134,7 +138,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -150,9 +154,9 @@ namespace Freelancing.Controllers
                     //return Redirect(url);
                     return Ok();
                 }
-                return BadRequest("proposal not found");
+                return BadRequest(new { Message = "proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
         }
 
 
@@ -173,7 +177,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -190,9 +194,9 @@ namespace Freelancing.Controllers
 
                     
                 }
-                return BadRequest("Proposal not found");
+                return BadRequest(new { Message = "Proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
 
         }
 
@@ -213,7 +217,7 @@ namespace Freelancing.Controllers
 			if (!session.Metadata.TryGetValue("userId", out var userId))
 			{
                 // This userId is unique per session
-                return BadRequest("payment failed");
+                return BadRequest(new { Message = "payment failed" });
 			}
 			var client = context.clients.FirstOrDefault(c => c.Id == userId);
 
@@ -256,7 +260,7 @@ namespace Freelancing.Controllers
 
 
                     var url = Pay(proposalId, PaymentMethod.Stripe, session_id);
-       
+                   
 					await _notification.CreateNotificationAsync(new()
 					{
 						isRead = false,
@@ -271,9 +275,9 @@ namespace Freelancing.Controllers
 					});
 					return Redirect(url);
                 }
-                return BadRequest("Proposal not found");
+                return BadRequest(new { Message = "Proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
 
 
         }

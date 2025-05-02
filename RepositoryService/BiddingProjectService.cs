@@ -198,6 +198,7 @@ namespace Freelancing.RepositoryService
                                         .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
                                         .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                                         .Include(b=>b.Freelancer).ThenInclude(f=>f.subscriptionPlan)
+
                                         .Include(b=>b.Client.City).ThenInclude(c=>c.Country)
                                         .FirstOrDefaultAsync(b => b.Id == id);
             if (project == null)
@@ -216,8 +217,8 @@ namespace Freelancing.RepositoryService
             projectDto.ClientProjectsTotalCount = _context.project.Where(p => !p.IsDeleted && p.ClientId == project.ClientId).Count();
 
             var freelancer = await _context.freelancers
-        .Include(f => f.subscriptionPlan)
-        .FirstOrDefaultAsync(f => f.Id == userId);
+            .Include(f => f.subscriptionPlan)
+            .FirstOrDefaultAsync(f => f.Id == userId);
 
             projectDto.FreelancersubscriptionPlan = freelancer?.subscriptionPlan?.name ?? string.Empty;
             projectDto.FreelancerTotalNumber = freelancer?.subscriptionPlan?.TotalNumber ?? 0;
@@ -273,7 +274,8 @@ namespace Freelancing.RepositoryService
 
 
             await _context.biddingProjects.AddAsync(createdProject);
-            await _context.SaveChangesAsync();
+			(await _context.clients.FirstOrDefaultAsync(c => c.Id == (createdProject.ClientId))).RemainingNumberOfProjects--;
+			await _context.SaveChangesAsync();
 
             _context.Entry(createdProject).Reference(p => p.Subcategory).Load();
             await _context.Entry(createdProject).Collection(p => p.ProjectSkills).LoadAsync();

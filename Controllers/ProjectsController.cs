@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
@@ -25,7 +26,7 @@ namespace Freelancing.Controllers
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userId is null)
 			{
-				return BadRequest();
+				return BadRequest(new { Message = "Not Found" });
 			}
 			var user = await userManager.FindByIdAsync(userId);
 			var projects = await context.GetAllProjectsDtoAsync();
@@ -41,7 +42,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				return BadRequest(new { message = "Admins dont have projects" });
+				return BadRequest(new { Message = "Admins dont have projects" });
 			}
 
 			return Ok(projects);

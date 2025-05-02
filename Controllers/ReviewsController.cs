@@ -41,7 +41,7 @@ namespace Freelancing.Controllers
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review Found" });
             }
             var reviewDto = mapper.Map<ReviewDto>(review);
             return Ok(reviewDto);
@@ -53,7 +53,7 @@ namespace Freelancing.Controllers
             var reviews = await reviewService.GetReviewsByRevieweeIdAsync(revieweeId);
             if (reviews == null )
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Reviews Found" });
             }
             var reviewDtos = mapper.Map<List<GetReviewByRevieweeIdDto>>(reviews);
             return Ok(reviewDtos);
@@ -63,22 +63,35 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId) {
 
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
-            if (reviews == null || reviews.Count == 0)
+            if (reviews == null )
             {
-                return NotFound();
-            }
+                return BadRequest(new { Message = "No reviews Found" });
+			}
             var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewDtos);
         }
+		[HttpGet("project/{projectId}")]
+		public async Task<ActionResult<List<ReviewDto>>> GetReviewsByProjectId(int projectId)
+		{
 
-        [HttpPost]
+			var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
+			if (reviews == null )
+			{
+				return BadRequest(new { Message = "No reviews Found" });
+			}
+			var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
+			return Ok(reviewDtos);
+		}
+
+		[HttpPost]
         public async Task<ActionResult<ReviewDto>> CreateReview([FromBody] ReviewDto reviewDto)
         {
             if (reviewDto == null)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
             }
             var review = mapper.Map<Review>(reviewDto);
+            review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);
             await _notifications.CreateNotificationAsync(new()
             {
@@ -95,15 +108,18 @@ namespace Freelancing.Controllers
         {
             if (id != reviewDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
             }
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review Found" });
             }
-            mapper.Map(reviewDto, review);
-            await reviewService.UpdateReviewAsync(review);
+            //mapper.Map(reviewDto, review);
+            review.Comment = reviewDto.Comment;
+            review.Rating = reviewDto.Rating;
+
+			await reviewService.UpdateReviewAsync(review);
             return NoContent();
         }
 
@@ -115,7 +131,7 @@ namespace Freelancing.Controllers
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review found" });
             }
             await reviewService.DeleteReviewAsync(id);
             return NoContent();

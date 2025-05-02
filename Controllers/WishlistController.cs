@@ -13,7 +13,7 @@ namespace Freelancing.Controllers
 	public class WishlistController(INotificationRepositoryService _notifications,ApplicationDbContext _context) : ControllerBase
 	{
 		[HttpGet]
-		[Authorize(Roles = "Freelancer")]
+		//[Authorize(Roles = "Freelancer")]
 		public IActionResult GetmyWishlist()
 		{
 			// Logic to get the wishlist
@@ -55,7 +55,7 @@ namespace Freelancing.Controllers
 			var project = _context.project.Include(p=>p.Freelancer).FirstOrDefault(p => p.Id == projectid);
 			if (project == null)
 			{
-				return BadRequest(new { message = "Project not found" });
+				return BadRequest(new { Message = "Project not found" });
 			}
 			//if(! (project.Status==projectStatus.Completed))
 			//{
@@ -63,7 +63,7 @@ namespace Freelancing.Controllers
 			//}
 			if (_context.FreelancerWishlists.Any(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid))
 			{
-				return BadRequest(new { message = "Project already in wishlist" });
+				return BadRequest(new { Message = "Project already in wishlist" });
 			}
 			var wishlist = new FreelancerWishlist()
 			{
@@ -77,6 +77,7 @@ namespace Freelancing.Controllers
 
 			_context.SaveChanges();
 			project = _context.project.Include(p => p.Freelancer).FirstOrDefault(p => p.Id == projectid);
+			//User.FindFirstValue(ClaimTypes.Name);
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
@@ -97,7 +98,7 @@ namespace Freelancing.Controllers
 			var project = _context.project.FirstOrDefault(p => p.Id == projectid);
 			if (project == null)
 			{
-				return BadRequest(new { message = "Project not found" });
+				return BadRequest(new { Message = "Project not found" });
 			}
 			//if (!(project.Status == projectStatus.Completed))
 			//{
@@ -107,11 +108,11 @@ namespace Freelancing.Controllers
 			var wishlistitem = _context.FreelancerWishlists.FirstOrDefault(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid);
 			if(wishlistitem==null)
 			{
-				return BadRequest(new { message = "Project is not in wishlist" });
+				return BadRequest(new { Message = "Project is not in wishlist" });
 			}
 			_context.FreelancerWishlists.Remove(wishlistitem);
 			_context.SaveChanges();
-			return Ok(new { message = "Removed" });
+			return Ok(new { Message = "Removed" });
 		}
 	}
 }

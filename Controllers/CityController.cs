@@ -31,7 +31,7 @@ namespace Freelancing.Controllers
 			var city = _cityService.GetById(id);
 			if (city == null)
 			{
-				return NotFound();
+				return BadRequest(new { Message = "City Not Found" });
 			}
 
 			return Ok(new { city.Name, countryname = city.Country.Name, city.Id });
@@ -44,11 +44,11 @@ namespace Freelancing.Controllers
 		{
 			if(vm.Id !=null && vm.Id!=0)
 			{
-				return BadRequest("cannot be created dont insert an id");
+				return BadRequest(new { Message = "cannot be created dont insert an id" });
 			}
 			if (_countryservice.GetById(vm.CountryId) == null)
 			{
-				return BadRequest("Invalid Country");
+				return BadRequest(new { Message = "Invalid Country" });
 			}
 			_cityService.Create(vm);
 			return Ok(new { Message = "Created" });
@@ -62,14 +62,14 @@ namespace Freelancing.Controllers
 
 			if (vm.Id is null)
 			{
-				return NotFound();
+				return BadRequest(new { Message = "Not Found" });
 			}
 			var country = _cityService.GetById((int)vm.Id);
 
 
 			if (country == null)
 			{
-				return NotFound();
+				return BadRequest(new { Message = "Country Not Found" });
 			}
 			_cityService.Update(vm);
 			return Ok(new { Message = "Updated" });

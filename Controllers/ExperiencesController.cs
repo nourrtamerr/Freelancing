@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
@@ -20,9 +21,9 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllExperiences()
         {
             var experienceslist = await _experienceService.GetAllExperiences();
-            if (experienceslist == null || !experienceslist.Any())
+            if (experienceslist == null)
             {
-                return NotFound(new { msg = "No experiences found." });
+                return BadRequest(new { Message = "No experiences found." });
             }
             var experienceDtolist = experienceslist.Select(e => new ExperienceDTO
             {
@@ -45,7 +46,7 @@ namespace Freelancing.Controllers
             var experienceslist = await _experienceService.GetExperienceByFreelancerUserName(username);
             if (experienceslist == null )
             {
-                return NotFound(new { msg = "No experiences found." });
+                return BadRequest(new { Message = "No experiences found." });
             }
             var experienceDtolist = experienceslist.Select(e => new ExperienceDTO
             {
@@ -68,7 +69,7 @@ namespace Freelancing.Controllers
             var experience = await _experienceService.GetExperienceById(id);
             if (experience == null)
             {
-                return NotFound(new { msg = "no experince found has this id" });
+                return BadRequest(new { Message = "no experince found has this id" });
             }
             var experienceDto = new ExperienceDTO
             {
@@ -91,7 +92,7 @@ namespace Freelancing.Controllers
         {
 			if (!ModelState.IsValid)
             {
-                return BadRequest(experienceDto);
+                return BadRequest(new { Message = experienceDto });
             }
             var exp = new Experience {
                 JobTitle = experienceDto.JobTitle,
@@ -121,7 +122,7 @@ namespace Freelancing.Controllers
 					}
                     );
             }
-            return BadRequest(new { msg = "failed to create experience" });
+            return BadRequest(new { Message = "failed to create experience" });
         }
 
         [HttpPut("{id}")]
@@ -130,7 +131,7 @@ namespace Freelancing.Controllers
             var exp =await _experienceService.GetExperienceById(id);            
             if (exp == null || !ModelState.IsValid)
             {
-                return BadRequest(new { msg = "can't find experience with this id"});
+                return BadRequest(new { Message = "can't find experience with this id"});
             }
             exp.StartDate = experienceDto.StartDate;
             exp.EndDate = experienceDto.EndDate;
@@ -141,7 +142,7 @@ namespace Freelancing.Controllers
             var updatedExperience = await _experienceService.UpdateExperience(exp);
             if (!updatedExperience)
             {
-                return BadRequest(new {msg = "failed to update the experience" });
+                return BadRequest(new {Message = "failed to update the experience" });
             }
             return Ok(updatedExperience);
         }
@@ -152,14 +153,14 @@ namespace Freelancing.Controllers
             var exp = await _experienceService.GetExperienceById(id);
             if(exp == null)
             {
-                return BadRequest(new {msg="experience not found"});
+                return BadRequest(new {Message ="experience not found"});
             }
             var deleted = await _experienceService.DeleteExperience(id);
             if (!deleted)
             {
-                return BadRequest(new { msg = "failed to delete experience"});
+                return BadRequest(new { Message = "failed to delete experience"});
             }
-            return Ok(new { msg = "experience marked as deleted successfully" });
+            return Ok(new { Message = "experience marked as deleted successfully" });
         }               
     }
 }

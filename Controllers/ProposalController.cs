@@ -41,19 +41,20 @@ namespace Freelancing.Controllers
 			var user =await usermanager.FindByNameAsync(name);
 			if(user is null)
 			{
-				return BadRequest("usr not found");
+				return BadRequest(new { Message = "usr not found" });
 			}
 			
 				return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(user.Id)));
 		}
 		
 		[HttpGet("getbyfreelancerId")]
+		[Authorize]
 		public async Task<IActionResult> GetProposalsbyfreelancerid()
 		{
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
             {
-                return BadRequest("usr not found");
+                return BadRequest(new { Message = "usr not found" });
             }
             return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(userId)));
         }
@@ -68,18 +69,18 @@ namespace Freelancing.Controllers
 
 			if (project is null)
             {
-				return BadRequest(new {message= "The project no longer exists" });
+				return BadRequest(new {Message= "The project no longer exists" });
 			}
             if(project.FreelancerId is not null)
             {
-                return BadRequest(new { message = "This project has already been assigned to another freelancer" });
+                return BadRequest(new { Message = "This project has already been assigned to another freelancer" });
             }
             dto.type=project.GetType()==typeof(FixedPriceProject)? projectType.fixedprice : projectType.bidding;
             if (dto.type == projectType.fixedprice)
             {
                 //if((project as FixedPriceProject).fixedPrice!=dto.Price)
                 //{
-                //    return BadRequest("not matching the price");
+                //    return BadRequest(new { Message ="not matching the price"});
                 //}
             }
             else
@@ -88,11 +89,11 @@ namespace Freelancing.Controllers
 				{
 					if (prjct.minimumPrice > dto.Price || prjct.maximumprice <dto.Price)
 					{
-						return BadRequest( new {message= "Your bid amount must be between the minimum and maximum price range" });
+						return BadRequest( new {Message = "Your bid amount must be between the minimum and maximum price range" });
 					}
 					if (prjct.BiddingEndDate < DateTime.Now )
 					 {
-						return BadRequest(new { message = "The bidding period for this project has ended" });
+						return BadRequest(new { Message = "The bidding period for this project has ended" });
 					}
 				}
 
@@ -120,18 +121,18 @@ namespace Freelancing.Controllers
 
 			if (project is null)
 			{
-				return BadRequest("Project not found");
+				return BadRequest(new { Message = "Project not found" });
 			}
 			if (project.FreelancerId is not null)
 			{
-				return BadRequest("Project is already assigned to a freelancer");
+				return BadRequest(new { Message = "Project is already assigned to a freelancer" });
 			}
 			dto.type = project.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding;
 			if (dto.type == projectType.fixedprice)
 			{
 				if ((project as FixedPriceProject).Price != dto.Price)
 				{
-					return BadRequest("not matching the price");
+					return BadRequest(new { Message = "not matching the price" });
 				}
 			}
 			else
@@ -140,11 +141,11 @@ namespace Freelancing.Controllers
 				{
 					if (prjct.minimumPrice > dto.Price || prjct.maximumprice < dto.Price)
 					{
-						return BadRequest("not within bid limits");
+						return BadRequest(new { Message = "not within bid limits" });
 					}
 					if (prjct.BiddingEndDate < DateTime.Now)
 					{
-						return BadRequest("bid is over");
+						return BadRequest(new { Message = "bid is over" });
 					}
 				}
 			}
