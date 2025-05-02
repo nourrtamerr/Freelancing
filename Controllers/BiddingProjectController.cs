@@ -94,7 +94,7 @@ namespace Freelancing.Controllers
 				//});
 				return Ok(new
                 {
-                    ClientId = project.ClientId ?? "63d89bb1-7a13-4e02-bf19-14701398e3a1",
+                    ClientId = project.ClientId ?? userid,
                     project.Subcategory.Name,
                     project.Id,
                     p = project.ProjectSkills.Select(ps => ps.Skill.Name).ToList()

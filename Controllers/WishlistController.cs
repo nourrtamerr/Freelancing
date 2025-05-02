@@ -41,6 +41,12 @@ namespace Freelancing.Controllers
 
 				);
 		}
+		
+		
+		
+		
+		
+		
 		[HttpPost("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
 		public async Task<IActionResult> AddToWishlist(int projectid)
@@ -75,11 +81,14 @@ namespace Freelancing.Controllers
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
-				Message = $"your project with id {project.Id} was added to wishwishlist  by userid {User.FindFirstValue(ClaimTypes.Name)}",
-				UserId = project.ClientId
+                Message = $"your project with id {project.Id} was added to wishwishlist  by userid {User.FindFirstValue(ClaimTypes.Name)}",
+                UserId = project.ClientId
 			});
 			return Ok(new { id = wishlist.Id });
 		}
+
+
+
 
 		[HttpDelete("{projectid}")]
 		[Authorize(Roles = "Freelancer")]

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
+using static Freelancing.SignalR.ChatHub;
 
 
 namespace Freelancing

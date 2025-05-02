@@ -165,15 +165,73 @@ namespace Freelancing.Controllers
             await _chatRepository.MarkAsReadAsync(id);
             return NoContent();
         }
+        [HttpPut("mark-conversation-read/{conversationId}")]
+        public async Task<IActionResult> MarkConversationAsRead(string conversationId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            var messages = await _context.Chats
+                .Where(m => (m.SenderId == conversationId && m.ReceiverId == userId) && !m.isRead)
+                .ToListAsync();
+
+            foreach (var message in messages)
+            {
+                message.isRead = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Notify sender that messages were read
+            await _hubContext.Clients.User(conversationId)
+                .SendAsync("MessagesRead", userId, messages.Select(m => m.Id));
+
+            return NoContent();
+        }
+
+        [HttpPut("update-message")]
+        public async Task<IActionResult> UpdateMessage([FromBody] UpdateMessageDto dto)
+        {
+            try
+            {
+                var message = await _context.Chats
+                    .FirstOrDefaultAsync(m => m.Id == dto.MessageId);
+
+                if (message == null)
+                    return NotFound("Message not found");
+
+                // Update message content and mark as edited
+                message.Message = dto.NewMessage;
+                message.IsEdited = true;
+                message.SentAt = DateTime.UtcNow;  // Update timestamp
+
+                await _context.SaveChangesAsync();
+
+                // Notify both participants
+                var chatDto = _mapper.Map<ChatDto>(message);
+                await _hubContext.Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
+                    .SendAsync("MessageUpdated", chatDto);
+
+                return Ok(chatDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating message: {ex.Message}");
+            }
+        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChat(int id)
         {
             var chat = await _chatRepository.GetChatByIdAsync(id);
+<<<<<<< HEAD
+            if (chat == null) return NotFound();
+
+            var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+=======
             if (chat == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
             }
+>>>>>>> fcfe6ba528cbd6cf6d2f380ddc7c1f38144217e5
 
             if (!string.IsNullOrEmpty(chat.ImageUrl))
             {
@@ -185,27 +243,17 @@ namespace Freelancing.Controllers
             }
 
             await _chatRepository.DeleteChatAsync(id);
+
+            await _hubContext.Clients.Users(participants)
+                .SendAsync("MessageDeleted", id); 
+
             return NoContent();
         }
-
-        [HttpGet("online-users")]
-        public async Task<IActionResult> GetOnlineUsers()
-        {
-            var onlineUsers = await _context.UserConnections
-                .Where(uc => uc.IsConnected)
-                .Include(uc => uc.User)
-                .Select(uc => new
-                {
-                    UserId = uc.UserId,
-                    UserName = uc.User.UserName
-                })
-                .Distinct()
-                .ToListAsync();
-
-            return Ok(onlineUsers);
-        }
-
+        
+        
         [HttpGet("conversations/{username}")]
+    
+        
         public async Task<IActionResult> GetConversations(string username)
         {
             // Find the user by username
@@ -231,6 +279,25 @@ namespace Freelancing.Controllers
                 .ToList();
 
             return Ok(conversations);
+        }
+
+        // In GetOnlineUsers endpoint
+        [HttpGet("online-usersc")]
+        public async Task<IActionResult> GetOnlineUsers()
+        {
+            var onlineUsers = await _context.UserConnections
+                .Where(uc => uc.IsConnected)
+                .Include(uc => uc.User)
+                .Select(uc => new
+                {
+                    UserId = uc.UserId,
+                    UserName = uc.User.UserName,
+                    IsConnected = uc.IsConnected
+                })
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(onlineUsers);
         }
     }
 }
