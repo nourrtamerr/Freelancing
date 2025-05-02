@@ -222,9 +222,17 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> DeleteChat(int id)
         {
             var chat = await _chatRepository.GetChatByIdAsync(id);
+<<<<<<< HEAD
             if (chat == null) return NotFound();
 
             var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+=======
+
+            if (chat == null) return NotFound();
+
+            var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+
+>>>>>>> 09cb897db750ed587fdee2c5765cd63cef4a41e7
             if (chat == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
