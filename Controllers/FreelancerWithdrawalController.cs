@@ -250,11 +250,13 @@ namespace Freelancing.Controllers
 		}
 
 
-		[HttpGet("StripeWithdraw")]
+		[HttpPost("StripeWithdraw")]
 		//[Authorize]
-		public async Task<IActionResult> StripeWithdraw(int money, string email)
+		public async Task<IActionResult> StripeWithdraw(WithdrawRequest request)
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var money = request.Money;
+				var email = request.Email;
 			if (userid == null)
 			{
 				return Unauthorized();
@@ -353,7 +355,7 @@ namespace Freelancing.Controllers
 						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
 						UserId = userid
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + "/paymentsucess";
 					return Redirect(url);
 				}
 				else
@@ -405,5 +407,10 @@ namespace Freelancing.Controllers
 
 
 
+	}
+	public class WithdrawRequest
+	{
+		public int Money { get; set; }
+		public string Email { get; set; }
 	}
 }
