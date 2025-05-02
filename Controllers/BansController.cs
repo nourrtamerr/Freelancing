@@ -39,7 +39,7 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<BanDto>>> GetBansByUserId(string userId)
         {
             var bans = await banService.GetBansByUserIdAsync(userId);
-            if (bans == null || !bans.Any())
+            if (bans == null)
             {
                 return BadRequest(new { Message = "No Bans Found" });
             }

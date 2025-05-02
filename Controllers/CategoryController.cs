@@ -48,7 +48,7 @@ namespace Freelancing.Controllers
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
 
-            if (categories == null || !categories.Any())
+            if (categories == null)
             {
                 return BadRequest(new { Message = "No categories found." });
             }

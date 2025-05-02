@@ -21,7 +21,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllExperiences()
         {
             var experienceslist = await _experienceService.GetAllExperiences();
-            if (experienceslist == null || !experienceslist.Any())
+            if (experienceslist == null)
             {
                 return BadRequest(new { Message = "No experiences found." });
             }

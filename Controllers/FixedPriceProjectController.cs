@@ -166,7 +166,7 @@ namespace Freelancing.Controllers
 
             var projects = await _fixedProjectService.GetAllFixedPriceProjectsAsync();
 
-            if (projects == null || !projects.Any())
+            if (projects == null)
             {
                 return BadRequest(new { Message = "No fixed price projects found." });
             }

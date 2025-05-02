@@ -33,7 +33,7 @@ namespace Freelancing.Controllers
 
             var skills = await context.GetUserSkillByUserIdAsync(freelancerId);
           //  var skills =await context.GetAllUserSkillAsync();
-            if (skills == null|| skills.Count()==0 )
+            if (skills == null )
             {
                 return BadRequest(new { Message = "No skills found" });
             }

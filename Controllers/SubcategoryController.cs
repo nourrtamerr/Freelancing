@@ -51,7 +51,7 @@ namespace Freelancing.Controllers
 
         {
             var subcategories = await _subcategoryService.GetAllSubcategoriesAsync();
-            if (subcategories == null|| subcategories.Count()==0 )
+            if (subcategories == null)
             {
                 return BadRequest(new { Message = "No subcategories found." });
             }

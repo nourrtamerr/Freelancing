@@ -68,7 +68,7 @@ namespace Freelancing.Controllers
                 return BadRequest(new { Message = "invalidusers" });
             }
 			var chats = await _chatRepository.GetConversationAsync(user1.Id, user2.Id);
-            if (chats == null || !chats.Any())
+            if (chats == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
             }

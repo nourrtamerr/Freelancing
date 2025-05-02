@@ -78,7 +78,7 @@ namespace Freelancing.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest(new { Message = "Invalid user ID" });
             var userSkills = await skillService.GetUserSkillByUserIdAsync(userId);
-            if (userSkills == null || !userSkills.Any())
+            if (userSkills == null)
                 return BadRequest(new { Message = $"No user skills found for user ID {userId}" });
             var userSkillDtos = mapper.Map<List<UserSkillDto>>(userSkills);
             return Ok(userSkillDtos);

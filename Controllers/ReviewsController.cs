@@ -52,7 +52,7 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId) {
 
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
-            if (reviews == null || reviews.Count == 0)
+            if (reviews == null)
             {
                 return BadRequest(new { Message = "No reviews Found" });
             }
