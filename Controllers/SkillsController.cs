@@ -32,11 +32,11 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<SkillDto>> GetSkillById(int id)
         {
             if (id <= 0)
-                return BadRequest("Invalid skill ID");
+                return BadRequest(new { Message = "Invalid skill ID" });
 
             var skill = await _skillService.GetSkillByIDAsync(id);
             if (skill == null)
-                return NotFound($"Skill with ID {id} not found");
+                return BadRequest(new { Message = $"Skill with ID {id} not found" });
 
             return Ok(_mapper.Map<SkillDto>(skill));
         }
@@ -46,7 +46,7 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<SkillDto>> CreateSkill([FromBody] SkillDto skillCreateDto)
         {
             if (skillCreateDto == null || !ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = ModelState });
 
             var skill = _mapper.Map<Skill>(skillCreateDto);
             var createdSkill = await _skillService.CreateSkillAsync(skill);
@@ -59,13 +59,13 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<SkillDto>> UpdateSkill(int id, [FromBody] SkillDto skillUpdateDto)
         {
             if (skillUpdateDto == null || id != skillUpdateDto.Id || !ModelState.IsValid)
-                return BadRequest("Invalid skill data or ID mismatch");
+                return BadRequest(new { Message = "Invalid skill data or ID mismatch" });
 
             var skill = _mapper.Map<Skill>(skillUpdateDto);
             var updatedSkill = await _skillService.UpdateSkillAsync(skill);
 
             if (updatedSkill == null)
-                return NotFound($"Skill with ID {id} not found");
+                return BadRequest(new { Message = $"Skill with ID {id} not found" });
 
             return Ok(_mapper.Map<SkillDto>(updatedSkill));
         }
@@ -74,11 +74,11 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> DeleteSkill(int id)
         {
             if (id <= 0)
-                return BadRequest("Invalid skill ID");
+                return BadRequest(new { Message = "Invalid skill ID" });
 
             var result = await _skillService.DeleteSkillAsync(id);
             if (!result)
-                return NotFound($"Skill with ID {id} not found");
+                return BadRequest(new { Message = $"Skill with ID {id} not found" });
 
             return NoContent();
         }

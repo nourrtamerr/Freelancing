@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
@@ -22,10 +23,10 @@ namespace Freelancing.Controllers
 		[HttpGet("MyProjects")]
 		public async Task<ActionResult<List<Project>>> MyProjects()
 		{
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userId is null)
 			{
-				return BadRequest();
+				return BadRequest(new { Message = "Not Found" });
 			}
 			var user = await userManager.FindByIdAsync(userId);
 			var projects = await context.GetAllProjectsDtoAsync();
@@ -41,7 +42,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				return BadRequest(new { message = "Admins dont have projects" });
+				return BadRequest(new { Message = "Admins dont have projects" });
 			}
 
 			return Ok(projects);
@@ -58,12 +59,15 @@ namespace Freelancing.Controllers
 			var projects = await context.GetAllProjectsAsync();
 			var prs = projects.Where(p => p.FreelancerId == userId);
 			var clients = projects.Where(p => p.FreelancerId == userId).Select(p => p.ClientId).Distinct().Count();
+			var completed = prs.Where(p => p.Status == projectStatus.Completed).Count();
+				//pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
+			var working = prs.Where(p => p.Status == projectStatus.Working).Count();
 			return Ok(new
 			{
 				clients,
-				completed = prs.Where(p => p.Status == projectStatus.Completed).Count(),
+				completed = completed,
 				//pending = prs.Where(p => p.Status == projectStatus.Pending).Count(),
-				working = prs.Where(p => p.Status == projectStatus.Working).Count()
+				working = working
 			});
 
 		}

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
@@ -33,17 +34,43 @@ namespace Freelancing.Controllers
 		}
 
 		[HttpGet("getIdByUserName/{username}")]
-		[Authorize]
+	
 		public async Task<IActionResult> getIdByUserName(string username)
 		{
 			var user = await _userManager.FindByNameAsync(username);
 			if (user is null)
 			{
-				return BadRequest("not found");
+				return BadRequest(new {Message= "Not Found"});
 			}
 			return Ok(new { id=user.Id});
 		}
-		[HttpGet("FreeAgents")]
+        [HttpGet("getImagebyUserName")]
+        public async Task<IActionResult> getImagebyUserName(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user is null)
+            {
+                return BadRequest(new { Message = "Not Found" });
+            }
+
+            if (user.ProfilePicture is null)
+            {
+                return BadRequest(new { Message = "No Image Found" });
+            }
+
+            var fileName = Path.GetFileName(user.ProfilePicture);
+            var imagePath = Path.Combine(_env.ContentRootPath, "MyPrivateUploads", fileName);
+
+            if (!System.IO.File.Exists(imagePath))
+            {
+                return BadRequest(new { Message = "No Image Found" });
+            }
+            return Ok(new { fileName });
+        }
+
+
+
+        [HttpGet("FreeAgents")]
 		public async Task<IActionResult> getAllFreelancers()
 		{
 			return Ok(await _freelancersmanager.GetAllAsync());
@@ -179,9 +206,19 @@ namespace Freelancing.Controllers
 
 			if (user==null)
 			{
-				return BadRequest("not found");
-			}
+                return BadRequest(new { Message = "Not Found" });
+            }
 			return Ok(await _freelancersmanager.GetByIDAsync(user.Id));
+		}
+		[HttpGet("usernameById")]
+		public async Task<IActionResult> getUserNameById(string id)
+		{
+			var user = (await _userManager.FindByIdAsync(id));
+			if (user == null)
+			{
+                return BadRequest(new { Message = "Not Found" });
+            }
+			return Ok(new { userName = user.UserName });
 		}
 		[HttpGet("Clients/{username}")]
 		public async Task<IActionResult> getClientsById(string username)
@@ -189,8 +226,8 @@ namespace Freelancing.Controllers
 			var user = (await _userManager.FindByNameAsync(username));
 			if (user == null)
 			{
-				return BadRequest("not found");
-			}
+                return BadRequest(new { Message = "Not Found" });
+            }
 			return Ok(await _clientsmanager.GetClientById(user.Id));
 		}
 		[HttpGet("Clients")]
@@ -206,7 +243,7 @@ namespace Freelancing.Controllers
 			var users = await _userManager.Users.ToListAsync();
 			if (users.Count == 0)
 			{
-				return NotFound("No users found");
+				return BadRequest(new { Message = "No users found" });
 			}
 			var userDtos = new List<UsersViewDTO>();
 			foreach (var user in users)
@@ -224,7 +261,7 @@ namespace Freelancing.Controllers
 			var user = await _userManager.Users.Include(u=>u.City).ThenInclude(c=>c.Country).FirstOrDefaultAsync(U=>U.Id==User.FindFirstValue(ClaimTypes.NameIdentifier));
 			if (user is null)
 			{
-				return NotFound("No users found");
+				return BadRequest(new { Message = "No users found" });
 			}
 			
 			return Ok(_mapper.Map<UsersViewDTO>(user));
@@ -244,7 +281,7 @@ namespace Freelancing.Controllers
 			var users = _userManager.Users.Include(u=>u.City).ThenInclude(c=>c.Country).Where(u => u.NationalId != null&&!u.IsVerified).ToList();
 			if (users is null)
 			{
-				return NotFound("No users are requesting verification");
+				return BadRequest(new { Message = "No users are requesting verification" });
 			}
 			var userDtos = new List<UsersRequestingVerificationViewDTO>();
 			foreach (var user in users)
@@ -261,15 +298,15 @@ namespace Freelancing.Controllers
 			var currentuser =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			if(currentuser.GetType()==typeof(Admin))
 			{
-				return BadRequest("Admins cant be verified");
+				return BadRequest(new { Message = "Admins cant be verified" });
 			}
 			if (currentuser.IsVerified)
 			{
-				return BadRequest("User is already verified");
+				return BadRequest(new { Message = "User is already verified" });
 			}
 			if(currentuser.NationalId is not null)
 			{
-				return BadRequest("Please wait till you get response for the first verification request");
+				return BadRequest(new { Message = "Please wait till you get response for the first verification request" });
 			}
 			currentuser.NationalId = dto.IdPicture.Save();
 			await _userManager.UpdateAsync(currentuser);
@@ -292,15 +329,15 @@ namespace Freelancing.Controllers
 			var user=await _userManager.FindByIdAsync(dto.userId);
 			if(user is null)
 			{
-				return BadRequest("Wrong user");
+				return BadRequest(new { Message = "Wrong user" });
 			}
 			if(user.IsVerified)
 			{
-				return BadRequest("user is already verified");
+				return BadRequest(new { Message = "user is already verified" });
 			}
 			if(user.NationalId is null)
 			{
-				return BadRequest("user doesnt have an active verification request");
+				return BadRequest(new { Message = "user doesnt have an active verification request" });
 			}
 			if(dto.isAccepted)
 			{
@@ -345,12 +382,12 @@ namespace Freelancing.Controllers
 
 			if (!(await _userManager.CheckPasswordAsync(newuser, dto.Password)))
 			{
-				return BadRequest("Invalid password");
+				return BadRequest(new { Message = "Invalid password" });
 			}
 			var user2 = await _userManager.FindByNameAsync(dto.UserName);
 			if (user2 is not null && user2.Id!=newuser.Id)
 			{
-				return BadRequest("user name is taken");
+				return BadRequest(new { Message = "user name is taken" });
 			}
 			_mapper.Map(dto, newuser);
 			if (dto.ProfilePicture is not null)
@@ -385,7 +422,7 @@ namespace Freelancing.Controllers
 					status = 400,
 					errors = validationErrors,
 				};
-				return BadRequest(errorResponse);
+				return BadRequest(new { Message = errorResponse });
 			}
 			return Ok(new
 			{
@@ -401,18 +438,18 @@ namespace Freelancing.Controllers
 			var user=await _userManager.FindByIdAsync(userId);
 			if(user is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 			}
 			if(await _userManager.IsInRoleAsync(user,"Admin"))
 			{
-				return BadRequest("Already an admin");
+				return BadRequest(new { Message = "Already an admin" });
 			}
 			var result = await _userManager.AddToRoleAsync(user, "Admin");
 			if(!result.Succeeded)
 			{
-				return BadRequest("error occured");
+				return BadRequest(new { Message = "error occured" });
 			}
-			return Ok("Added to Admin");
+			return Ok(new { Message = "Added to Admin" });
 		}
 		[HttpPost("RemoveAdmin")]
 		[Authorize(Roles = "Admin")]
@@ -421,18 +458,18 @@ namespace Freelancing.Controllers
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 			}
 			if (!(await _userManager.IsInRoleAsync(user, "Admin")))
 			{
-				return BadRequest("user is not an admin");
+				return BadRequest(new { Message = "user is not an admin" });
 			}
 			var result = await _userManager.RemoveFromRoleAsync(user, "Admin");
 			if (!result.Succeeded)
 			{
-				return BadRequest("error occured");
+				return BadRequest(new { Message = "error occured" });
 			}
-			return Ok("Removed from Admin");
+			return Ok(new { Message = "Removed from Admin" });
 		}
 		[HttpPost("CreateAdminAccount")]
 		[Authorize(Roles = "Admin")]
@@ -444,17 +481,17 @@ namespace Freelancing.Controllers
 				{
 					if (myuser.EmailConfirmed == true)
 					{
-						return BadRequest("Email already exists");
+						return BadRequest(new { Message = "Email already exists" });
 					}
 					else
 					{
-						return BadRequest("Email already exists but not confirmed");
+						return BadRequest(new { Message = "Email already exists but not confirmed" });
 					}
 				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
 			{
-				return BadRequest("User Name already exists");
+				return BadRequest(new { Message = "User Name already exists" });
 			}
 			Admin admin = _mapper.Map<Admin>(dto);
 			admin.RefreshToken = JWTHelpers.CreateRefreshToken();
@@ -483,7 +520,7 @@ namespace Freelancing.Controllers
 					status = 400,
 					errors = validationErrors,
 				};
-				return BadRequest(errorResponse);
+				return BadRequest(new { Message = errorResponse });
 			}
 			
 				await _userManager.AddToRoleAsync(admin, RoleSeeder.admin);
@@ -512,17 +549,17 @@ namespace Freelancing.Controllers
 				{
 					if (myuser.EmailConfirmed == true)
 					{
-						return BadRequest("Email already exists");
+						return BadRequest(new { Message = "Email Already exists." });
 					}
 					else
 					{
-						return BadRequest("Email already exists but not confirmed");
+						return BadRequest(new { Message = "Email already exists but not confirmed" });
 					}
 				}
 			}
 			if ((await _userManager.FindByNameAsync(dto.UserName)) is not null)
 			{
-				return BadRequest("User Name already exists");
+				return BadRequest(new { Message = "User Name already exists" });
 			}
 
 			#endregion
@@ -535,6 +572,7 @@ namespace Freelancing.Controllers
 				Freelancer freelancer = _mapper.Map<Freelancer>(dto);
 				freelancer.RefreshToken = JWTHelpers.CreateRefreshToken();
 				freelancer.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				freelancer.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(freelancer, dto.Password);
 				//await _userManager.AddToRoleAsync(freelancer, RoleSeeder.freelancer);
 				newuser = freelancer;
@@ -544,6 +582,7 @@ namespace Freelancing.Controllers
 				Client client = _mapper.Map<Client>(dto);
 				client.RefreshToken = JWTHelpers.CreateRefreshToken();
 				client.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+				client.subscriptionPlanId = 1;
 				result = await _userManager.CreateAsync(client, dto.Password);
 				//await _userManager.AddToRoleAsync(client, RoleSeeder.client);
 				newuser = client;
@@ -611,11 +650,11 @@ namespace Freelancing.Controllers
 
 			if (user == null || !await _userManager.CheckPasswordAsync(user, LoginUser.loginPassword))
 			{
-				return Unauthorized("Invalid email or password.");
+				return Unauthorized(new { Message = "Invalid email or password." });
 			}
 			if (!await _userManager.IsEmailConfirmedAsync(user))
 			{
-				return BadRequest("You must confirm your email before logging in");
+				return BadRequest(new { Message = "You must confirm your email before logging in" });
 			}
 
 			user.RefreshToken = JWTHelpers.CreateRefreshToken();
@@ -631,7 +670,7 @@ namespace Freelancing.Controllers
 			var user = (await _userManager.FindByNameAsync(dto.UserName));
 			if (user is null || dto.RefreshToken != user.RefreshToken || user.RefreshTokenExpiryDate < DateTime.UtcNow)
 			{
-				return BadRequest("Ineligible for refresh token");
+				return BadRequest(new{ Message= "Ineligible for refresh token" });
 			}
 			user.RefreshToken = JWTHelpers.CreateRefreshToken();
 			user.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
@@ -668,7 +707,7 @@ namespace Freelancing.Controllers
             }
             else
             {
-                return BadRequest("Email is invalid");
+                return BadRequest(new { Message = "Email is invalid" });
             }
         }
 
@@ -686,7 +725,9 @@ namespace Freelancing.Controllers
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
-                return BadRequest(new { message = "Invalid user." });
+
+
+                return BadRequest(new { Message = "Invalid user." });
             }
 
             var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
@@ -725,11 +766,11 @@ namespace Freelancing.Controllers
 			var newuser = await _userManager.FindByEmailAsync(emailToBeCONFIRMED);
 			if (newuser is null)
 			{
-				return BadRequest("Email is not registered");
+				return BadRequest(new { Message = "Email is not registered" });
 			}
 			if (newuser.EmailConfirmed)
 			{
-				return BadRequest("Email is already confirmed");
+				return BadRequest(new { Message = "Email is already confirmed" });
 			}
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(newuser);
 			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = newuser.Id, token = token }, Request.Scheme);
@@ -750,25 +791,25 @@ namespace Freelancing.Controllers
 		{
 			if (userId == null || token == null)
 			{
-				return BadRequest("Invalid email confirmation request.");
+				return BadRequest(new { Message = "Invalid email confirmation request." });
 			}
 
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 			{
-				return NotFound("User not found.");
+				return BadRequest(new { Message = "User not found." });
 			}
 
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
+				var url = configuration["AppSettings:AngularAppUrl"] + "/login?pleaseLogin";
 				await _notifications.CreateNotificationAsync(new Notification()
 				{
 					isRead = false,
 					Message = $"Welcome to Worktern, {user.UserName} , We hope you have a nice stay",
 					UserId = user.Id
 				});
-				var url = configuration["AppSettings:AngularAppUrl"] + "/home?pleaseLogin";
 				return Redirect(url);
 
 

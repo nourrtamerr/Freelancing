@@ -59,7 +59,7 @@ namespace Freelancing.RepositoryService
                                                 .Include(b => b.Proposals)
                                                 .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                                                 .Include(b=>b.Client).ThenInclude(c=>c.City).ThenInclude(c=>c.Country)                                             
-                                                .Where(b => !b.IsDeleted).AsQueryable();
+                                                .Where(b => !b.IsDeleted && b.FreelancerId == null).AsQueryable();
 
             if (filters.minPrice > 0)
             {
@@ -198,6 +198,7 @@ namespace Freelancing.RepositoryService
                                         .Include(b => b.ProjectSkills).ThenInclude(ps => ps.Skill)
                                         .Include(b => b.Client).ThenInclude(c => c.Reviewed)
                                         .Include(b=>b.Freelancer).ThenInclude(f=>f.subscriptionPlan)
+
                                         .Include(b=>b.Client.City).ThenInclude(c=>c.Country)
                                         .FirstOrDefaultAsync(b => b.Id == id);
             if (project == null)
@@ -216,8 +217,8 @@ namespace Freelancing.RepositoryService
             projectDto.ClientProjectsTotalCount = _context.project.Where(p => !p.IsDeleted && p.ClientId == project.ClientId).Count();
 
             var freelancer = await _context.freelancers
-        .Include(f => f.subscriptionPlan)
-        .FirstOrDefaultAsync(f => f.Id == userId);
+            .Include(f => f.subscriptionPlan)
+            .FirstOrDefaultAsync(f => f.Id == userId);
 
             projectDto.FreelancersubscriptionPlan = freelancer?.subscriptionPlan?.name ?? string.Empty;
             projectDto.FreelancerTotalNumber = freelancer?.subscriptionPlan?.TotalNumber ?? 0;
@@ -267,16 +268,14 @@ namespace Freelancing.RepositoryService
 
 
             var createdProject = _mapper.Map<BiddingProject>(project);
-            //createdProject.ClientId = ClinetId;
-            createdProject.ClientId = "029098eb-7fe7-4a63-b2ef-733107050530";
-            //     createdProject.ClientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
+            createdProject.ClientId = ClinetId;
+            //createdProject.ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1";
 
 
 
             await _context.biddingProjects.AddAsync(createdProject);
-            await _context.SaveChangesAsync();
+			(await _context.clients.FirstOrDefaultAsync(c => c.Id == (createdProject.ClientId))).RemainingNumberOfProjects--;
+			await _context.SaveChangesAsync();
 
             _context.Entry(createdProject).Reference(p => p.Subcategory).Load();
             await _context.Entry(createdProject).Collection(p => p.ProjectSkills).LoadAsync();

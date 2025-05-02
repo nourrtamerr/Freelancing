@@ -35,7 +35,7 @@ namespace Freelancing.Controllers
             var p = await portofolioProjectContext.GetAllAync();
             if (p == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "Not Found" });
             }
             var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
             return Ok(DTO);
@@ -47,7 +47,7 @@ namespace Freelancing.Controllers
 			var p = await portofolioProjectContext.GetByFreelancerId(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			if (p == null)
 			{
-				return NotFound();
+				return BadRequest(new {Message="Only for freelancers"});
 			}
 			var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
 			return Ok(DTO.Select(p=> new
@@ -69,7 +69,7 @@ namespace Freelancing.Controllers
 			var p = await portofolioProjectContext.GetByFreelancerId(userId);
 			if (p == null)
 			{
-				return NotFound();
+				return BadRequest(new { Message = "Not Found" });
 			}
 			var DTO = mapper.Map<List<PortofolioProjectDTO>>(p);
 			return Ok(DTO.Select(p => new
@@ -91,7 +91,7 @@ namespace Freelancing.Controllers
 
             if (p == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "Not Found" });
             }
 
             var DTO = mapper.Map<PortofolioProjectDTO>(p);
@@ -106,14 +106,14 @@ namespace Freelancing.Controllers
         {
             //if (id != portofolioProjectDTO.Id)
             //{
-            //    return BadRequest();
+            //    return BadRequest(new { Message ="Not Found"});
             //}
 
             //find the project
             var existingProject = await portofolioProjectContext.GetByIdAsync(id);
             if (existingProject == null)
             {
-                return NotFound($"No project found with ID = {id}");
+                return BadRequest(new { Message = $"No project found with ID = {id}" });
             }
 
 
@@ -162,7 +162,7 @@ namespace Freelancing.Controllers
             var success = await portofolioProjectContext.DeleteAsync(id);
             if (!success)
             {
-                return NotFound($"No project found with ID = {id}");
+                return BadRequest(new { Message = $"No project found with ID = {id}" });
             }
 
             return NoContent();

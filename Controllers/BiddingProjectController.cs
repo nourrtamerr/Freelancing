@@ -41,7 +41,7 @@ namespace Freelancing.Controllers
             // Pass userId to service
             var result = await _biddingProjectService.GetBiddingProjectByIdAsync(id, userId);
 
-            return result != null ? Ok(result) : NotFound();
+            return result != null ? Ok(result) : BadRequest(new { Message = "No Bidding Project Found Hasing This Id" });
 
 
             //return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
@@ -125,10 +125,14 @@ namespace Freelancing.Controllers
         [HttpGet("GetMyBiddingProjects")]
         public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber=1, [FromQuery] int PageSize=5)
         {
-            userRole role;
+            userRole role = userRole.Client;
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentuser = await _userManager.FindByIdAsync(userid);
+            if(currentuser==null)
+            {
+                return BadRequest(new { Message = "Current User Not Found" });
+            }
             if (currentuser.GetType() == typeof(Client))
             {
                 role = userRole.Client;
@@ -139,7 +143,7 @@ namespace Freelancing.Controllers
             }
             else
             {
-                throw new Exception("User is not a client or freelancer");
+                BadRequest (new { Message = "User is not a client or freelancer" });
             }
 
             return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));
@@ -148,7 +152,7 @@ namespace Freelancing.Controllers
 		[HttpGet("GetForUser/{userId}")]
 		public async Task<IActionResult> GetFreelancerbiddingprojects(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int PageSize = 300)
 		{
-			userRole role;
+			userRole role = userRole.Client;
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			var currentuser = await _userManager.FindByIdAsync(userId);
@@ -162,7 +166,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				throw new Exception("User is not a client or freelancer");
+				BadRequest(new { Message = "User is not a client or freelancer" });
 			}
 
 			return Ok(await _biddingProjectService.GetmyBiddingProjectsAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), role, pageNumber, PageSize));

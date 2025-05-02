@@ -34,6 +34,8 @@
         public int NumOfBids { get; set; }
         public int ExpectedDuration { get; set; }
 
+        public string? FreelancerId { get; set; }
+
 
     }
 }

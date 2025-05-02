@@ -13,6 +13,7 @@ using CloudinaryDotNet;
 using Freelancing.DTOs;
 using Stripe.Issuing;
 using System.Numerics;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Freelancing.Controllers
 {
@@ -46,14 +47,14 @@ namespace Freelancing.Controllers
 
                 if (freelancer == null && client == null)
                 {
-                    return BadRequest("User must be a freelancer or client to subscribe.");
+                    return BadRequest(new { Message = "User must be a freelancer or client to subscribe." });
                 }
 
                 // Get the plan
                 var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
                 if (plan == null)
                 {
-                    return BadRequest("Invalid subscription plan.");
+                    return BadRequest(new { Message = "Invalid subscription plan." });
                 }
 
                 // If it's a free plan, activate it immediately for both freelancers and clients
@@ -74,7 +75,7 @@ namespace Freelancing.Controllers
                     }
 
                     await _context.SaveChangesAsync();
-                    return Ok(new { message = "Free plan activated successfully." });
+                    return Ok(new { Message = "Free plan activated successfully." });
                 }
 
                 // var url = $"{Request.Scheme}://{Request.Host}/Stripe/create-checkout-session?Amount={plan.Price}";
@@ -107,7 +108,7 @@ namespace Freelancing.Controllers
             catch (StripeException ex)
             {
                 _logger.LogError(ex, "Stripe error");
-                return BadRequest(new { error = ex.StripeError.Message });
+                return BadRequest(new { Message = ex.StripeError.Message });
             }
             catch (Exception ex)
             {
@@ -129,22 +130,22 @@ namespace Freelancing.Controllers
 
 
             if (userId == null)
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new { Message = "User not authenticated." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             var freelancer = await _context.freelancers.FirstOrDefaultAsync(f => f.Id == userId);
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
 
             if (freelancer == null && client == null)
-                return BadRequest("User must be a freelancer or client.");
+                return BadRequest(new { Message = "User must be a freelancer or client." });
 
             decimal userBalance = freelancer?.Balance ?? client?.Balance ?? 0;
 
             if (userBalance < plan.Price)
-                return BadRequest("Not enough balance.");
+                return BadRequest(new { Message = "Not enough balance." });
 
             // Deduct balance
             if (freelancer != null)
@@ -221,11 +222,11 @@ namespace Freelancing.Controllers
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
 
             if (freelancer == null && client == null)
-                return BadRequest("User must be a freelancer or client.");
+                return BadRequest(new { Message = "User must be a freelancer or client." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             if (plan.Price == 0)
                 return BadRequest("This is a free plan. No card payment required.");
@@ -307,20 +308,20 @@ namespace Freelancing.Controllers
 
             // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new { Message = "User not authenticated." });
 
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             var freelancer = await _context.freelancers.FirstOrDefaultAsync(f => f.Id == userId);
 
             if (client == null && freelancer == null)
-                return BadRequest("User must be a client or freelancer.");
+                return BadRequest(new { Message = "User must be a client or freelancer." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             if (plan.Price == 0)
-                return BadRequest("This is a free plan — Stripe payment not required.");
+                return BadRequest(new { Message = "This is a free plan — Stripe payment not required." });
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var successUrl = $"{baseUrl}/api/SubscribtionPlanPayment/payment-success?sessionId={{CHECKOUT_SESSION_ID}}&planId={planId}";
@@ -361,7 +362,7 @@ namespace Freelancing.Controllers
                 if (!session.Metadata.TryGetValue("userId", out var userId))
                 {
                     // This userId is unique per session
-                    return BadRequest("payment failed");
+                    return BadRequest(new { Message = "payment failed" });
                 }
 
 
@@ -428,12 +429,12 @@ namespace Freelancing.Controllers
 
                 if (session == null)
                 {
-                    return NotFound("Session not found.");
+                    return BadRequest(new { Message = "Session not found." });
                 }
                 // Handle successful payment here (e.g., update user subscription status)
 
                 // You can also redirect to the success URL if needed
-                return Ok(new { message = "Payment successful.", session });
+                return Ok(new { Message = "Payment successful.", session });
             }
             catch (Exception ex)
             {
