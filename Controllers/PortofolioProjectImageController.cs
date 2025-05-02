@@ -10,6 +10,7 @@ using Freelancing.Models;
 using AutoMapper;
 using Microsoft.CodeAnalysis;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Freelancing.Controllers
 {
@@ -23,7 +24,7 @@ namespace Freelancing.Controllers
             var images = await context.GetByPortfolioProjectIdAsync(previousProjectId);
             if (images == null)
             {
-                return NotFound($"Image with Pervious Project {previousProjectId} is not found.");
+                return BadRequest(new { Message = $"Image with Pervious Project {previousProjectId} is not found." });
             }
 
             var dto = mapper.Map<List<PortofolioProjectImageDTO>>(images);
@@ -36,12 +37,12 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<PortofolioProjectImageDTO>> UploadImage([FromForm] UploadImageRequest request)
         {
             if (request.ImageFile == null || request.ImageFile.Length == 0)
-                return BadRequest("No image uploaded");
+                return BadRequest(new { Message = "No image uploaded" });
 
             var project = await projectRepository.GetByIdAsync(request.ProjectId);
             if (project == null)
             {
-                return NotFound($"Project with ID {request.ProjectId} not found.");
+                return BadRequest(new { Message = $"Project with ID {request.ProjectId} not found." });
 
             }
                
@@ -79,11 +80,11 @@ namespace Freelancing.Controllers
             var portofolioProjectImageDTO = await context.DeleteAsync(id);
             if (!portofolioProjectImageDTO)
             {
-                return BadRequest(new { msg = $"Unable to find or delete image with ID {id}" });
+                return BadRequest(new { Message = $"Unable to find or delete image with ID {id}" });
             }
 
 
-            return Ok(new { msg = "Image marked as deleted successfully" });
+            return Ok(new { Message = "Image marked as deleted successfully" });
         }
 
     }
