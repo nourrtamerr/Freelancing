@@ -52,15 +52,27 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId) {
 
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
-            if (reviews == null || reviews.Count == 0)
+            if (reviews == null )
             {
                 return NotFound();
             }
             var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewDtos);
         }
+		[HttpGet("project/{projectId}")]
+		public async Task<ActionResult<List<ReviewDto>>> GetReviewsByProjectId(int projectId)
+		{
 
-        [HttpPost]
+			var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
+			if (reviews == null )
+			{
+				return NotFound();
+			}
+			var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
+			return Ok(reviewDtos);
+		}
+
+		[HttpPost]
         public async Task<ActionResult<ReviewDto>> CreateReview([FromBody] ReviewDto reviewDto)
         {
             if (reviewDto == null)
@@ -68,6 +80,7 @@ namespace Freelancing.Controllers
                 return BadRequest();
             }
             var review = mapper.Map<Review>(reviewDto);
+            review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);
             await _notifications.CreateNotificationAsync(new()
             {
@@ -91,8 +104,11 @@ namespace Freelancing.Controllers
             {
                 return NotFound();
             }
-            mapper.Map(reviewDto, review);
-            await reviewService.UpdateReviewAsync(review);
+            //mapper.Map(reviewDto, review);
+            review.Comment = reviewDto.Comment;
+            review.Rating = reviewDto.Rating;
+
+			await reviewService.UpdateReviewAsync(review);
             return NoContent();
         }
 

@@ -41,7 +41,7 @@ namespace Freelancing.Controllers
             // Pass userId to service
             var result = await _biddingProjectService.GetBiddingProjectByIdAsync(id, userId);
 
-            return result != null ? Ok(result) : NotFound();
+            return result != null ? Ok(result) : BadRequest();
 
 
             //return Ok(await _biddingProjectService.GetBiddingProjectByIdAsync(id));
