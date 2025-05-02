@@ -9,5 +9,8 @@
         public bool IsConnected { get; set; }
 
         public AppUser User { get; set; }
+
+        [NotMapped] 
+        public int ConnectionCount { get; set; }
     }
 }

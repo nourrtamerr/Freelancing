@@ -20,4 +20,6 @@ public class Chat
     public string? Message { get; set; } //contains(".com") 
     public DateTime SentAt { get; set; }
     public bool isRead { set; get; }
+
+    public bool IsEdited { get; set; } = false;
 }
