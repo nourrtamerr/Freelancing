@@ -23,7 +23,7 @@ namespace Freelancing.Controllers
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userid is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 					
 			}
 			var user = await _freelancers.FindByIdAsync(userid);
@@ -72,7 +72,7 @@ namespace Freelancing.Controllers
 				Message = $"Withdrawal completed with amount of {dto.amount} using credit card please check your balance",
 				UserId = userid
 			});
-			return BadRequest("not a correct client");
+			return BadRequest(new { Message = "not a correct client" });
 		}
 		[HttpPost("AddFundsCard")]
 		[Authorize]
@@ -81,7 +81,7 @@ namespace Freelancing.Controllers
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (userid is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			var user = await _freelancers.FindByIdAsync(userid);
@@ -127,7 +127,7 @@ namespace Freelancing.Controllers
 				Message = $"Funding completed with amount of {dto.amount} using credit card please check your balance",
 				UserId = userid
 			});
-			return BadRequest("not a correct client");
+			return BadRequest(new { Message = "not a correct client" });
 		}
 
 		#region stripe
@@ -143,7 +143,7 @@ namespace Freelancing.Controllers
 			var freelancer = await _freelancers.FindByIdAsync(userid);
 			if (freelancer == null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			if (freelancer is Freelancer freelancer1)
@@ -176,7 +176,7 @@ namespace Freelancing.Controllers
 			if (!session.Metadata.TryGetValue("userId", out var userId))
 			{
 				// This userId is unique per session
-				return BadRequest("payment failed");
+				return BadRequest(new { Message = "payment failed" });
 			}
 
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -212,7 +212,7 @@ namespace Freelancing.Controllers
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 
 			}
@@ -239,7 +239,7 @@ namespace Freelancing.Controllers
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 			}
 			else
@@ -262,14 +262,14 @@ namespace Freelancing.Controllers
 			var freelancer = await _freelancers.FindByIdAsync(userid);
 			if (freelancer == null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			if (freelancer is Freelancer freelancer1)
 			{
 				if (freelancer1.Balance < money)
 				{
-					return BadRequest("Not enough balance");
+					return BadRequest(new { Message = "Not enough balance" });
 				}
 
 			}
@@ -277,7 +277,7 @@ namespace Freelancing.Controllers
 			{
 				if (client1.Balance < money)
 				{
-					return BadRequest("Not enough balance");
+					return BadRequest(new { Message = "Not enough balance" });
 				}
 
 			}
@@ -285,7 +285,7 @@ namespace Freelancing.Controllers
 			#region withdrawal
 			else
 			{
-				return BadRequest("you are not a freelancer");
+				return BadRequest(new { Message = "you are not a freelancer" });
 			}
 
 			if (freelancer is Freelancer freelancerr && string.IsNullOrEmpty(freelancerr.StripeAccountId))
@@ -322,7 +322,7 @@ namespace Freelancing.Controllers
 			if (!retrievedPaymentIntent.Metadata.TryGetValue("userId", out var userid))
 			{
 				// This userId is unique per session
-				return BadRequest("payment failed");
+				return BadRequest(new { Message = "payment failed" });
 			}
 	
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -358,7 +358,7 @@ namespace Freelancing.Controllers
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 
 			}
@@ -392,7 +392,7 @@ namespace Freelancing.Controllers
 
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 			}
 			else

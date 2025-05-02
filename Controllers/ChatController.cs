@@ -6,6 +6,7 @@ using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.Controllers
@@ -50,7 +51,7 @@ namespace Freelancing.Controllers
             var chat = await _chatRepository.GetChatByIdAsync(id);
             if (chat == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Chats Found" });
             }
 
             var chatDto = _mapper.Map<ChatDto>(chat);
@@ -64,12 +65,12 @@ namespace Freelancing.Controllers
 			var user2 = await _usermanager.FindByNameAsync(userId2);
             if(user1==null||user2==null)
             {
-                return BadRequest(new { error = "invalidusers" });
+                return BadRequest(new { Message = "invalidusers" });
             }
 			var chats = await _chatRepository.GetConversationAsync(user1.Id, user2.Id);
-            if (chats == null || !chats.Any())
+            if (chats == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Chats Found" });
             }
             var chatDtos = _mapper.Map<List<ChatDto>>(chats);
             return Ok(chatDtos);
@@ -87,7 +88,7 @@ namespace Freelancing.Controllers
             {
                 if (string.IsNullOrEmpty(createChatDto.Message) && createChatDto.Image==null)
                 {
-                    return BadRequest(new { error = "Either a message or an image is required." });
+                    return BadRequest(new { Message = "Either a message or an image is required." });
                 }
 
                 if (!ModelState.IsValid)
@@ -112,13 +113,13 @@ namespace Freelancing.Controllers
                     }
                     catch
                     {
-                        return BadRequest(new { error = "Invalid image format." });
+                        return BadRequest(new { Message = "Invalid image format." });
                     }
                 }
                 var user = await _usermanager.FindByNameAsync(createChatDto.ReceiverId);
                 if(user is null)
                 {
-                    return BadRequest(new { error = "user not found" });
+                    return BadRequest(new { Message = "user not found" });
                 }    
 
                 var chat = _mapper.Map<Chat>(createChatDto);
@@ -159,7 +160,7 @@ namespace Freelancing.Controllers
             var chat = await _chatRepository.GetChatByIdAsync(id);
             if (chat == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Chats Found" });
             }
             await _chatRepository.MarkAsReadAsync(id);
             return NoContent();
@@ -221,9 +222,16 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> DeleteChat(int id)
         {
             var chat = await _chatRepository.GetChatByIdAsync(id);
+<<<<<<< HEAD
             if (chat == null) return NotFound();
 
             var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+=======
+            if (chat == null)
+            {
+                return BadRequest(new { Message = "No Chats Found" });
+            }
+>>>>>>> fcfe6ba528cbd6cf6d2f380ddc7c1f38144217e5
 
             if (!string.IsNullOrEmpty(chat.ImageUrl))
             {
@@ -252,7 +260,7 @@ namespace Freelancing.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
             if (user == null)
             {
-                return NotFound($"User {username} not found");
+                return BadRequest(new { Message = $"User {username} not found" });
             }
 
             // Get all messages where the user is either the sender or receiver

@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class ProjectsController(IProjectService context, UserManager<AppUser> userManager) : ControllerBase
+	public class ProjectsController(IProjectService context, UserManager<AppUser> userManager, ApplicationDbContext dbContext) : ControllerBase
 	{
 		[HttpGet]
 		public async Task<ActionResult<List<Project>>> GetAllProjects()
@@ -25,7 +26,7 @@ namespace Freelancing.Controllers
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userId is null)
 			{
-				return BadRequest();
+				return BadRequest(new { Message = "Not Found" });
 			}
 			var user = await userManager.FindByIdAsync(userId);
 			var projects = await context.GetAllProjectsDtoAsync();
@@ -41,7 +42,7 @@ namespace Freelancing.Controllers
 			}
 			else
 			{
-				return BadRequest(new { message = "Admins dont have projects" });
+				return BadRequest(new { Message = "Admins dont have projects" });
 			}
 
 			return Ok(projects);
@@ -81,5 +82,15 @@ namespace Freelancing.Controllers
 			var project = await context.GetProjectDtoByIdAsync(id);
 			return Ok(project);
 		}
-	}
+
+
+
+        [HttpGet("Category/{id}")]
+        public async Task<ActionResult<List<int>>> GetProjectsByCategoryId(int id)
+        {
+			var projects = await dbContext.project.Include(p=>p.Subcategory).ThenInclude(c=>c.Category).Where(p => p.Subcategory.CategoryId == id).Select(p=>p.Id).ToListAsync();
+            return Ok(projects);
+        }
+
+    }
 }

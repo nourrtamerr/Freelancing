@@ -44,8 +44,14 @@ namespace Freelancing.RepositoryService
                 .Where(r => r.RevieweeId == revieweeId)
                 .OrderByDescending(r => r.id)
                 .ToListAsync();
-            var ReviewsDto = _mapper.Map<List<GetReviewByRevieweeIdDto>>(reviews);
-
+            
+            var ReviewsDto = new List<GetReviewByRevieweeIdDto>();
+            foreach(var review in reviews)
+            {
+                var addedreview = _mapper.Map<GetReviewByRevieweeIdDto>(review);
+				addedreview.ReviewerId = review.ReviewerId;
+				ReviewsDto.Add(addedreview);
+			}
             return ReviewsDto;
         }
 
@@ -58,15 +64,35 @@ namespace Freelancing.RepositoryService
                 .OrderByDescending(r => r.id)
                 .ToListAsync();
         }
+		public async Task<List<Review>> GetReviewsByProjectIdAsync(int projectid)
+		{
+			return await _context.Reviews
+				.Include(r => r.Reviewee)
+				.Include(r => r.Reviewer)
+				.Where(r => r.ProjectId == projectid)
+				.OrderByDescending(r => r.id)
+				.ToListAsync();
+		}
 
-        public async Task<Review> CreateReviewAsync(Review review)
+		public async Task<Review> CreateReviewAsync(Review review)
         {
-         
-            if((review.RevieweeId==review.Project.FreelancerId && review.ReviewerId==review.Project.ClientId) ||
-                (review.RevieweeId == review.Project.ClientId && review.ReviewerId == review.Project.FreelancerId))
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
-            return review;
+
+           var project= _context.project.FirstOrDefault(p => p.Id == review.ProjectId);
+            if(project==null)
+            {
+                return null;
+            }
+            if ((review.RevieweeId == project.FreelancerId && review.ReviewerId == project.ClientId) ||
+                (review.RevieweeId == project.ClientId && review.ReviewerId == project.FreelancerId))
+            {
+                _context.Reviews.Add(review);
+                await _context.SaveChangesAsync();
+                return review;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task UpdateReviewAsync(Review review)

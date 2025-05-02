@@ -7,6 +7,7 @@
         public string Comment { get; set; }
         public string Date { get; set; }
         public string ReviewerName { set; get; }
+        public string? ReviewerId { set; get; }
         public int ProjectId { get; set; }
         public string ProjectTitle { set; get; }
         public string ProjectType { get; set; }

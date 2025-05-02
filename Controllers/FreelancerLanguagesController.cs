@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
@@ -22,7 +23,7 @@ namespace Freelancing.Controllers
             var languageslist = await _LanguageService.GetAllLanguagesAsync();
             if (languageslist == null || languageslist.Count() == 0)
             {
-                return BadRequest(new { msg = "there is no languages found" });
+                return BadRequest(new { Message = "there is no languages found" });
             }
             var languagesDTOlist = languageslist.Select(e => new FreelancerLanguageDTO
             {
@@ -40,7 +41,7 @@ namespace Freelancing.Controllers
             var languageslist = await _LanguageService.GetLanguagesByFreelancerUserNameAsync(username);
             if (languageslist == null)
             {
-                return BadRequest(new { msg = "there is no languages for this freelancer" });
+                return BadRequest(new { Message = "there is no languages for this freelancer" });
             }
             var languagesDTOlist = languageslist.Select(e => new FreelancerLanguageDTO
             {
@@ -58,7 +59,7 @@ namespace Freelancing.Controllers
             var selected= await _LanguageService.GetLanguageById(id);
             if (selected == null)
             {
-                return BadRequest(new { msg = "can't find a language has this id" });
+                return BadRequest(new { Message = "can't find a language has this id" });
             }
             var languageDTO = new FreelancerLanguageDTO
             {
@@ -98,7 +99,7 @@ namespace Freelancing.Controllers
                     }
                     );
             }
-            return BadRequest(new { msg = "failed to create language" });
+            return BadRequest(new { Message = "failed to create language" });
         }
 
         [HttpPut("{id}")]
@@ -111,11 +112,11 @@ namespace Freelancing.Controllers
                 var updated = await _LanguageService.UpdateLanguageAsync(selected);
                 if (updated)
                 {
-                    return Ok(new { msg = "language updated successfully" });
+                    return Ok(new { Message = "language updated successfully" });
                 }
-                return BadRequest(new { msg = "failed to update language" });
+                return BadRequest(new { Message = "failed to update language" });
             }
-            return BadRequest(new { msg = "no language found has this id" });
+            return BadRequest(new { Message = "no language found has this id" });
 
 
         }
@@ -129,11 +130,11 @@ namespace Freelancing.Controllers
                 var deleted = await _LanguageService.DeleteLanguageAsync(id);
                 if (!deleted)
                 {
-                    return BadRequest(new { msg = $"Unable to delete language {id}" });
+                    return BadRequest(new { Message = $"Unable to delete language {id}" });
                 }
-                return Ok(new { msg = "language marked as deleted successfully" });
+                return Ok(new { Message = "language marked as deleted successfully" });
             }
-            return BadRequest(new { msg = "Unable to find language by this id " });
+            return BadRequest(new { Message = "Unable to find language by this id " });
         }
     }
 }

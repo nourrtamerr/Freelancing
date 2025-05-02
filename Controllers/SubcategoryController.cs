@@ -24,7 +24,7 @@ namespace Freelancing.Controllers
             var category = await _categoryService.GetCategoryByIdAsync(subcategory.CategoryId);
             if (category == null)
             {
-                return NotFound("Category not found.");
+                return BadRequest(new { Message = "Category not found." });
             }
 
             var newSubcategory = new Subcategory
@@ -51,9 +51,9 @@ namespace Freelancing.Controllers
 
         {
             var subcategories = await _subcategoryService.GetAllSubcategoriesAsync();
-            if (subcategories == null )
+            if (subcategories == null)
             {
-                return NotFound("No subcategories found.");
+                return BadRequest(new { Message = "No subcategories found." });
             }
           
 
@@ -79,7 +79,7 @@ namespace Freelancing.Controllers
             var subcategory = await _subcategoryService.GetSubcategoryByIdAsync(id);
             if (subcategory == null)
             {
-                return NotFound("Subcategory not found.");
+                return BadRequest(new { Message = "Subcategory not found." });
             }
             var subcategorydto = new GetAllSubCategoryDTO
             {
@@ -97,12 +97,12 @@ namespace Freelancing.Controllers
             var existingsubcategory= await _subcategoryService.GetSubcategoryByIdAsync(id);
             if (existingsubcategory == null)
             {
-                return NotFound("Subcategory not found.");
+                return BadRequest(new { Message = "Subcategory not found." });
             }
             var category = await _categoryService.GetCategoryByIdAsync(subcategory.CategoryId);
             if (category == null)
             {
-                return NotFound("Category not found.");
+                return BadRequest(new { Message = "Category not found." });
             }
 
 
@@ -113,7 +113,7 @@ namespace Freelancing.Controllers
             var updatedSubcategory = await _subcategoryService.UpdateSubcategoryAsync(existingsubcategory);
             if (!updatedSubcategory)
             {
-                return BadRequest("Failed to update subcategory.");
+                return BadRequest(new { Message = "Failed to update subcategory." });
             }
             return Ok  (new
             {
@@ -138,14 +138,14 @@ namespace Freelancing.Controllers
             var subcategory = await _subcategoryService.GetSubcategoryByIdAsync(id);
             if (subcategory == null)
             {
-                return NotFound("Subcategory not found.");
+                return BadRequest(new { Message = "Subcategory not found." });
             }
             var deletedSubcategory = await _subcategoryService.DeleteSubcategoryAsync(id);
             if (!deletedSubcategory)
             {
-                return BadRequest("Failed to delete subcategory.");
+                return BadRequest(new { Message = "Failed to delete subcategory." });
             }
-            return Ok("Subcategory deleted successfully.");
+            return Ok(new { Message = "Subcategory deleted successfully." });
         }
 
 

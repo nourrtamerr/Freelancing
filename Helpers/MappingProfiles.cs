@@ -387,7 +387,8 @@ namespace Freelancing.Helpers
 
             CreateMap<Project, ProjectDTO>()
             .ForMember(dest => dest.projectType, opt => opt.MapFrom(src =>
-            src.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding));
+            src.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding))
+            .ForMember(dest=>dest.milestones, opt=>opt.Ignore());
 
 			CreateMap<ProjectDTO, Project>();
         }

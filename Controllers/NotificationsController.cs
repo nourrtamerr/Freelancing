@@ -38,7 +38,7 @@ namespace Freelancing.Controllers
             var notification = await notificationService.GetNotificationByIdAsync(id);
             if (notification == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Notification Found" });
             }
             var notificationDto = mapper.Map<NotificationDto>(notification);
             return Ok(notificationDto);
@@ -74,13 +74,13 @@ namespace Freelancing.Controllers
         {
             if (id != updateNotificationDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
             }
 
             var notification = await notificationService.GetNotificationByIdAsync(id);
             if (notification == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Notification Found" });
             }
 
             mapper.Map(updateNotificationDto, notification);
@@ -95,7 +95,7 @@ namespace Freelancing.Controllers
             var notification = await notificationService.GetNotificationByIdAsync(id);
             if (notification == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Notification Found" });
             }
             await notificationService.DeleteNotificationAsync(id);
             return NoContent();
@@ -107,7 +107,7 @@ namespace Freelancing.Controllers
             var notification = await notificationService.GetNotificationByIdAsync(id);
             if (notification == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Notification Found" });
             }
             await notificationService.MarkAsReadAsync(id);
             return NoContent();
