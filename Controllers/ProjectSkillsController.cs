@@ -34,7 +34,7 @@ namespace Freelancing.Controllers
         {
             var projectSkill = await _projectSkillRepo.GetByIdAsync(id);
             if (projectSkill == null)
-                return NotFound();
+                return BadRequest(new { Message = "Not Found" });
 
             var projectSkillDto = _mapper.Map<ProjectSkillDto>(projectSkill);
             return Ok(projectSkillDto);
@@ -46,7 +46,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> AddSkillsToProject([FromBody] ProjectSkillCreateDto createDto)
         {
             if (createDto == null)
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
 
             var projectSkill = _mapper.Map<ProjectSkill>(createDto);
             var created = await _projectSkillRepo.CreateProjectSkill(projectSkill);
@@ -61,7 +61,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] ProjectSkillUpdateDto updateDto)
         {
             if (updateDto == null)
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
 
             var projectSkill = new ProjectSkill
             {
@@ -72,7 +72,7 @@ namespace Freelancing.Controllers
 
             var updated = await _projectSkillRepo.UpdateAsync(projectSkill);
             if (updated == null)
-                return NotFound();
+                return BadRequest(new { Message = "Not Found" });
 
             var resultDto = _mapper.Map<ProjectSkillDto>(updated);
             return Ok(resultDto);
@@ -85,7 +85,7 @@ namespace Freelancing.Controllers
         {
             var result = await _projectSkillRepo.DeleteAsync(id);
             if (!result)
-                return NotFound();
+                return BadRequest(new { Message = "failed to delete" });
 
             return NoContent();
         }

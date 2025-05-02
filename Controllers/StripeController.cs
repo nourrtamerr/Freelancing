@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Stripe.V2;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
@@ -140,7 +141,7 @@ namespace Freelancing.Controllers
 			catch (StripeException e)
 			{
 				_logger.LogError(e, "Stripe error");
-				return BadRequest(new { error = e.StripeError.Message });
+				return BadRequest(new { Message = e.StripeError.Message });
 			}
 		}
 		
@@ -157,7 +158,7 @@ namespace Freelancing.Controllers
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userId);
 			var client = _context.clients.FirstOrDefault(f => f.Id == userId);
 			if (freelancer == null&&client==null)
-				return NotFound("Freelancer not found.");
+				return BadRequest(new { Message = "Freelancer not found." });
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
@@ -250,14 +251,14 @@ namespace Freelancing.Controllers
 			var account = accountService.Get(connectedAccountId);
 			//var account = new AccountService().Get(connectedAccountId);
 			if (!account.Metadata.TryGetValue("userId", out var userid))
-				return BadRequest("userId not found in metadata");
+				return BadRequest(new { Message = "userId not found in metadata" });
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userid);
 			var client = _context.clients.FirstOrDefault(f => f.Id == userid);
 
 			if (freelancer == null || string.IsNullOrEmpty(freelancer.StripeAccountId))
 				//if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
-				return BadRequest(" not onboarded yet.");
+				return BadRequest(new { Message = " not onboarded yet." });
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
@@ -282,23 +283,23 @@ namespace Freelancing.Controllers
 
 
 
-			//StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+            //StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
-			//var account = new AccountService().Get(connectedAccountId);
-			//if (!account.PayoutsEnabled)
-			//	return BadRequest("Account not ready for payouts.");
+            //var account = new AccountService().Get(connectedAccountId);
+            //if (!account.PayoutsEnabled)
+            //	return BadRequest(new { Message ="Account not ready for payouts."});
 
-			////var transfer = new TransferService().Create(new TransferCreateOptions
-			////{
-			////	Amount = amountInCents,
-			////	Currency = "usd",
-			////	Destination = connectedAccountId,
-			////	Description = "Freelancer payout"
-			////});
-			////fake test mode 
+            ////var transfer = new TransferService().Create(new TransferCreateOptions
+            ////{
+            ////	Amount = amountInCents,
+            ////	Currency = "usd",
+            ////	Destination = connectedAccountId,
+            ////	Description = "Freelancer payout"
+            ////});
+            ////fake test mode 
 
-			//string session_id= Guid.NewGuid().ToString();
-			var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.Id, amount = amountInCents / 1000 });
+            //string session_id= Guid.NewGuid().ToString();
+            var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.Id, amount = amountInCents / 1000 });
 			//// Redirect to frontend success page
 
 			return Redirect(url);

@@ -30,7 +30,7 @@ namespace Freelancing.Controllers
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review Found" });
             }
             var reviewDto = mapper.Map<ReviewDto>(review);
             return Ok(reviewDto);
@@ -42,7 +42,7 @@ namespace Freelancing.Controllers
             var reviews = await reviewService.GetReviewsByRevieweeIdAsync(revieweeId);
             if (reviews == null )
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Reviews Found" });
             }
             var reviewDtos = mapper.Map<List<GetReviewByRevieweeIdDto>>(reviews);
             return Ok(reviewDtos);
@@ -54,7 +54,7 @@ namespace Freelancing.Controllers
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
             if (reviews == null || reviews.Count == 0)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No reviews Found" });
             }
             var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewDtos);
@@ -65,7 +65,7 @@ namespace Freelancing.Controllers
         {
             if (reviewDto == null)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
             }
             var review = mapper.Map<Review>(reviewDto);
             var createdReview = await reviewService.CreateReviewAsync(review);
@@ -84,12 +84,12 @@ namespace Freelancing.Controllers
         {
             if (id != reviewDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "Not Found" });
             }
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review Found" });
             }
             mapper.Map(reviewDto, review);
             await reviewService.UpdateReviewAsync(review);
@@ -104,7 +104,7 @@ namespace Freelancing.Controllers
             var review = await reviewService.GetReviewByIdAsync(id);
             if (review == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No review found" });
             }
             await reviewService.DeleteReviewAsync(id);
             return NoContent();

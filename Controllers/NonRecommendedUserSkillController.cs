@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 
 namespace Freelancing.Controllers
@@ -30,7 +31,7 @@ namespace Freelancing.Controllers
                 await context.SaveChangesAsync();
                 return Ok(new { NewSkill.Id, NewSkill.Name });
             }
-            return BadRequest("Freelancer not found");
+            return BadRequest(new { Message = "Freelancer not found" });
         }
 		[Authorize]
 		[HttpGet("byuser")]
@@ -49,12 +50,12 @@ namespace Freelancing.Controllers
                 {
                     freelancer.NonRecommendedUserSkills.Remove(skill);
                     await context.SaveChangesAsync();
-                    return Ok(new { msg = "Skill removed successfully" });
+                    return Ok(new { Message = "Skill removed successfully" });
                 }
-                return BadRequest("Skill not found");
+                return BadRequest(new { Message = "Skill not found" });
 
             }
-            return BadRequest("Freelancer not found");
+            return BadRequest(new { Message = "Freelancer not found" });
 
         }
 
