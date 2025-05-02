@@ -25,7 +25,7 @@ namespace Freelancing.Controllers
         private readonly UserManager<AppUser> _usermanager;
         private readonly INotificationRepositoryService _notifserivcee;
 
-		public ChatController(
+        public ChatController(
             IChatRepositoryService chatRepository,
             IMapper mapper,
             IHubContext<ChatHub> hubContext,
@@ -43,7 +43,7 @@ namespace Freelancing.Controllers
             _usermanager = usermanager;
             _NotifhubContext = NotifhubContext;
             _notifserivcee = notifserivcee;
-		}
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetChat(int id)
@@ -61,13 +61,13 @@ namespace Freelancing.Controllers
         [HttpGet("conversation/{userId1}/{userId2}")]
         public async Task<IActionResult> GetConversation(string userId1, string userId2)
         {
-			var user1 = await _usermanager.FindByNameAsync(userId1);
-			var user2 = await _usermanager.FindByNameAsync(userId2);
-            if(user1==null||user2==null)
+            var user1 = await _usermanager.FindByNameAsync(userId1);
+            var user2 = await _usermanager.FindByNameAsync(userId2);
+            if (user1 == null || user2 == null)
             {
                 return BadRequest(new { Message = "invalidusers" });
             }
-			var chats = await _chatRepository.GetConversationAsync(user1.Id, user2.Id);
+            var chats = await _chatRepository.GetConversationAsync(user1.Id, user2.Id);
             if (chats == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
@@ -86,7 +86,7 @@ namespace Freelancing.Controllers
 
             try
             {
-                if (string.IsNullOrEmpty(createChatDto.Message) && createChatDto.Image==null)
+                if (string.IsNullOrEmpty(createChatDto.Message) && createChatDto.Image == null)
                 {
                     return BadRequest(new { Message = "Either a message or an image is required." });
                 }
@@ -105,7 +105,7 @@ namespace Freelancing.Controllers
                 }
 
                 string imageUrl = null;
-                if (createChatDto.Image!=null)
+                if (createChatDto.Image != null)
                 {
                     try
                     {
@@ -117,10 +117,10 @@ namespace Freelancing.Controllers
                     }
                 }
                 var user = await _usermanager.FindByNameAsync(createChatDto.ReceiverId);
-                if(user is null)
+                if (user is null)
                 {
                     return BadRequest(new { Message = "user not found" });
-                }    
+                }
 
                 var chat = _mapper.Map<Chat>(createChatDto);
                 chat.SenderId = senderId;
@@ -135,18 +135,18 @@ namespace Freelancing.Controllers
                 await _hubContext.Clients.Users(chatDto.SenderId, chatDto.ReceiverId)
                     .SendAsync("ReceiveMessage", chatDto);
 
-                var name=(await _usermanager.FindByIdAsync(chatDto.SenderId))?.UserName;
+                var name = (await _usermanager.FindByIdAsync(chatDto.SenderId))?.UserName;
                 await _notifserivcee.CreateNotificationAsync(new()
                 {
                     isRead = false,
                     Message = $"You received a message from {name ?? "undefined user"}",
                     UserId = chatDto.ReceiverId,
                 });
-				
 
 
 
-				return CreatedAtAction(nameof(GetChat), new { id = chatDto.Id }, chatDto);
+
+                return CreatedAtAction(nameof(GetChat), new { id = chatDto.Id }, chatDto);
             }
             catch (Exception ex)
             {
@@ -222,16 +222,13 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> DeleteChat(int id)
         {
             var chat = await _chatRepository.GetChatByIdAsync(id);
-<<<<<<< HEAD
             if (chat == null) return NotFound();
 
             var participants = new List<string> { chat.SenderId, chat.ReceiverId };
-=======
             if (chat == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
             }
->>>>>>> fcfe6ba528cbd6cf6d2f380ddc7c1f38144217e5
 
             if (!string.IsNullOrEmpty(chat.ImageUrl))
             {
@@ -245,15 +242,15 @@ namespace Freelancing.Controllers
             await _chatRepository.DeleteChatAsync(id);
 
             await _hubContext.Clients.Users(participants)
-                .SendAsync("MessageDeleted", id); 
+                .SendAsync("MessageDeleted", id);
 
             return NoContent();
         }
-        
-        
+
+
         [HttpGet("conversations/{username}")]
-    
-        
+
+
         public async Task<IActionResult> GetConversations(string username)
         {
             // Find the user by username
@@ -280,9 +277,57 @@ namespace Freelancing.Controllers
 
             return Ok(conversations);
         }
+        [HttpDelete("conversations/{username}")]
+        public async Task<IActionResult> DeleteConversation(string username)
+        {
+            try
+            {
+                // Get current user ID
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { Message = "User not authenticated" });
+                }
+
+                // Get target user
+                var targetUser = await _usermanager.FindByNameAsync(username);
+                if (targetUser == null)
+                {
+                    return BadRequest(new { Message = "Target user not found" });
+                }
+
+                // Get all messages between current user and target user
+                var messages = await _context.Chats
+                    .Where(m =>
+                        (m.SenderId == currentUserId && m.ReceiverId == targetUser.Id) ||
+                        (m.SenderId == targetUser.Id && m.ReceiverId == currentUserId))
+                    .ToListAsync();
+
+                if (!messages.Any())
+                {
+                    return NotFound(new { Message = "No conversation found" });
+                }
+
+          
+
+                // Remove messages
+                _context.Chats.RemoveRange(messages);
+                await _context.SaveChangesAsync();
+
+                // Notify both participants
+                await _hubContext.Clients.Users(currentUserId, targetUser.Id)
+                    .SendAsync("ConversationDeleted", currentUserId, targetUser.Id);
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Error deleting conversation", Error = ex.Message });
+            }
+        }
 
         // In GetOnlineUsers endpoint
-        [HttpGet("online-usersc")]
+        [HttpGet("online-users")]
         public async Task<IActionResult> GetOnlineUsers()
         {
             var onlineUsers = await _context.UserConnections
@@ -299,5 +344,7 @@ namespace Freelancing.Controllers
 
             return Ok(onlineUsers);
         }
+
+       
     }
 }

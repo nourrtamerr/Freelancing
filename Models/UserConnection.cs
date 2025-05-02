@@ -10,7 +10,6 @@
 
         public AppUser User { get; set; }
 
-        [NotMapped] 
-        public int ConnectionCount { get; set; }
+     
     }
 }
