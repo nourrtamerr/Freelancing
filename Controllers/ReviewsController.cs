@@ -66,7 +66,7 @@ namespace Freelancing.Controllers
 			var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
 			if (reviews == null )
 			{
-				return NotFound();
+				return BadRequest(new { Message = "No reviews Found" });
 			}
 			var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
 			return Ok(reviewDtos);
