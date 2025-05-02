@@ -1,4 +1,6 @@
-﻿namespace Freelancing.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Freelancing.Models
 {
     public class UserConnection
     {
