@@ -125,7 +125,7 @@ namespace Freelancing.Controllers
         [HttpGet("GetMyBiddingProjects")]
         public async Task<IActionResult> GetMyBiddingProjectsAll([FromQuery] int pageNumber=1, [FromQuery] int PageSize=5)
         {
-            userRole role;
+            userRole role = userRole.Client;
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var currentuser = await _userManager.FindByIdAsync(userid);
@@ -152,7 +152,7 @@ namespace Freelancing.Controllers
 		[HttpGet("GetForUser/{userId}")]
 		public async Task<IActionResult> GetFreelancerbiddingprojects(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int PageSize = 300)
 		{
-			userRole role;
+			userRole role = userRole.Client;
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 			var currentuser = await _userManager.FindByIdAsync(userId);

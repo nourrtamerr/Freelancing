@@ -449,7 +449,7 @@ namespace Freelancing.Controllers
 			{
 				return BadRequest(new { Message = "error occured" });
 			}
-			return Ok(`new { Message = "Added to Admin" });
+			return Ok(new { Message = "Added to Admin" });
 		}
 		[HttpPost("RemoveAdmin")]
 		[Authorize(Roles = "Admin")]
