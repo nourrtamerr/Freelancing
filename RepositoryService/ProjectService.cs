@@ -77,7 +77,29 @@ namespace Freelancing.RepositoryService
 			var projects = biddingProjects.Cast<Project>()
 				.Concat(fixedProjects.Cast<Project>())
 				.ToList();
-			return mapper.Map<List<ProjectDTO>>(projects);
+
+			var prjcts = new List<ProjectDTO>();
+			foreach(var project in projects)
+			{
+				var prjct = mapper.Map<ProjectDTO>(project);
+				prjct.milestones = new();
+				foreach(var milestone in project.Milestones)
+				{
+
+					prjct.milestones.Add(new()
+					{
+						Amount=milestone.Amount,
+						Description=milestone.Description,
+						startdate=milestone.StartDate,
+						enddate=milestone.EndDate,
+						Status=milestone.Status,
+						Title = milestone.Title
+					});
+				}
+				prjcts.Add(prjct);
+
+			}
+			return prjcts;
 		}
 
 		public async Task<ProjectDTO> GetProjectDtoByIdAsync(int id)
