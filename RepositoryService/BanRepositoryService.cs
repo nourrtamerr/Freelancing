@@ -49,6 +49,7 @@ namespace Freelancing.RepositoryService
             _context.Bans.Update(ban);
             await _context.SaveChangesAsync();
         }
+
         public async Task DeleteBanAsync(int id)
         {
             var ban = _context.Bans.Find(id);
