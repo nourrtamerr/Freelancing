@@ -14,15 +14,26 @@ namespace Freelancing.Controllers
     {
         private readonly IReviewRepositoryService reviewService;
         private readonly IMapper mapper;
+        private readonly ApplicationDbContext _context;
         private readonly INotificationRepositoryService _notifications;
 
-		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper)
+		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper, ApplicationDbContext context)
         {
             this.reviewService = reviewService;
             this.mapper = mapper;
+            _context = context;
             _notifications = notifications;
 
 		}
+
+        [HttpGet]
+        public async Task<ActionResult<ReviewDto>> GetAllReviews()
+        {
+            var reviews = await _context.Reviews.Include(r=>r.Reviewee).Include(r=>r.Reviewer).ToListAsync();
+            var reviewsDto = mapper.Map<List<ReviewDto>>(reviews);
+            return Ok(reviewsDto);
+        }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ReviewDto>> GetReview(int id)

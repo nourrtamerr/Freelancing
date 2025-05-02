@@ -41,6 +41,8 @@ namespace Freelancing.RepositoryService
             .ThenInclude(ps => ps.Skill)
         .Include(p => p.Milestones)
         .Include(p => p.Proposals)
+        .Include(p=>p.Client).ThenInclude(c=>c.City).ThenInclude(c=>c.Country)
+        .Include(p=>p.Client).ThenInclude(c=>c.Reviewed)
         .Include(p => p.Subcategory).Where(p=>!p.IsDeleted && p.FreelancerId==null).ToListAsync();
         }
 
