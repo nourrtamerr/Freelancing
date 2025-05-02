@@ -267,8 +267,11 @@ namespace Freelancing.RepositoryService
 
 
             var createdProject = _mapper.Map<BiddingProject>(project);
-            createdProject.ClientId = ClinetId;
-            createdProject.ClientId = "63d89bb1-7a13-4e02-bf19-14701398e3a1";
+            //createdProject.ClientId = ClinetId;
+            createdProject.ClientId = "029098eb-7fe7-4a63-b2ef-733107050530";
+            //     createdProject.ClientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
 
 
 
