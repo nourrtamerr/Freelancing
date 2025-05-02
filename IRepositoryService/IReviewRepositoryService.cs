@@ -12,5 +12,8 @@ namespace Freelancing.IRepositoryService
         Task<Review> CreateReviewAsync(Review review);
         Task UpdateReviewAsync(Review review);
         Task DeleteReviewAsync(int id);
-    }
+        Task<List<Review>> GetReviewsByProjectIdAsync(int projectid);
+
+
+	}
 }

@@ -1,4 +1,6 @@
-﻿namespace Freelancing.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Freelancing.Models
 {
     public class UserConnection
     {
@@ -9,5 +11,8 @@
         public bool IsConnected { get; set; }
 
         public AppUser User { get; set; }
+
+        [NotMapped] 
+        public int ConnectionCount { get; set; }
     }
 }

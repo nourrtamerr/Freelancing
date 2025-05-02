@@ -274,6 +274,10 @@ namespace Freelancing.Controllers
                 ProjectSkills = p.ProjectSkills != null
                     ? p.ProjectSkills.Where(ps => ps.Skill != null).Select(ps => ps.Skill.Name).ToList()
                     : new List<string>(),
+                ClientCountry = p.Client.City.Country.Name,
+                ClientRating = p.Client?.Reviewed != null && p.Client.Reviewed.Any()
+                ? p.Client.Reviewed.Average(r => r?.Rating ?? 0)
+                : 0,
                 Milestones = p.Milestones?.Select(m => new MilestoneDto
                 {
                     Title = m.Title,
@@ -431,7 +435,7 @@ namespace Freelancing.Controllers
             var project = await _fixedProjectService.GetFixedPriceProjectByIdAsync(id);
             if (project == null)
             {
-                return BadRequest(new { Message = $"Fixed price project with ID {id} not found." });
+                return NotFound( new  { message= $"Fixed price project with ID {id} not found." });
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

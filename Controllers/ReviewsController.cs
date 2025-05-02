@@ -14,15 +14,37 @@ namespace Freelancing.Controllers
     {
         private readonly IReviewRepositoryService reviewService;
         private readonly IMapper mapper;
+        private readonly ApplicationDbContext _context;
         private readonly INotificationRepositoryService _notifications;
 
-		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper)
+		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper, ApplicationDbContext context)
         {
             this.reviewService = reviewService;
             this.mapper = mapper;
+            _context = context;
             _notifications = notifications;
 
 		}
+
+        [HttpGet]
+        public async Task<ActionResult<ReviewDto>> GetAllReviews()
+        {
+            try
+            {
+                var x = _context;
+                var y = _context.Reviews;
+
+
+				var reviews = await _context.Reviews.Include(r => r.Reviewee).Include(r => r.Reviewer).ToListAsync();
+                var reviewsDto = mapper.Map<List<ReviewDto>>(reviews);
+                return Ok(reviewsDto);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ReviewDto>> GetReview(int id)
@@ -52,15 +74,27 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId) {
 
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
-            if (reviews == null)
+            if (reviews == null )
             {
                 return BadRequest(new { Message = "No reviews Found" });
-            }
+			}
             var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewDtos);
         }
+		[HttpGet("project/{projectId}")]
+		public async Task<ActionResult<List<ReviewDto>>> GetReviewsByProjectId(int projectId)
+		{
 
-        [HttpPost]
+			var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
+			if (reviews == null )
+			{
+				return BadRequest(new { Message = "No reviews Found" });
+			}
+			var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
+			return Ok(reviewDtos);
+		}
+
+		[HttpPost]
         public async Task<ActionResult<ReviewDto>> CreateReview([FromBody] ReviewDto reviewDto)
         {
             if (reviewDto == null)
@@ -68,6 +102,7 @@ namespace Freelancing.Controllers
                 return BadRequest(new { Message = "Not Found" });
             }
             var review = mapper.Map<Review>(reviewDto);
+            review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);
             await _notifications.CreateNotificationAsync(new()
             {
@@ -91,8 +126,11 @@ namespace Freelancing.Controllers
             {
                 return BadRequest(new { Message = "No review Found" });
             }
-            mapper.Map(reviewDto, review);
-            await reviewService.UpdateReviewAsync(review);
+            //mapper.Map(reviewDto, review);
+            review.Comment = reviewDto.Comment;
+            review.Rating = reviewDto.Rating;
+
+			await reviewService.UpdateReviewAsync(review);
             return NoContent();
         }
 

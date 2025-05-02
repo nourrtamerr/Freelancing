@@ -9,7 +9,7 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class ProjectsController(IProjectService context, UserManager<AppUser> userManager) : ControllerBase
+	public class ProjectsController(IProjectService context, UserManager<AppUser> userManager, ApplicationDbContext dbContext) : ControllerBase
 	{
 		[HttpGet]
 		public async Task<ActionResult<List<Project>>> GetAllProjects()
@@ -82,5 +82,15 @@ namespace Freelancing.Controllers
 			var project = await context.GetProjectDtoByIdAsync(id);
 			return Ok(project);
 		}
-	}
+
+
+
+        [HttpGet("Category/{id}")]
+        public async Task<ActionResult<List<int>>> GetProjectsByCategoryId(int id)
+        {
+			var projects = await dbContext.project.Include(p=>p.Subcategory).ThenInclude(c=>c.Category).Where(p => p.Subcategory.CategoryId == id).Select(p=>p.Id).ToListAsync();
+            return Ok(projects);
+        }
+
+    }
 }
