@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.ML;
 
 
 namespace Freelancing
@@ -21,7 +22,57 @@ namespace Freelancing
 	{
 		public static async Task Main(string[] args)
 		{
-			var builder = WebApplication.CreateBuilder(args);
+            var context = new MLContext();
+
+            
+
+            // Load data
+            var data = context.Data.LoadFromTextFile<ReviewData>("reviews.csv", separatorChar: ',', hasHeader: true, allowQuoting: true,
+    trimWhitespace: true);
+
+            // Build the pipeline
+            var pipeline = context.Transforms.Text.FeaturizeText("Features", nameof(ReviewData.Text))
+     .Append(context.BinaryClassification.Trainers.SdcaLogisticRegression(
+         labelColumnName: nameof(ReviewData.Label),
+         featureColumnName: "Features"
+     ));
+
+            // Train the model
+            var model = pipeline.Fit(data);
+            var modelDirectory = Path.Combine(Directory.GetCurrentDirectory(), "MLModels");
+            // Save the trained model
+            var modelPath = Path.Combine(Directory.GetCurrentDirectory(), "MLModels", "sentimentModel.zip");
+
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(modelDirectory))
+            {
+                Directory.CreateDirectory(modelDirectory);
+            }
+
+            // Save the trained model
+            context.Model.Save(model, data.Schema, modelPath);
+            context.Model.Save(model, data.Schema, modelPath);
+
+            Console.WriteLine($"Model saved to: {modelPath}");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            var builder = WebApplication.CreateBuilder(args);
 
 			builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddSignalR();
@@ -175,7 +226,7 @@ namespace Freelancing
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
             builder.Services.AddScoped<CloudinaryService>();
 
-
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
             builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
