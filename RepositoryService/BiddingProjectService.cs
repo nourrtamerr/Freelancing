@@ -126,7 +126,25 @@ namespace Freelancing.RepositoryService
                 )).ToList();
             }
 
-            var filterdto = _mapper.Map<List<BiddingProjectGetAllDTO>>(result);
+            List<BiddingProjectGetAllDTO> filterdto = new();
+
+
+			foreach (var project in result) {
+                var instance = _mapper.Map<BiddingProjectGetAllDTO>(project);
+				if (project.Proposals.Count == 0)
+				{
+					instance.currentBid = project.maximumprice;
+
+				}
+				else
+				{
+					instance.currentBid = project.Proposals.Min(p => p.Price);
+				}
+				filterdto.Add(instance);
+                
+
+			}
+			//var filterdto = _mapper.Map<List<BiddingProjectGetAllDTO>>(result);
 
 
 

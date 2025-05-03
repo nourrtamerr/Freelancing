@@ -101,7 +101,7 @@ namespace Freelancing.Controllers
 				}
 
 			}
-			var proposal = await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier) /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			var proposal = await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier)??"hhh" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
 			var average = (await _proposals.GetProposalsByProjectIdAsync(proposal.ProjectId)).Average(p => p.suggestedMilestones.Sum(m => m.Amount));
 			await hubContext.Clients.Group(proposal.ProjectId.ToString()).SendAsync("BiddingChanged",new{proposal.Price, average });
 

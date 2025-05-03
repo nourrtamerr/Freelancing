@@ -23,7 +23,7 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+	public class AccountController(ProjectService projects,MilestoneService milestoneService,ApplicationDbContext _context,IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
 	{
 
 		[HttpGet("test")]
@@ -32,6 +32,46 @@ namespace Freelancing.Controllers
 		{
 			return Ok(new { str = "hh" });
 		}
+
+
+		[HttpPost("Dispute/{milestoneId}")]
+		[Authorize]
+		public async Task<IActionResult> Dispute(int milestoneId, string complaint)
+		{
+			var MILESTONE=await milestoneService.GetByIdAsync(milestoneId);
+			if(MILESTONE==null)
+			{
+				return BadRequest(new { Message = "Milestone not found" });
+			}
+			await _context.Disputes.AddAsync(new DisputeResolution()
+			{
+				Complaint = complaint,
+				MilestoneId = milestoneId,
+			});
+			await _context.SaveChangesAsync();
+			var admins=_userManager.Users.OfType<Admin>().ToList();
+			foreach (var admin in admins)
+			{
+				await _notifications.CreateNotificationAsync(new Notification()
+				{
+					isRead = false,
+					Message = $"User {User.FindFirstValue(ClaimTypes.Name)} has a dispute on milestone {milestoneId} with the complaint: {complaint}",
+					UserId = admin.Id,
+
+				});
+			}
+			var project= await projects.GetProjectByIdAsync(MILESTONE.ProjectId);
+			await _notifications.CreateNotificationAsync(new Notification()
+			{
+				isRead = false,
+				Message = $"User {User.FindFirstValue(ClaimTypes.Name)} has a dispute on milestone {milestoneId} with the complaint: {complaint}",
+				UserId = project.ClientId==User.FindFirstValue(ClaimTypes.NameIdentifier)? project.FreelancerId:project.ClientId,
+
+			});
+			return Ok(new {Message= "Dispute Created" });
+
+		}
+
 
 		[HttpGet("getIdByUserName/{username}")]
 	
