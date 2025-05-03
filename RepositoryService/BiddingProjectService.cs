@@ -219,13 +219,24 @@ namespace Freelancing.RepositoryService
             var freelancer = await _context.freelancers
             .Include(f => f.subscriptionPlan)
             .FirstOrDefaultAsync(f => f.Id == userId);
+            if (freelancer is not null)
+            {
+                projectDto.FreelancersubscriptionPlan = freelancer?.subscriptionPlan?.name ?? string.Empty;
+                projectDto.FreelancerTotalNumber = freelancer?.subscriptionPlan?.TotalNumber ?? 0;
+                projectDto.FreelancerRemainingNumberOfBids = freelancer?.RemainingNumberOfBids ?? 0;
+            }
+            if(project.Proposals.Count==0)
+            {
+                projectDto.currentBid = project.maximumprice;
 
-            projectDto.FreelancersubscriptionPlan = freelancer?.subscriptionPlan?.name ?? string.Empty;
-            projectDto.FreelancerTotalNumber = freelancer?.subscriptionPlan?.TotalNumber ?? 0;
-            projectDto.FreelancerRemainingNumberOfBids = freelancer?.RemainingNumberOfBids ?? 0;
+			}
+            else
+            {
+                projectDto.currentBid = project.Proposals.Min(p => p.Price);
+            }
 
 
-            return projectDto;
+			return projectDto;
 
         }
 

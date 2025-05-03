@@ -55,7 +55,7 @@ namespace Freelancing.Controllers
 
             if (user.ProfilePicture is null)
             {
-                return BadRequest(new { Message = "No Image Found" });
+                return Ok(null);
             }
 
             var fileName = Path.GetFileName(user.ProfilePicture);
