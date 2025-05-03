@@ -267,7 +267,8 @@ namespace Freelancing.Controllers
                 .Where(m => m.SenderId == user.Id || m.ReceiverId == user.Id)
                 .Include(m => m.Sender)
                 .Include(m => m.Receiver)
-                .OrderByDescending(m => m.SentAt)
+				.Where(m => m.Sender != null && m.Receiver != null)
+				.OrderByDescending(m => m.SentAt)
                 .ToListAsync();
 
             // Group messages by the other participant's ID and take the latest message
@@ -281,7 +282,7 @@ namespace Freelancing.Controllers
         }
 
         // In GetOnlineUsers endpoint
-        [HttpGet("online-usersc")]
+        [HttpGet("online-users")]
         public async Task<IActionResult> GetOnlineUsers()
         {
             var onlineUsers = await _context.UserConnections

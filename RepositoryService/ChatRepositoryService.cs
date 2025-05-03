@@ -43,13 +43,20 @@ namespace Freelancing.RepositoryService
 
         public async Task<List<Chat>> GetConversationAsync(string userId1, string userId2)
         {
-            return await _context.Chats
+
+            var chats = _context.Chats
                 .Include(c => c.Sender)
                 .Include(c => c.Receiver)
                 .Where(c => (c.SenderId == userId1 && c.ReceiverId == userId2) ||
-                           (c.SenderId == userId2 && c.ReceiverId == userId1))
-                .OrderBy(c => c.SentAt)
-                .ToListAsync();
+                           (c.SenderId == userId2 && c.ReceiverId == userId1));
+            var x = chats.OrderBy(c => c.SentAt);
+            if(x.Count()==0)
+            {
+                return new List<Chat>();
+            }
+            var y = await x.ToListAsync();
+
+            return y;
         }
         //public async Task<Chat> CreateChatAsync(Chat chat)
         //{
