@@ -198,6 +198,9 @@ namespace Freelancing.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
@@ -1227,7 +1230,10 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
+
                             ConcurrencyStamp = "10aa621a-4550-4f5c-9a04-6f7992b1213b",
+
+
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1236,11 +1242,15 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
+
                             PasswordHash = "AQAAAAIAAYagAAAAEH/7BAQUlTIlySWL2zbESFs83O/y2stg4IKABtKKsL+or0r54AkAN29/l6QXHuE+8w==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
                             RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 17, 5, 42, 599, DateTimeKind.Local).AddTicks(2757),
                             SecurityStamp = "2b5a1032-7714-4e3e-b255-bb169576e14f",
+
+                           
+
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",

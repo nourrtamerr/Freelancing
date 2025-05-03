@@ -15,6 +15,8 @@ namespace Freelancing.DTOs
 		public projectType projectType { set; get; }
 		public projectStatus Status { get; set; }
         public ExperienceLevel ExperienceLevel { get; set; }
-        public bool IsDeleted { get; set; }
+        public List<MilestoneDto> milestones { set; get; }
+
+		public bool IsDeleted { get; set; }
     }
 }

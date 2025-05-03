@@ -48,9 +48,9 @@ namespace Freelancing.Controllers
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
 
-            if (categories == null || !categories.Any())
+            if (categories == null)
             {
-                return NotFound("No categories found.");
+                return BadRequest(new { Message = "No categories found." });
             }
             var categoriesDto = categories.Select(c => new
             {
@@ -73,7 +73,7 @@ namespace Freelancing.Controllers
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
-                return NotFound($"Category with ID {id} not found.");
+                return BadRequest(new { Message = $"Category with ID {id} not found." });
             }
             var categoryDto = new
             {
@@ -89,12 +89,12 @@ namespace Freelancing.Controllers
         {
             if (category == null)
             {
-                return BadRequest("Category cannot be null.");
+                return BadRequest(new { Message = "Category cannot be null." });
             }
             var existingCategory = await _categoryService.GetCategoryByIdAsync(category.Id);
             if (existingCategory == null)
             {
-                return NotFound($"Category with ID {category.Id} not found.");
+                return BadRequest(new { Message = $"Category with ID {category.Id} not found." });
             }
             existingCategory.Name = category.Name;
             existingCategory.IsDeleted = category.IsDeleted;
@@ -119,12 +119,12 @@ namespace Freelancing.Controllers
             var existingCategory = await _categoryService.GetCategoryByIdAsync(id);
             if (existingCategory == null)
             {
-                return NotFound($"Category with ID {id} not found.");
+                return BadRequest(new { Message = $"Category with ID {id} not found." });
             }
             var result = await _categoryService.DeleteCategoryAsync(id);
             if (!result)
             {
-                return BadRequest("Failed to delete category.");
+                return BadRequest(new { Message = "Failed to delete category." });
             }
             return Ok(new {
                 Message=

@@ -10,8 +10,10 @@ namespace Freelancing.DTOs
         public string SenderName { get; set; }
         public string ReceiverId { get; set; }
         public string ReceiverName { get; set; }
+
+
         public string Message { get; set; }
-        public string ImageUrl { get; set; } 
+        public string ImageUrl { get; set; }
         public DateTime SentAt { get; set; }
         public bool IsRead { get; set; }
     }
@@ -25,6 +27,19 @@ namespace Freelancing.DTOs
         public string? Message { get; set; }
         [ImageExtension]
 
-        public IFormFile? Image { get; set; } 
+        public IFormFile? Image { get; set; }
+
+        public bool IsEdited { get; set; }
     }
+
+    public class UpdateMessageDto
+    {
+        [Required]
+        public int MessageId { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        public string NewMessage { get; set; }
+    }
+
 }

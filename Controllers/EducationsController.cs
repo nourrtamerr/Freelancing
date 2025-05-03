@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace Freelancing.Controllers
             var educationslist  = await _EducationService.GetAllEducations();            
             if (educationslist == null || educationslist.Count() == 0)
             {
-                return BadRequest(new { msg = "there is no educations found" });
+                return BadRequest(new { Message = "there is no educations found" });
             }
             var educationsDTOlist = educationslist.Select(e => new EducationDTO
             {
@@ -46,7 +47,7 @@ namespace Freelancing.Controllers
             var educationslist = await _EducationService.GetAllEducationsByFreelancerUserName(username);
             if (educationslist == null)
             {
-                return BadRequest(new { msg = "there is no educations for this freelancer" });
+                return BadRequest(new { Message = "there is no educations for this freelancer" });
             }
             var educationsDTOlist = educationslist.Select(e => new EducationDTO
             {
@@ -70,7 +71,7 @@ namespace Freelancing.Controllers
             var selected = await _EducationService.GetEducationById(id);
             if (selected == null)
             {
-                return BadRequest(new { msg = "can't find a education has this id" });
+                return BadRequest(new { Message = "can't find a education has this id" });
             }
             var educationDTO = new EducationDTO
             {
@@ -94,7 +95,7 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(educationDTO);
+                return BadRequest(new { Message = educationDTO });
             }
             var education = new Education
             {
@@ -128,7 +129,7 @@ namespace Freelancing.Controllers
                     }
                     );
             }
-            return BadRequest(new { msg = "failed to create education" });
+            return BadRequest(new { Message = "failed to create education" });
         }
 
         [HttpPut("{id}")]
@@ -147,11 +148,11 @@ namespace Freelancing.Controllers
                 var updated = await _EducationService.UpdateEducation(selected);
                 if (updated)
                 {
-                    return Ok(new { msg = "education updated successfully" });
+                    return Ok(new { Message = "education updated successfully" });
                 }
-                return BadRequest(new { msg = "failed to update education" });
+                return BadRequest(new { Message = "failed to update education" });
             }
-            return BadRequest(new { msg = "no education found has this id" });
+            return BadRequest(new { Message = "no education found has this id" });
         }
 
         [HttpDelete("{id}")]
@@ -163,11 +164,11 @@ namespace Freelancing.Controllers
                 var deleted = await _EducationService.DeleteEducation(id);
                 if (!deleted)
                 {
-                    return BadRequest(new { msg = $"Unable to delete education {id}" });
+                    return BadRequest(new { Message = $"Unable to delete education {id}" });
                 }
-                return Ok(new { msg = "education marked as deleted successfully" });
+                return Ok(new { Message = "education marked as deleted successfully" });
             }
-            return BadRequest(new { msg = "Unable to find education by this id " });
+            return BadRequest(new { Message = "Unable to find education by this id " });
         }
     }
 }

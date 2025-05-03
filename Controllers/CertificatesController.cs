@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,9 +23,9 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllCertificates()
         {
             var certificateslist = await _certificatesService.GetAllUserCertificatesAsync();
-            if (certificateslist == null || certificateslist.Count() == 0)
+            if (certificateslist == null )
             {
-                return BadRequest(new { msg = "there is no certificates found" });
+                return BadRequest(new { Message = "there is no certificates found" });
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {
@@ -44,7 +45,7 @@ namespace Freelancing.Controllers
             var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerUserName(username);
             if (certificateslist == null)
             {
-                return BadRequest(new {msg = "there is no certificates for this freelancer"});
+                return BadRequest(new {Message = "there is no certificates for this freelancer"});
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {
@@ -67,7 +68,7 @@ namespace Freelancing.Controllers
             var certificateslist = await _certificatesService.GetAllCertificatesByFreelancerId(freelancerId);
             if (certificateslist == null)
             {
-                return BadRequest(new { msg = "there is no certificates for this freelancer" });
+                return BadRequest(new { Message = "there is no certificates for this freelancer" });
             }
             var certificatesDTOlist = certificateslist.Select(e => new CertificateDTO
             {
@@ -84,7 +85,7 @@ namespace Freelancing.Controllers
             var selectedcertificate =await _certificatesService.GetCertificateByIDAsync(id);
             if (selectedcertificate == null)
             {
-                return BadRequest(new {msg="can't find a certificate has this id"});
+                return BadRequest(new {Message ="can't find a certificate has this id"});
             }
             var certificateDTO = new CertificateDTO {
                 Name = selectedcertificate.Name,
@@ -103,7 +104,7 @@ namespace Freelancing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(certificateDTO);
+                return BadRequest(new { Message = certificateDTO });
             }
             var certificate = new Certificate
             {
@@ -130,7 +131,7 @@ namespace Freelancing.Controllers
                     }
                     );
             }
-            return BadRequest(new { msg = "failed to create Certificate" });
+            return BadRequest(new { Message = "failed to create Certificate" });
         }
 
         [HttpPut("{id}")]
@@ -146,11 +147,11 @@ namespace Freelancing.Controllers
 				var updated = await _certificatesService.UpdateCertificateAsync(selected);
                 if (updated)
                 {
-                return Ok(new { msg = "certificate updated successfully"});
+                return Ok(new { Message = "certificate updated successfully"});
                 }
-                return BadRequest(new { msg = "failed to update certificate" });
+                return BadRequest(new { Message = "failed to update certificate" });
             }
-            return BadRequest(new { msg = "no certificate found has this id" });
+            return BadRequest(new { Message = "no certificate found has this id" });
 
 
         }
@@ -163,11 +164,11 @@ namespace Freelancing.Controllers
                 var deleted = await _certificatesService.DeleteCertificateAsync(id);
                 if (!deleted)
                 {
-                    return BadRequest(new { msg = $"Unable to delete certificate {id}" });
+                    return BadRequest(new { Message = $"Unable to delete certificate {id}" });
                 }
-                return Ok(new { msg = "certificate marked as deleted successfully"});
+                return Ok(new { Message = "certificate marked as deleted successfully"});
             }
-            return BadRequest(new { msg = "Unable to find certificate by this id " });
+            return BadRequest(new { Message = "Unable to find certificate by this id " });
         }
     }
 }

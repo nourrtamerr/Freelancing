@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.DTOs.ProposalDTOS;
 using Freelancing.Filters;
 using Freelancing.Models;
+using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -13,7 +16,7 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProposalController(IProjectService _project,INotificationRepositoryService _notifications,UserManager<AppUser> usermanager,IMapper _mapper,IproposalService _proposals,IProjectService _projects) : ControllerBase
+    public class ProposalController(IHubContext<BiddingHub> hubContext,IProjectService _project,INotificationRepositoryService _notifications,UserManager<AppUser> usermanager,IMapper _mapper,IproposalService _proposals,IProjectService _projects,IBiddingProjectService _biddings) : ControllerBase
     {
         // GET: api/<ProposalController>
         [HttpGet]
@@ -41,7 +44,7 @@ namespace Freelancing.Controllers
 			var user =await usermanager.FindByNameAsync(name);
 			if(user is null)
 			{
-				return BadRequest("usr not found");
+				return BadRequest(new { Message = "usr not found" });
 			}
 			
 				return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(user.Id)));
@@ -54,51 +57,54 @@ namespace Freelancing.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
             {
-                return BadRequest("usr not found");
+                return BadRequest(new { Message = "usr not found" });
             }
             return Ok(await (_proposals.GetProposalsByFreelancerIdAsync(userId)));
         }
 
 		// POST api/<ProposalController>
 		[HttpPost]
-        //[Authorize(Roles = "Freelancer")]
-        public async Task<IActionResult> Post([FromBody]CreateProposalDTO dto)
-        {
-            //var proposal = _mapper.Map<Proposal>(dto);
-            var project = await _projects.GetProjectByIdAsync(dto.ProjectId);
+		//[Authorize(Roles = "Freelancer")]
+		public async Task<IActionResult> Post([FromBody] CreateProposalDTO dto)
+		{
+			//var proposal = _mapper.Map<Proposal>(dto);
+			var project = await _projects.GetProjectByIdAsync(dto.ProjectId);
 
 			if (project is null)
-            {
-				return BadRequest(new {message= "The project no longer exists" });
+			{
+				return BadRequest(new { Message = "The project no longer exists" });
 			}
-            if(project.FreelancerId is not null)
-            {
-                return BadRequest(new { message = "This project has already been assigned to another freelancer" });
-            }
-            dto.type=project.GetType()==typeof(FixedPriceProject)? projectType.fixedprice : projectType.bidding;
-            if (dto.type == projectType.fixedprice)
-            {
-                //if((project as FixedPriceProject).fixedPrice!=dto.Price)
-                //{
-                //    return BadRequest("not matching the price");
-                //}
-            }
-            else
-            {
-                if(project is BiddingProject prjct)
+			if (project.FreelancerId is not null)
+			{
+				return BadRequest(new { Message = "This project has already been assigned to another freelancer" });
+			}
+			dto.type = project.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding;
+			if (dto.type == projectType.fixedprice)
+			{
+				//if((project as FixedPriceProject).fixedPrice!=dto.Price)
+				//{
+				//    return BadRequest(new { Message ="not matching the price"});
+				//}
+			}
+			else
+			{
+				if (project is BiddingProject prjct)
 				{
-					if (prjct.minimumPrice > dto.Price || prjct.maximumprice <dto.Price)
+					if (prjct.minimumPrice > dto.Price || prjct.maximumprice < dto.Price)
 					{
-						return BadRequest( new {message= "Your bid amount must be between the minimum and maximum price range" });
+						return BadRequest(new { Message = "Your bid amount must be between the minimum and maximum price range" });
 					}
-					if (prjct.BiddingEndDate < DateTime.Now )
-					 {
-						return BadRequest(new { message = "The bidding period for this project has ended" });
+					if (prjct.BiddingEndDate < DateTime.Now)
+					{
+						return BadRequest(new { Message = "The bidding period for this project has ended" });
 					}
 				}
 
 			}
-			var proposal=await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier) /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			var proposal = await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier) /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			var average = (await _proposals.GetProposalsByProjectIdAsync(proposal.ProjectId)).Average(p => p.suggestedMilestones.Sum(m => m.Amount));
+			await hubContext.Clients.Group(proposal.ProjectId.ToString()).SendAsync("BiddingChanged",new{proposal.Price, average });
+
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
@@ -121,18 +127,18 @@ namespace Freelancing.Controllers
 
 			if (project is null)
 			{
-				return BadRequest("Project not found");
+				return BadRequest(new { Message = "Project not found" });
 			}
 			if (project.FreelancerId is not null)
 			{
-				return BadRequest("Project is already assigned to a freelancer");
+				return BadRequest(new { Message = "Project is already assigned to a freelancer" });
 			}
 			dto.type = project.GetType() == typeof(FixedPriceProject) ? projectType.fixedprice : projectType.bidding;
 			if (dto.type == projectType.fixedprice)
 			{
 				if ((project as FixedPriceProject).Price != dto.Price)
 				{
-					return BadRequest("not matching the price");
+					return BadRequest(new { Message = "not matching the price" });
 				}
 			}
 			else
@@ -141,11 +147,11 @@ namespace Freelancing.Controllers
 				{
 					if (prjct.minimumPrice > dto.Price || prjct.maximumprice < dto.Price)
 					{
-						return BadRequest("not within bid limits");
+						return BadRequest(new { Message = "not within bid limits" });
 					}
 					if (prjct.BiddingEndDate < DateTime.Now)
 					{
-						return BadRequest("bid is over");
+						return BadRequest(new { Message = "bid is over" });
 					}
 				}
 			}

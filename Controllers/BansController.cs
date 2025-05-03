@@ -4,6 +4,7 @@ using Freelancing.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -29,7 +30,7 @@ namespace Freelancing.Controllers
             var ban = await banService.GetBanByIdAsync(id);
             if (ban == null)
             {
-                return NotFound();
+                return BadRequest(new { Message ="No Bans Found"});
             }
             var banDto = mapper.Map<BanDto>(ban);
             return Ok(banDto);
@@ -39,9 +40,9 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<BanDto>>> GetBansByUserId(string userId)
         {
             var bans = await banService.GetBansByUserIdAsync(userId);
-            if (bans == null || !bans.Any())
+            if (bans == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Bans Found" });
             }
             var banDtos = mapper.Map<List<BanDto>>(bans);
             return Ok(banDtos);
@@ -51,11 +52,11 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<BanDto>> CreateBan([FromBody] BanDto banDto)
         {
             if (banDto == null)
-                return BadRequest("BanDto cannot be null");
+                return BadRequest(new { Message = "BanDto cannot be null" });
 
             var userExists = await context.Users.AnyAsync(u => u.Id == banDto.BannedUserId);
             if (!userExists)
-                return BadRequest("Invalid BannedUserId");
+                return BadRequest(new { Message = "Invalid BannedUserId" });
 
             var ban = mapper.Map<Ban>(banDto);
 
@@ -72,21 +73,27 @@ namespace Freelancing.Controllers
             );
         }
         [HttpPut("{id}")]
+
+
+
+
         public async Task<ActionResult<BanDto>> UpdateBan(int id, [FromBody] BanDto banDto)
         {
             if (banDto is null)
-                return BadRequest("BanDto cannot be null");
+                return BadRequest(new { Message = "BanDto cannot be null" });
             var existingBan = await banService.GetBanByIdAsync(id);
             if (existingBan == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "No Bans Found" });
             }
-            var updatedBan = mapper.Map<Ban>(banDto);
-            updatedBan.Id = id;
-            await banService.UpdateBanAsync(updatedBan);
-            var updatedBanDto = mapper.Map<BanDto>(updatedBan);
+            mapper.Map(banDto, existingBan);
+            //updatedBan.Id = id;
+            await banService.UpdateBanAsync(existingBan);
+            var updatedBanDto = mapper.Map<BanDto>(existingBan);
             return Ok(updatedBanDto);
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBan(int id)
@@ -94,7 +101,7 @@ namespace Freelancing.Controllers
             var existingBan = await banService.GetBanByIdAsync(id);
             if (existingBan == null)
             {
-                return NotFound();
+                return BadRequest(new { Message ="No Bans Found"});
             }
             await banService.DeleteBanAsync(id);
             return NoContent();
@@ -106,7 +113,7 @@ namespace Freelancing.Controllers
             var ban = await banService.GetActiveBansByUserIdAsync(userId);
             if (ban == null)
             {
-                return NotFound("No active ban found for this user.");
+                return BadRequest(new { Message = "No active ban found for this user." });
             }
             return Ok(mapper.Map<BanDto>(ban));
         }
@@ -119,7 +126,7 @@ namespace Freelancing.Controllers
             var bannedUsers = await banService.GetBannedUsersAsync();
             if (bannedUsers.Count()==0)
             {
-                return NotFound("No banned users found.");
+                return BadRequest(new { Message = "No banned users found." });
             }
             var bannedUserDtos = mapper.Map<List<BanDto>>(bannedUsers);
             return Ok(bannedUserDtos);

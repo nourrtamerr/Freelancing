@@ -11,6 +11,9 @@ using Freelancing.Helpers;
 using Stripe.Checkout;
 using CloudinaryDotNet;
 using Freelancing.DTOs;
+using Stripe.Issuing;
+using System.Numerics;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Freelancing.Controllers
 {
@@ -34,8 +37,8 @@ namespace Freelancing.Controllers
         {
             try
             {
-                var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
-                // var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+               // var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (userId == null) return Unauthorized("User not authenticated.");
 
                 // Check if user is a Freelancer or Client
@@ -44,14 +47,14 @@ namespace Freelancing.Controllers
 
                 if (freelancer == null && client == null)
                 {
-                    return BadRequest("User must be a freelancer or client to subscribe.");
+                    return BadRequest(new { Message = "User must be a freelancer or client to subscribe." });
                 }
 
                 // Get the plan
                 var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
                 if (plan == null)
                 {
-                    return BadRequest("Invalid subscription plan.");
+                    return BadRequest(new { Message = "Invalid subscription plan." });
                 }
 
                 // If it's a free plan, activate it immediately for both freelancers and clients
@@ -72,7 +75,7 @@ namespace Freelancing.Controllers
                     }
 
                     await _context.SaveChangesAsync();
-                    return Ok(new { message = "Free plan activated successfully." });
+                    return Ok(new { Message = "Free plan activated successfully." });
                 }
 
                 // var url = $"{Request.Scheme}://{Request.Host}/Stripe/create-checkout-session?Amount={plan.Price}";
@@ -84,7 +87,7 @@ namespace Freelancing.Controllers
                 //var SuccessUrl = $"{baseUrl}/api/SubscribtionPlanPayment/Success?session_id={{CHECKOUT_SESSION_ID}}&proposalId={planId}&";
 
 
-                //var PaymentSuccessUrl = Url.ActionLink("PaymentSuccess", "SubscribtionPlanPayment", new
+                //var paymentsucessUrl = Url.ActionLink("paymentsucess", "SubscribtionPlanPayment", new
                 //{
                 //    sessionId = "{CHECKOUT_SESSION_ID}",
                 //    planid = plan.Id
@@ -105,7 +108,7 @@ namespace Freelancing.Controllers
             catch (StripeException ex)
             {
                 _logger.LogError(ex, "Stripe error");
-                return BadRequest(new { error = ex.StripeError.Message });
+                return BadRequest(new { Message = ex.StripeError.Message });
             }
             catch (Exception ex)
             {
@@ -122,27 +125,28 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromBalance")]
         public async Task<IActionResult> PaySubscriptionFromBalance(int planId)
         {
-            //  var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-              var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+
 
 
             if (userId == null)
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new { Message = "User not authenticated." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             var freelancer = await _context.freelancers.FirstOrDefaultAsync(f => f.Id == userId);
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
 
             if (freelancer == null && client == null)
-                return BadRequest("User must be a freelancer or client.");
+                return BadRequest(new { Message = "User must be a freelancer or client." });
 
             decimal userBalance = freelancer?.Balance ?? client?.Balance ?? 0;
 
             if (userBalance < plan.Price)
-                return BadRequest("Not enough balance.");
+                return BadRequest(new { Message = "Not enough balance." });
 
             // Deduct balance
             if (freelancer != null)
@@ -188,7 +192,7 @@ namespace Freelancing.Controllers
 
             // Redirect to the success page with the same transactionId
             //  var url = $"/payments/subscription-success?transactionId={transactionId}";
-            //  var url = Url.Action("PaymentSuccess", "SubscribtionPlanPayment", new { sessionId = transactionId, planid = plan.Id });
+            //  var url = Url.Action("paymentsucess", "SubscribtionPlanPayment", new { sessionId = transactionId, planid = plan.Id });
             //  return Redirect(url);
             return Ok()
 ;        }
@@ -207,7 +211,9 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromCard")]
         public async Task<IActionResult> PaySubscriptionFromCard(int planId, [FromQuery] CardPaymentDTO card)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
 
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -217,17 +223,54 @@ namespace Freelancing.Controllers
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
 
             if (freelancer == null && client == null)
-                return BadRequest("User must be a freelancer or client.");
+                return BadRequest(new { Message = "User must be a freelancer or client." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             if (plan.Price == 0)
                 return BadRequest("This is a free plan. No card payment required.");
+            // Deduct balance
+            if (freelancer != null)
+            {
+               
+                freelancer.subscriptionPlanId = plan.Id;
+                freelancer.RemainingNumberOfBids = plan.TotalNumber;
+            }
+            else if (client != null)
+            {
+                
+                client.subscriptionPlanId = plan.Id;
+                client.RemainingNumberOfProjects = plan.TotalNumber;
+            }
 
-            // Combine card details into a token or pass-through string (simulate)
+            // Record payment
             var cardToken = $"{card.Cardnumber},{card.cvv}"; // ⚠️ Never do this in production without secure handling
+            var payment = new SubscriptionPayment
+            {
+                Amount = plan.Price,
+                Date = DateTime.UtcNow,
+                PaymentMethod = PaymentMethod.Balance,
+                TransactionId =  cardToken, // Use same transactionId
+                IsDeleted = false
+            };
+
+            _context.SubscriptionPayments.Add(payment);
+            await _context.SaveChangesAsync();
+
+            // Link payment to user and plan
+            var userPlan = new UserSubscriptionPlanPayment
+            {
+                UserId = userId,
+                SubscriptionPlanId = plan.Id,
+                SubscriptionPaymentId = payment.Id,
+                isDeleted = false
+            };
+
+            _context.UserSubscriptionPlanPayments.Add(userPlan);
+            await _context.SaveChangesAsync();
+            // Combine card details into a token or pass-through string (simulate)
 
             // Build a payment redirect URL (like your `Pay()` function in the proposal)
             var url = Pay(planId, PaymentMethod.CreditCard, cardToken);
@@ -260,24 +303,26 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromStripe")]
         public async Task<IActionResult> PaySubscriptionFromStripe(int planId)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
 
             // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new { Message = "User not authenticated." });
 
             var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             var freelancer = await _context.freelancers.FirstOrDefaultAsync(f => f.Id == userId);
 
             if (client == null && freelancer == null)
-                return BadRequest("User must be a client or freelancer.");
+                return BadRequest(new { Message = "User must be a client or freelancer." });
 
             var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
             if (plan == null)
-                return BadRequest("Subscription plan not found.");
+                return BadRequest(new { Message = "Subscription plan not found." });
 
             if (plan.Price == 0)
-                return BadRequest("This is a free plan — Stripe payment not required.");
+                return BadRequest(new { Message = "This is a free plan — Stripe payment not required." });
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var successUrl = $"{baseUrl}/api/SubscribtionPlanPayment/payment-success?sessionId={{CHECKOUT_SESSION_ID}}&planId={planId}";
@@ -305,7 +350,7 @@ namespace Freelancing.Controllers
 
 
         [HttpGet("payment-success")]
-        public IActionResult PaymentSuccess(string sessionId, int planid)
+        public async Task <IActionResult> paymentsucess(string sessionId, int planid)
         {
             try
             {
@@ -318,17 +363,80 @@ namespace Freelancing.Controllers
                 if (!session.Metadata.TryGetValue("userId", out var userId))
                 {
                     // This userId is unique per session
-                    return BadRequest("payment failed");
+                    return BadRequest(new { Message = "payment failed" });
                 }
 
-          
+
+
+                var freelancer = await _context.freelancers.FirstOrDefaultAsync(f => f.Id == userId);
+                var client = await _context.clients.FirstOrDefaultAsync(c => c.Id == userId);
+
+              //  if (freelancer == null && client == null)
+                //    return BadRequest("User must be a freelancer or client.");
+
+                var plan = SubscriptionPlansHelper.SubscriptionPlans.FirstOrDefault(p => p.Id == planid);
+                if (plan == null)
+                    return BadRequest("Subscription plan not found.");
+
+                if (plan.Price == 0)
+                    return BadRequest("This is a free plan. No card payment required.");
+                // Deduct balance
+                if (freelancer != null)
+                {
+
+                    freelancer.subscriptionPlanId = plan.Id;
+                    freelancer.RemainingNumberOfBids = plan.TotalNumber;
+                }
+                else if (client != null)
+                {
+
+                    client.subscriptionPlanId = plan.Id;
+                    client.RemainingNumberOfProjects = plan.TotalNumber;
+                }
+
+                // Record payment
+                var payment = new SubscriptionPayment
+                {
+                    Amount = plan.Price,
+                    Date = DateTime.UtcNow,
+                    PaymentMethod = PaymentMethod.Stripe,
+                    TransactionId = sessionId, // Use same transactionId
+                    IsDeleted = false
+                };
+
+                _context.SubscriptionPayments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                // Link payment to user and plan
+                var userPlan = new UserSubscriptionPlanPayment
+                {
+                    UserId = userId,
+                    SubscriptionPlanId = plan.Id,
+                    SubscriptionPaymentId = payment.Id,
+                    isDeleted = false
+                };
+
+                _context.UserSubscriptionPlanPayments.Add(userPlan);
+                await _context.SaveChangesAsync();
+                // Combine card details into a token or pass-through string (simulate)
+
+                // Build a payment redirect URL (like your `Pay()` function in the proposal)
+                var url = Pay(planid, PaymentMethod.Stripe,sessionId);
+
+
+
+
+
+
                 if (session == null)
                 {
-                    return NotFound("Session not found.");
+                    return BadRequest(new { Message = "Session not found." });
                 }
                 // Handle successful payment here (e.g., update user subscription status)
+
                 // You can also redirect to the success URL if needed
-                return Ok(new { message = "Payment successful.", session });
+                return Redirect($"http://localhost:4200/paymentsucess?sessionId={sessionId}");
+                return Ok(new { Message = "Payment successful.", session });
             }
             catch (Exception ex)
             {

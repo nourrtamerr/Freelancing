@@ -13,7 +13,11 @@ using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
+
 using Microsoft.ML;
+
+using static Freelancing.SignalR.ChatHub;
+
 
 
 namespace Freelancing
@@ -81,15 +85,15 @@ namespace Freelancing
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy
-					//.AllowAnyOrigin()
-                        .WithOrigins("http://localhost:4200")
+					policy
+						//.AllowAnyOrigin()
+						.WithOrigins("http://localhost:4200")
 
-                  //  .WithOrigins("http://127.0.0.1:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .SetIsOriginAllowed(_ => true); 
+						//  .WithOrigins("http://127.0.0.1:4200")
+						.AllowAnyMethod()
+						.AllowAnyHeader()
+						.AllowCredentials();
+                        //.SetIsOriginAllowed(_ => true); 
                 });
             });
             #endregion
@@ -121,7 +125,7 @@ namespace Freelancing
 				{
 					OnMessageReceived = context =>
 					{
-						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification"))
+						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification")|| context.Request.Path.StartsWithSegments("/biddingHub"))
 						{
 							var accessToken = context.Request.Query["access_token"];
 							context.Token = accessToken;
@@ -324,10 +328,21 @@ namespace Freelancing
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
-			app.UseHttpsRedirection();
             app.UseCors("AllowAll");
+			//app.UseHttpsRedirection();
 
-            app.UseAuthentication();
+
+			app.Use(async (context, next) =>
+			{
+				if (context.Request.Method == HttpMethods.Options)
+				{
+					context.Response.StatusCode = StatusCodes.Status200OK;
+					await context.Response.CompleteAsync();
+					return;
+				}
+				await next();
+			});
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 
@@ -335,6 +350,7 @@ namespace Freelancing
 			app.MapControllers();
 			app.MapHub<ChatHub>("/chathub");
 			app.MapHub<NotificationHub>("/notification");
+			app.MapHub<BiddingHub>("/biddingHub");
 			//app.MapHub<NotificationHub>("/chathub");
 			app.Run();
 		}

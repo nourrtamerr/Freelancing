@@ -31,10 +31,10 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetUserSkillById(int id)
         {
             if (id <= 0)
-                return BadRequest("Invalid user skill ID");
+                return BadRequest(new { Message = "Invalid user skill ID" });
             var userSkill = await skillService.GetUserSkillByIDAsync(id);
             if (userSkill == null)
-                return NotFound($"User skill with ID {id} not found");
+                return BadRequest(new { Message = $"User skill with ID {id} not found" });
             return Ok(mapper.Map<UserSkillDto>(userSkill));
         }
 
@@ -76,10 +76,10 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetUserSkillByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))
-                return BadRequest("Invalid user ID");
+                return BadRequest(new { Message = "Invalid user ID" });
             var userSkills = await skillService.GetUserSkillByUserIdAsync(userId);
-            if (userSkills == null || !userSkills.Any())
-                return NotFound($"No user skills found for user ID {userId}");
+            if (userSkills == null)
+                return BadRequest(new { Message = $"No user skills found for user ID {userId}" });
             var userSkillDtos = mapper.Map<List<UserSkillDto>>(userSkills);
             return Ok(userSkillDtos);
         }

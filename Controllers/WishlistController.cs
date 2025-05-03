@@ -13,7 +13,7 @@ namespace Freelancing.Controllers
 	public class WishlistController(INotificationRepositoryService _notifications,ApplicationDbContext _context) : ControllerBase
 	{
 		[HttpGet]
-		[Authorize(Roles = "Freelancer")]
+		//[Authorize(Roles = "Freelancer")]
 		public IActionResult GetmyWishlist()
 		{
 			// Logic to get the wishlist
@@ -41,6 +41,12 @@ namespace Freelancing.Controllers
 
 				);
 		}
+		
+		
+		
+		
+		
+		
 		[HttpPost("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
 		public async Task<IActionResult> AddToWishlist(int projectid)
@@ -49,7 +55,7 @@ namespace Freelancing.Controllers
 			var project = _context.project.Include(p=>p.Freelancer).FirstOrDefault(p => p.Id == projectid);
 			if (project == null)
 			{
-				return BadRequest(new { message = "Project not found" });
+				return BadRequest(new { Message = "Project not found" });
 			}
 			//if(! (project.Status==projectStatus.Completed))
 			//{
@@ -57,7 +63,7 @@ namespace Freelancing.Controllers
 			//}
 			if (_context.FreelancerWishlists.Any(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid))
 			{
-				return BadRequest(new { message = "Project already in wishlist" });
+				return BadRequest(new { Message = "Project already in wishlist" });
 			}
 			var wishlist = new FreelancerWishlist()
 			{
@@ -75,11 +81,14 @@ namespace Freelancing.Controllers
 			await _notifications.CreateNotificationAsync(new()
 			{
 				isRead = false,
-				Message = $"your project with id {project.Id} was added to wishwishlist  by userid {User.FindFirstValue(ClaimTypes.Name)}",
-				UserId = project.ClientId
+                Message = $"your project with id {project.Id} was added to wishwishlist  by userid {User.FindFirstValue(ClaimTypes.Name)}",
+                UserId = project.ClientId
 			});
 			return Ok(new { id = wishlist.Id });
 		}
+
+
+
 
 		[HttpDelete("{projectid}")]
 		[Authorize(Roles = "Freelancer")]
@@ -89,7 +98,7 @@ namespace Freelancing.Controllers
 			var project = _context.project.FirstOrDefault(p => p.Id == projectid);
 			if (project == null)
 			{
-				return BadRequest(new { message = "Project not found" });
+				return BadRequest(new { Message = "Project not found" });
 			}
 			//if (!(project.Status == projectStatus.Completed))
 			//{
@@ -99,11 +108,11 @@ namespace Freelancing.Controllers
 			var wishlistitem = _context.FreelancerWishlists.FirstOrDefault(f => f.FreelancerId == User.FindFirstValue(ClaimTypes.NameIdentifier) && f.ProjectId == projectid);
 			if(wishlistitem==null)
 			{
-				return BadRequest(new { message = "Project is not in wishlist" });
+				return BadRequest(new { Message = "Project is not in wishlist" });
 			}
 			_context.FreelancerWishlists.Remove(wishlistitem);
 			_context.SaveChanges();
-			return Ok(new { message = "Removed" });
+			return Ok(new { Message = "Removed" });
 		}
 	}
 }

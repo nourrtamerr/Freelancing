@@ -23,7 +23,7 @@ namespace Freelancing.Controllers
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if(userid is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 					
 			}
 			var user = await _freelancers.FindByIdAsync(userid);
@@ -42,7 +42,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 
 			}
@@ -62,7 +62,7 @@ namespace Freelancing.Controllers
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 			}
 
@@ -73,7 +73,7 @@ namespace Freelancing.Controllers
 				Message = $"Withdrawal completed with amount of {dto.amount} using credit card please check your balance",
 				UserId = userid
 			});
-			return BadRequest("not a correct client");
+			return BadRequest(new { Message = "not a correct client" });
 		}
 		[HttpPost("AddFundsCard")]
 		[Authorize]
@@ -82,7 +82,7 @@ namespace Freelancing.Controllers
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (userid is null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			var user = await _freelancers.FindByIdAsync(userid);
@@ -101,7 +101,7 @@ namespace Freelancing.Controllers
 				_context.Funds.Add(FUND);
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
 				return Ok(url);
 
 			}
@@ -120,7 +120,7 @@ namespace Freelancing.Controllers
 				_context.Funds.Add(FUND);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
 				return Ok(url);
 			}
 			await _notifications.CreateNotificationAsync(new()
@@ -129,7 +129,7 @@ namespace Freelancing.Controllers
 				Message = $"Funding completed with amount of {dto.amount} using credit card please check your balance",
 				UserId = userid
 			});
-			return BadRequest("not a correct client");
+			return BadRequest(new { Message = "not a correct client" });
 		}
 
 		#region stripe
@@ -145,7 +145,7 @@ namespace Freelancing.Controllers
 			var freelancer = await _freelancers.FindByIdAsync(userid);
 			if (freelancer == null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			if (freelancer is Freelancer freelancer1)
@@ -178,7 +178,7 @@ namespace Freelancing.Controllers
 			if (!session.Metadata.TryGetValue("userId", out var userId))
 			{
 				// This userId is unique per session
-				return BadRequest("payment failed");
+				return BadRequest(new { Message = "payment failed" });
 			}
 
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -209,12 +209,12 @@ namespace Freelancing.Controllers
 						Message = $"Funding completed with amount of {amount} using stripe please check your balance",
 						UserId = userId
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 
 			}
@@ -236,12 +236,12 @@ namespace Freelancing.Controllers
 					_context.Withdrawals.Add(withdrawal);
 					await _freelancers.UpdateAsync(current2);
 					_context.SaveChanges();
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 			}
 			else
@@ -252,11 +252,13 @@ namespace Freelancing.Controllers
 		}
 
 
-		[HttpGet("StripeWithdraw")]
+		[HttpPost("StripeWithdraw")]
 		//[Authorize]
-		public async Task<IActionResult> StripeWithdraw(int money, string email)
+		public async Task<IActionResult> StripeWithdraw(WithdrawRequest request)
 		{
 			var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var money = request.Money;
+				var email = request.Email;
 			if (userid == null)
 			{
 				return Unauthorized();
@@ -264,14 +266,14 @@ namespace Freelancing.Controllers
 			var freelancer = await _freelancers.FindByIdAsync(userid);
 			if (freelancer == null)
 			{
-				return BadRequest("user not found");
+				return BadRequest(new { Message = "user not found" });
 
 			}
 			if (freelancer is Freelancer freelancer1)
 			{
 				if (freelancer1.Balance < money)
 				{
-					return BadRequest("Not enough balance");
+					return BadRequest(new { Message = "Not enough balance" });
 				}
 
 			}
@@ -279,7 +281,7 @@ namespace Freelancing.Controllers
 			{
 				if (client1.Balance < money)
 				{
-					return BadRequest("Not enough balance");
+					return BadRequest(new { Message = "Not enough balance" });
 				}
 
 			}
@@ -287,16 +289,16 @@ namespace Freelancing.Controllers
 			#region withdrawal
 			else
 			{
-				return BadRequest("you are not a freelancer");
+				return BadRequest(new { Message = "you are not a freelancer" });
 			}
 
-			if (freelancer is Freelancer freelancerr && string.IsNullOrEmpty(freelancerr.StripeAccountId))
+			if (freelancer is Freelancer freelancerr) //&& string.IsNullOrEmpty(freelancerr.StripeAccountId))
 			{
 				// Redirect to connect account setup
 				var url2 = Url.ActionLink("CreateConnectedAccount", "Stripe", new { freelancerEmail = email, amountInCents = (long)money * 1000 });
 				return Redirect(url2);
 			}
-			if (freelancer is Client clientt && string.IsNullOrEmpty(clientt.StripeAccountId))
+			if (freelancer is Client clientt) //&& string.IsNullOrEmpty(clientt.StripeAccountId))
 			{
 				// Redirect to connect account setup
 				var url2 = Url.ActionLink("CreateConnectedAccount", "Stripe", new { freelancerEmail = email, amountInCents = (long)money * 1000 });
@@ -316,7 +318,7 @@ namespace Freelancing.Controllers
 
 
 		[HttpGet("Success")]
-		public async Task<IActionResult> Success(string session_id, string amount)
+		public async Task<ActionResult> Success(string session_id, string amount)
 		{
 			var sessionService = new PaymentIntentService();
 			var retrievedPaymentIntent = sessionService.Get(session_id);
@@ -324,7 +326,7 @@ namespace Freelancing.Controllers
 			if (!retrievedPaymentIntent.Metadata.TryGetValue("userId", out var userid))
 			{
 				// This userId is unique per session
-				return BadRequest("payment failed");
+				return BadRequest(new { Message = "payment failed" });
 			}
 	
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -355,12 +357,13 @@ namespace Freelancing.Controllers
 						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
 						UserId = userid
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
-					return Redirect(url);
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
+					
+					return Redirect($"http://localhost:4200/paymentsucess?sessionId={session_id}");
 				}
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 
 			}
@@ -388,13 +391,13 @@ namespace Freelancing.Controllers
 						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
 						UserId = userid
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 
 				else
 				{
-					return BadRequest("incorrect amount");
+					return BadRequest(new { Message = "incorrect amount" });
 				}
 			}
 			else
@@ -407,5 +410,10 @@ namespace Freelancing.Controllers
 
 
 
+	}
+	public class WithdrawRequest
+	{
+		public int Money { get; set; }
+		public string Email { get; set; }
 	}
 }

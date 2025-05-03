@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Stripe.V2;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System.Diagnostics;
 namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
@@ -34,7 +36,7 @@ namespace Freelancing.Controllers
 		success(string session_id,int proposalid)
 		{
 
-		redirect (_configuration["AppSettings:AngularAppUrl"]/PaymentSuccess)
+		redirect (_configuration["AppSettings:AngularAppUrl"]/paymentsucess?sessionId={session_id})
 		}
 
 
@@ -54,7 +56,7 @@ namespace Freelancing.Controllers
 		success(subscriptionplanid)
 		{
 		User.findfirstvalue
-		Redirect (_configuration["AppSettings:AngularAppUrl"]/PaymentSuccess)
+		Redirect (_configuration["AppSettings:AngularAppUrl"]/paymentsucess?sessionId={session_id})
 		}
 		 */
 
@@ -73,7 +75,7 @@ namespace Freelancing.Controllers
 
 				//var baseUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host;
 				var currency = "usd"; // Currency code
-									  //var successUrl = $"{Request.Scheme}://{Request.Host}/api/Order/PaymentSuccess?session_id={{CHECKOUT_SESSION_ID}}&successurl={{successurl}}";
+									  //var successUrl = $"{Request.Scheme}://{Request.Host}/api/Order/paymentsucess?sessionId={session_id}?session_id={{CHECKOUT_SESSION_ID}}&successurl={{successurl}}";
 
 				var successUrl = redirectionurl;
 				var cancelUrl = $"{baseUrl}/api/Stripe/cancel";
@@ -118,7 +120,7 @@ namespace Freelancing.Controllers
 				var service = new Stripe.Checkout.SessionService();
 				var session = service.Create(options);
 				//var successUrl = $"{baseUrl}/Invoice/Create/{session.Id}";
-				//$"{Request.Scheme}://{Request.Host}/api/Order/PaymentSuccess?session_id={{session.Id}}&successurl={{successurl}}"
+				//$"{Request.Scheme}://{Request.Host}/api/Order/paymentsucess?sessionId={session_id}?session_id={{session.Id}}&successurl={{successurl}}"
 				options.SuccessUrl = redirectionurl;
 				session.SuccessUrl = redirectionurl;
 
@@ -140,7 +142,7 @@ namespace Freelancing.Controllers
 			catch (StripeException e)
 			{
 				_logger.LogError(e, "Stripe error");
-				return BadRequest(new { error = e.StripeError.Message });
+				return BadRequest(new { Message = e.StripeError.Message });
 			}
 		}
 		
@@ -157,7 +159,7 @@ namespace Freelancing.Controllers
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userId);
 			var client = _context.clients.FirstOrDefault(f => f.Id == userId);
 			if (freelancer == null&&client==null)
-				return NotFound("Freelancer not found.");
+				return BadRequest(new { Message = "Freelancer not found." });
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
@@ -179,7 +181,7 @@ namespace Freelancing.Controllers
 			freelancer.StripeAccountId = account.Id;
 			else
 			{
-				//client.StripeAccountId = account.Id;
+				client.StripeAccountId = account.Id;
 			}
 				_context.SaveChanges();
 
@@ -231,6 +233,7 @@ namespace Freelancing.Controllers
 		public IActionResult OnboardingComplete(string accountId, long amountInCents)
 		{
 			// User completed onboarding — now do the transfer
+			
 			return RedirectToAction(nameof(TransferToFreelancer), new { connectedAccountId = accountId, amountInCents });
 		}
 
@@ -249,15 +252,22 @@ namespace Freelancing.Controllers
 			var accountService = new AccountService();
 			var account = accountService.Get(connectedAccountId);
 			//var account = new AccountService().Get(connectedAccountId);
-			if (!account.Metadata.TryGetValue("userId", out var userid))
-				return BadRequest("userId not found in metadata");
+			if (!account.Metadata.TryGetValue("userId", out var userid)) {
+				userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				if(userid==null)
+				return BadRequest(new { Message = "userId not found in metadata" });
+			}
 			//var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancer = _context.freelancers.FirstOrDefault(f => f.Id == userid);
 			var client = _context.clients.FirstOrDefault(f => f.Id == userid);
 
-			if (freelancer == null || string.IsNullOrEmpty(freelancer.StripeAccountId))
+			if (freelancer != null && string.IsNullOrEmpty(freelancer.StripeAccountId))
 				//if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
-				return BadRequest(" not onboarded yet.");
+				return BadRequest(new { Message = " not onboarded yet." });
+
+			if (client != null && string.IsNullOrEmpty(client.StripeAccountId))
+				//if(client == null || string.IsNullOrEmpty(client.StripeAccountId))
+				return BadRequest(new { Message = " not onboarded yet." });
 
 			StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
@@ -282,23 +292,23 @@ namespace Freelancing.Controllers
 
 
 
-			//StripeConfiguration.ApiKey = _stripesettings.SecretKey;
+            //StripeConfiguration.ApiKey = _stripesettings.SecretKey;
 
-			//var account = new AccountService().Get(connectedAccountId);
-			//if (!account.PayoutsEnabled)
-			//	return BadRequest("Account not ready for payouts.");
+            //var account = new AccountService().Get(connectedAccountId);
+            //if (!account.PayoutsEnabled)
+            //	return BadRequest(new { Message ="Account not ready for payouts."});
 
-			////var transfer = new TransferService().Create(new TransferCreateOptions
-			////{
-			////	Amount = amountInCents,
-			////	Currency = "usd",
-			////	Destination = connectedAccountId,
-			////	Description = "Freelancer payout"
-			////});
-			////fake test mode 
+            ////var transfer = new TransferService().Create(new TransferCreateOptions
+            ////{
+            ////	Amount = amountInCents,
+            ////	Currency = "usd",
+            ////	Destination = connectedAccountId,
+            ////	Description = "Freelancer payout"
+            ////});
+            ////fake test mode 
 
-			//string session_id= Guid.NewGuid().ToString();
-			var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.Id, amount = amountInCents / 1000 });
+            //string session_id= Guid.NewGuid().ToString();
+            var url = Url.Action("Success", "FreelancerWithdrawal", new { session_id = intent.Id, amount = amountInCents / 1000 });
 			//// Redirect to frontend success page
 
 			return Redirect(url);

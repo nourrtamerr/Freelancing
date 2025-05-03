@@ -35,7 +35,7 @@ namespace Freelancing.Controllers
           //  var skills =await context.GetAllUserSkillAsync();
             if (skills == null )
             {
-                return NotFound();
+                return BadRequest(new { Message = "No skills found" });
             }
 
             var skillDtos = mapper.Map<List<UserSkillDto>>(skills);
@@ -51,7 +51,7 @@ namespace Freelancing.Controllers
             
             if (userSkillDto == null)
             {
-                return NotFound();
+                return BadRequest(new { Message = "Not found" });
             }
 
             var skillDtos = mapper.Map<UserSkillDto>(userSkillDto);
@@ -75,7 +75,7 @@ namespace Freelancing.Controllers
 
             if (id != userSkillDto.Id)
             {
-                return BadRequest("ID mismatch between route and body.");
+                return BadRequest(new { Message = "ID mismatch between route and body." });
             }
 
 

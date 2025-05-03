@@ -16,11 +16,11 @@ namespace Freelancing.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProposalConfirmationController(INotificationRepositoryService _notification,IConfiguration configuration, IClientService clientService, IMapper mapper, ApplicationDbContext context) : ControllerBase
+    public class ProposalConfirmationController(IChatRepositoryService _chats,INotificationRepositoryService _notification,IConfiguration configuration, IClientService clientService, IMapper mapper, ApplicationDbContext context) : ControllerBase
     {
 
 
-        private string Pay(int proposalId, PaymentMethod method, string TransactionId)
+        private async Task<string> Pay(int proposalId, PaymentMethod method, string TransactionId)
         {
             var proposal = context.Proposals.Include(p=>p.suggestedMilestones).FirstOrDefault(p => p.Id == proposalId);
             var project = context.project.FirstOrDefault(p => p.Id == proposal.ProjectId);
@@ -47,10 +47,37 @@ namespace Freelancing.Controllers
                 });
                 context.project.Update(project);
                 context.SaveChanges();
-
-				context.freelancers.FirstOrDefault(f => f.Id == (context.Proposals.Find(proposalId).FreelancerId)).RemainingNumberOfBids--;
+                var userid = (context.Proposals.Find(proposalId)?.FreelancerId);
+                var proposalss =await context.Proposals.Include(p=>p.Project).FirstOrDefaultAsync(p => p.Id == proposalId);
+                var clientid = proposalss.Project.ClientId;
+                var freelancer = context.freelancers.FirstOrDefault(f => f.Id == userid);
+                    if(freelancer is not null)
+                {
+                    freelancer.RemainingNumberOfBids--;
+                }
 				context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+				await _notification.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"Payment successful for proposal Proposal with id `{proposalId}` please check it",
+					UserId = clientid
+				});
+				await _notification.CreateNotificationAsync(new()
+				{
+					isRead = false,
+					Message = $"Your proposal with id `{proposalId}` has been confirmed, please check your projects at {configuration["AppSettings:AngularAppUrl"]}/myProjects",
+					UserId = proposal.FreelancerId
+				});
+				await _chats.CreateChatAsync(
+					new Chat()
+					{
+						SenderId = clientid,
+						ReceiverId = proposal.FreelancerId,
+						Message = $"I'm looking forward to work with you on the project you recently applied for ",
+						SentAt = DateTime.Now,
+						isRead = false
+					});
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={TransactionId}";
 
                 return url;
             }
@@ -73,7 +100,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -86,7 +113,7 @@ namespace Freelancing.Controllers
                     var Amount = proposal.suggestedMilestones.Sum(m => m.Amount);
                     if (C.Balance < Amount)
                     {
-                        return BadRequest("Not enough balance");
+                        return BadRequest(new { Message = "Not enough balance" });
                     }
                     C.Balance -= Amount;
 
@@ -117,12 +144,12 @@ namespace Freelancing.Controllers
                     //}
                     #endregion
 
-                    var url = Pay(proposalId, PaymentMethod.Balance, Guid.NewGuid().ToString());
+                    var url = await Pay(proposalId, PaymentMethod.Balance, Guid.NewGuid().ToString());
                     return Ok();
                 }
-                return BadRequest("proposal not found");
+                return BadRequest(new { Message = "proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
         }
 
 
@@ -138,7 +165,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -150,13 +177,13 @@ namespace Freelancing.Controllers
                 {
                     var Amount = proposal.suggestedMilestones.Sum(m => m.Amount);
                    
-                    var url = Pay(proposalId, PaymentMethod.CreditCard, card.Cardnumber + "," + card.cvv);
+                    var url = await Pay(proposalId, PaymentMethod.CreditCard, card.Cardnumber + "," + card.cvv);
                     //return Redirect(url);
                     return Ok();
                 }
-                return BadRequest("proposal not found");
+                return BadRequest(new { Message = "proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
         }
 
 
@@ -177,7 +204,7 @@ namespace Freelancing.Controllers
             var client = await context.clients.FirstOrDefaultAsync(c => c.Id == userId);
             if (client == null)
             {
-                return BadRequest("user not found");
+                return BadRequest(new { Message = "user not found" });
             }
 
             if (client is Client C)
@@ -194,9 +221,9 @@ namespace Freelancing.Controllers
 
                     
                 }
-                return BadRequest("Proposal not found");
+                return BadRequest(new { Message = "Proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
 
         }
 
@@ -217,7 +244,7 @@ namespace Freelancing.Controllers
 			if (!session.Metadata.TryGetValue("userId", out var userId))
 			{
                 // This userId is unique per session
-                return BadRequest("payment failed");
+                return BadRequest(new { Message = "payment failed" });
 			}
 			var client = context.clients.FirstOrDefault(c => c.Id == userId);
 
@@ -259,25 +286,14 @@ namespace Freelancing.Controllers
                     #endregion
 
 
-                    var url = Pay(proposalId, PaymentMethod.Stripe, session_id);
+                    var url = await Pay(proposalId, PaymentMethod.Stripe, session_id);
                    
-					await _notification.CreateNotificationAsync(new()
-					{
-						isRead = false,
-						Message = $"Payment successful for proposal Proposal with id `{proposalId}` please check it",
-						UserId = userId
-					});
-					await _notification.CreateNotificationAsync(new()
-					{
-						isRead = false,
-						Message = $"Your proposal with id `{proposalId}` has been confirmed, please check your projects at {configuration["AppSettings:AngularAppUrl"]}/myProjects",
-						UserId = proposal.FreelancerId
-					});
+					
 					return Redirect(url);
                 }
-                return BadRequest("Proposal not found");
+                return BadRequest(new { Message = "Proposal not found" });
             }
-            return BadRequest("Client not found");
+            return BadRequest(new { Message = "Client not found" });
 
 
         }
