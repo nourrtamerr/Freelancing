@@ -30,7 +30,7 @@ namespace Freelancing.RepositoryService
         {
             if (method == PaymentMethod.CreditCard)
             {
-                // يفترض أنك خزنت رقم الكارت كـ "1234567890123456,123"
+               
                 var cardInfo = transactionId.Split(',');
                 if (cardInfo.Length > 0)
                 {
@@ -41,7 +41,7 @@ namespace Freelancing.RepositoryService
                 return "****";
             }
 
-            // لو Stripe رجع الـ session id
+         
             return transactionId;
         }
 
