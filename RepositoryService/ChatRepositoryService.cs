@@ -97,6 +97,11 @@ namespace Freelancing.RepositoryService
             var chat = await _context.Chats.FindAsync(id);
             if (chat != null)
             {
+                if(chat.ImageUrl!=null)
+                {
+                    SaveImage.Delete(chat.ImageUrl);
+
+				}
                 _context.Chats.Remove(chat);
                 await _context.SaveChangesAsync();
             }

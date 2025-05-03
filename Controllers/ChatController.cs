@@ -222,30 +222,24 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> DeleteChat(int id)
         {
             var chat = await _chatRepository.GetChatByIdAsync(id);
-<<<<<<< HEAD
-            if (chat == null) return NotFound();
-
-            var participants = new List<string> { chat.SenderId, chat.ReceiverId };
-=======
 
             if (chat == null) return NotFound();
 
             var participants = new List<string> { chat.SenderId, chat.ReceiverId };
 
->>>>>>> 09cb897db750ed587fdee2c5765cd63cef4a41e7
             if (chat == null)
             {
                 return BadRequest(new { Message = "No Chats Found" });
             }
 
-            if (!string.IsNullOrEmpty(chat.ImageUrl))
-            {
-                var publicId = _cloudinaryService.ExtractPublicId(chat.ImageUrl);
-                if (!string.IsNullOrEmpty(publicId))
-                {
-                    await _cloudinaryService.DeleteImageAsync(publicId);
-                }
-            }
+            //if (!string.IsNullOrEmpty(chat.ImageUrl))
+            //{
+            //    var publicId = _cloudinaryService.ExtractPublicId(chat.ImageUrl);
+            //    if (!string.IsNullOrEmpty(publicId))
+            //    {
+            //        await _cloudinaryService.DeleteImageAsync(publicId);
+            //    }
+            //}
 
             await _chatRepository.DeleteChatAsync(id);
 
@@ -269,13 +263,18 @@ namespace Freelancing.Controllers
             }
 
             // Get all messages where the user is either the sender or receiver
-            var messages = await _context.Chats
+            var messagess = _context.Chats
                 .Where(m => m.SenderId == user.Id || m.ReceiverId == user.Id)
                 .Include(m => m.Sender)
                 .Include(m => m.Receiver)
-				.Where(m => m.Sender != null && m.Receiver != null)
-				.OrderByDescending(m => m.SentAt)
-                .ToListAsync();
+                .Where(m => m.Sender != null && m.Receiver != null)
+                .OrderByDescending(m => m.SentAt);
+
+                if(messagess.Count() == 0)
+			{
+				return Ok(new List<ChatDto>());
+			}
+			var messages= await messagess.ToListAsync();
 
             // Group messages by the other participant's ID and take the latest message
             var conversations = messages

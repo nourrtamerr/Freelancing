@@ -50,7 +50,7 @@ namespace Freelancing.Controllers
 
 				context.freelancers.FirstOrDefault(f => f.Id == (context.Proposals.Find(proposalId).FreelancerId)).RemainingNumberOfBids--;
 				context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/Payments";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={TransactionId}";
 
                 return url;
             }

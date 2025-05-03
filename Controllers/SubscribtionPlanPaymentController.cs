@@ -87,7 +87,7 @@ namespace Freelancing.Controllers
                 //var SuccessUrl = $"{baseUrl}/api/SubscribtionPlanPayment/Success?session_id={{CHECKOUT_SESSION_ID}}&proposalId={planId}&";
 
 
-                //var PaymentSuccessUrl = Url.ActionLink("PaymentSuccess", "SubscribtionPlanPayment", new
+                //var paymentsucessUrl = Url.ActionLink("paymentsucess", "SubscribtionPlanPayment", new
                 //{
                 //    sessionId = "{CHECKOUT_SESSION_ID}",
                 //    planid = plan.Id
@@ -125,8 +125,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromBalance")]
         public async Task<IActionResult> PaySubscriptionFromBalance(int planId)
         {
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
 
 
 
@@ -192,7 +192,7 @@ namespace Freelancing.Controllers
 
             // Redirect to the success page with the same transactionId
             //  var url = $"/payments/subscription-success?transactionId={transactionId}";
-            //  var url = Url.Action("PaymentSuccess", "SubscribtionPlanPayment", new { sessionId = transactionId, planid = plan.Id });
+            //  var url = Url.Action("paymentsucess", "SubscribtionPlanPayment", new { sessionId = transactionId, planid = plan.Id });
             //  return Redirect(url);
             return Ok()
 ;        }
@@ -211,8 +211,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromCard")]
         public async Task<IActionResult> PaySubscriptionFromCard(int planId, [FromQuery] CardPaymentDTO card)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
-           // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -303,8 +303,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromStripe")]
         public async Task<IActionResult> PaySubscriptionFromStripe(int planId)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
             // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -350,7 +350,7 @@ namespace Freelancing.Controllers
 
 
         [HttpGet("payment-success")]
-        public async Task <IActionResult> PaymentSuccess(string sessionId, int planid)
+        public async Task <IActionResult> paymentsucess(string sessionId, int planid)
         {
             try
             {
@@ -435,6 +435,7 @@ namespace Freelancing.Controllers
                 // Handle successful payment here (e.g., update user subscription status)
 
                 // You can also redirect to the success URL if needed
+                return Redirect($"http://localhost:4200/paymentsucess?sessionId={sessionId}");
                 return Ok(new { Message = "Payment successful.", session });
             }
             catch (Exception ex)
