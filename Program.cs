@@ -14,6 +14,7 @@ using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
 using static Freelancing.SignalR.ChatHub;
+using DotNetEnv;
 
 
 namespace Freelancing
@@ -22,7 +23,10 @@ namespace Freelancing
 	{
 		public static async Task Main(string[] args)
 		{
-			var builder = WebApplication.CreateBuilder(args);
+
+            DotNetEnv.Env.Load();
+
+            var builder = WebApplication.CreateBuilder(args);
 
 			builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddSignalR();
@@ -32,11 +36,15 @@ namespace Freelancing
                 options.AddPolicy("AllowAll", policy =>
                 {
 					policy
-						//.AllowAnyOrigin()
-						.WithOrigins("http://localhost:4200")
+                         //.AllowAnyOrigin()
+                         .WithOrigins(
+                "http://localhost:4200",
+                "http://localhost:60663",
+                "http://127.0.0.1:4200"
+            )
 
-						//  .WithOrigins("http://127.0.0.1:4200")
-						.AllowAnyMethod()
+                        //  .WithOrigins("http://127.0.0.1:4200")
+                        .AllowAnyMethod()
 						.AllowAnyHeader()
 						.AllowCredentials();
                         //.SetIsOriginAllowed(_ => true); 
