@@ -9,7 +9,6 @@ namespace Freelancing.DTOs.ProposalDTOS
 
 		public string CoverLetter { get; set; }
 		public decimal? Price { get; set; } // nullable for fixedpriceprojects
-
 		public int ProjectId { set; get; }
 		public string FreelancerName { get; set; }
 		public string FreelancerProfilePicture { set; get; }

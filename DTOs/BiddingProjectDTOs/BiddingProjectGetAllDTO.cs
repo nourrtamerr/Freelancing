@@ -19,6 +19,7 @@
         public int NumOfBids { get; set; }
         public bool ClientIsVerified { get; set; }
         public int ExpectedDuration { get; set; }
+        public decimal? currentBid { set; get; }
         public DateTime BiddingStartDate { get; set; }
         public DateTime BiddingEndDate { get; set; }
 

@@ -23,7 +23,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllCertificates()
         {
             var certificateslist = await _certificatesService.GetAllUserCertificatesAsync();
-            if (certificateslist == null || certificateslist.Count() == 0)
+            if (certificateslist == null )
             {
                 return BadRequest(new { Message = "there is no certificates found" });
             }

@@ -332,8 +332,9 @@ namespace Freelancing.Helpers
                 .ForMember(dest => dest.FreelancersubscriptionPlan, opt => opt.Ignore())
                 .ForMember(dest => dest.FreelancerTotalNumber, opt => opt.Ignore())
                 .ForMember(dest => dest.FreelancerRemainingNumberOfBids, opt => opt.Ignore())
-                .ForMember(dest=>dest.FreelancerId, opt=>opt.MapFrom(src=>src.FreelancerId));
-
+                .ForMember(dest => dest.FreelancerId, opt => opt.MapFrom(src => src.FreelancerId))
+                .ForMember(dest => dest.currentBid, opt => opt.Ignore());
+                
 
 
             //.ForMember(dest=>dest.projectSkills, opt=>opt.Ignore())

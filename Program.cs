@@ -13,8 +13,12 @@ using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
+
+using Microsoft.ML;
+
 using static Freelancing.SignalR.ChatHub;
 using DotNetEnv;
+
 
 
 namespace Freelancing
@@ -79,7 +83,7 @@ namespace Freelancing
 				{
 					OnMessageReceived = context =>
 					{
-						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification"))
+						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification")|| context.Request.Path.StartsWithSegments("/biddingHub"))
 						{
 							var accessToken = context.Request.Query["access_token"];
 							context.Token = accessToken;
@@ -184,7 +188,7 @@ namespace Freelancing
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
             builder.Services.AddScoped<CloudinaryService>();
 
-
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
             builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
@@ -304,6 +308,7 @@ namespace Freelancing
 			app.MapControllers();
 			app.MapHub<ChatHub>("/chathub");
 			app.MapHub<NotificationHub>("/notification");
+			app.MapHub<BiddingHub>("/biddingHub");
 			//app.MapHub<NotificationHub>("/chathub");
 			app.Run();
 		}

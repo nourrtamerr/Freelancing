@@ -17,8 +17,8 @@
         public double ClientRating { get; set; }
 
         public string ClientId { get; set; }
-
-        public DateTime BiddingEndDate { get; set; }
+		public DateTime BiddingStartDate { get; set; }
+		public DateTime BiddingEndDate { get; set; }
         public bool ClientIsverified { get; set; }
         public string ClientCountry { get; set; }
         public string ClientCity { get; set; }
@@ -35,7 +35,8 @@
         public int ExpectedDuration { get; set; }
 
         public string? FreelancerId { get; set; }
+		public decimal? currentBid { set; get; }
 
 
-    }
+	}
 }
