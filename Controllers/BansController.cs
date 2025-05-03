@@ -86,11 +86,10 @@ namespace Freelancing.Controllers
             {
                 return BadRequest(new { Message = "No Bans Found" });
             }
-
-            var updatedBan = mapper.Map<Ban>(banDto);
-            updatedBan.Id = id;
-            await banService.UpdateBanAsync(updatedBan);
-            var updatedBanDto = mapper.Map<BanDto>(updatedBan);
+            mapper.Map(banDto, existingBan);
+            //updatedBan.Id = id;
+            await banService.UpdateBanAsync(existingBan);
+            var updatedBanDto = mapper.Map<BanDto>(existingBan);
             return Ok(updatedBanDto);
         }
 

@@ -100,6 +100,12 @@ namespace Freelancing.SignalR
         }
 
 
+        public async Task SendConversationDeleted(string userId1, string userId2)
+        {
+            await Clients.Users(userId1, userId2)
+                .SendAsync("ConversationDeleted", userId1, userId2);
+        }
+
         public class CustomUserIdProvider : IUserIdProvider
         {
             public string GetUserId(HubConnectionContext connection)
@@ -122,13 +128,48 @@ namespace Freelancing.SignalR
                 .SendAsync("MessageUpdated", chatDto);
         }
 
-      
+
         public async Task SendDeleteNotification(int messageId, string senderId, string receiverId)
         {
             await Clients.Users(senderId, receiverId)
                 .SendAsync("MessageDeleted", messageId);
         }
 
+
+        public async Task InitiateVideoCall(string receiverId)
+        {
+            var senderId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(receiverId) || string.IsNullOrEmpty(senderId))
+            {
+                throw new HubException("Invalid user IDs");
+            }
+
+            await Clients.User(receiverId).SendAsync("ReceiveVideoCall", senderId);
+        }
+
+        public async Task SendOffer(string receiverId, object offer)
+        {
+            var senderId = Context.UserIdentifier;
+            await Clients.User(receiverId).SendAsync("ReceiveOffer", senderId, offer);
+        }
+
+        public async Task SendAnswer(string receiverId, object answer)
+        {
+            var senderId = Context.UserIdentifier;
+            await Clients.User(receiverId).SendAsync("ReceiveAnswer", senderId, answer);
+        }
+
+        public async Task SendIceCandidate(string receiverId, object candidate)
+        {
+            var senderId = Context.UserIdentifier;
+            await Clients.User(receiverId).SendAsync("ReceiveIceCandidate", senderId, candidate);
+        }
+
+        public async Task EndVideoCall(string receiverId)
+        {
+            var senderId = Context.UserIdentifier;
+            await Clients.Users(senderId, receiverId).SendAsync("VideoCallEnded");
+        }
 
     }
 }
