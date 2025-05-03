@@ -56,8 +56,9 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					ClientId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
-					PaymentMethod = PaymentMethod.CreditCard
-				};
+					PaymentMethod = PaymentMethod.CreditCard,
+                   // TransactionType = TransactionType.Withdrawal
+                };
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
@@ -94,8 +95,9 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					FreelancerId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
-					PaymentMethod = PaymentMethod.Stripe
-				};
+					PaymentMethod = PaymentMethod.Stripe,
+					//TransactionType = TransactionType.AddFunds
+                };
 				_context.Funds.Add(FUND);
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();

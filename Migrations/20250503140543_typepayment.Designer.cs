@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503140543_typepayment")]
+    partial class typepayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,9 +200,6 @@ namespace Freelancing.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
@@ -1034,6 +1034,9 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1227,7 +1230,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "a56841bd-f0a1-4de3-8448-d93264cb8777",
+                            ConcurrencyStamp = "10aa621a-4550-4f5c-9a04-6f7992b1213b",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1236,11 +1239,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA8W/aOQhayAL9QhiZoQmqVyfjtd9KIV8gvjSUIbQRuTeuySHr2vP10rXvfP9vczoA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH/7BAQUlTIlySWL2zbESFs83O/y2stg4IKABtKKsL+or0r54AkAN29/l6QXHuE+8w==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 18, 45, 3, 597, DateTimeKind.Local).AddTicks(9548),
-                            SecurityStamp = "4a4f5393-9523-48a3-a6f8-ce7572cec738",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 17, 5, 42, 599, DateTimeKind.Local).AddTicks(2757),
+                            SecurityStamp = "2b5a1032-7714-4e3e-b255-bb169576e14f",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",

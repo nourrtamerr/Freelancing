@@ -7,6 +7,10 @@ public abstract class Payment
     public string TransactionId { get; set; }
     public bool IsDeleted { get; set; } = false;
 
+    public string UserId { get; set; }
+   // public TransactionType TransactionType { get; set; }
+   
+
 }
 public enum PaymentMethod
 {
@@ -14,4 +18,4 @@ public enum PaymentMethod
 	Stripe,
     Balance
 }
-	//Paypal
+
