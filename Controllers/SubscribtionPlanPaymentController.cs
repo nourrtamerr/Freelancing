@@ -131,8 +131,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromBalance")]
         public async Task<IActionResult> PaySubscriptionFromBalance(int planId)
         {
-          //  var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+          //  var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
 
 
 
@@ -217,8 +217,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromCard")]
         public async Task<IActionResult> PaySubscriptionFromCard(int planId, [FromQuery] CardPaymentDTO card)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
-          //  var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           // var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -309,8 +309,8 @@ namespace Freelancing.Controllers
         [HttpGet("PaySubscriptionFromStripe")]
         public async Task<IActionResult> PaySubscriptionFromStripe(int planId)
         {
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
             // var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

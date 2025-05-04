@@ -23,8 +23,8 @@ namespace Freelancing.Controllers
         public IActionResult GetCurrentSubscription()
         {
             // Retrieve the UserId from the claims (assuming 'ClientType' stores the UserId)
-          //  var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "4be59d6d-28bd-4a39-93eb-33f304792d84";
 
 
             if (string.IsNullOrEmpty(userId))
