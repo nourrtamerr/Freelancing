@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503231612_rev")]
+    partial class rev
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -728,6 +731,12 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Sentiment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("SentimentScore")
+                        .HasColumnType("real");
+
                     b.HasKey("id");
 
                     b.HasIndex("ProjectId");
@@ -1245,7 +1254,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "de232101-dee3-4e2a-ad74-e18ff84349ad",
+                            ConcurrencyStamp = "d64ae1aa-d0cf-4a6d-9dd2-6fe34ead849b",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1254,11 +1263,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIQntn7hUwvb1iaPww4ai3VgRoljjkWfHs6sm6dzlC0H3E3QlGahAf9tD4Dw+wVsbg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGs7lyT7yKKDe0fTnGEyTAXBFoCvsynMX+NVQjCqzgNaFpE1urMHTaox8pVJpaOGsQ==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 4, 4, 29, 81, DateTimeKind.Local).AddTicks(4776),
-                            SecurityStamp = "d8793873-7dbd-4334-bc17-07cd81e10582",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 2, 16, 9, 416, DateTimeKind.Local).AddTicks(4596),
+                            SecurityStamp = "f6aaa64f-d489-46ed-afa9-023016099fef",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1339,8 +1348,6 @@ namespace Freelancing.Migrations
 
                     b.Property<int>("ProposalId")
                         .HasColumnType("int");
-
-                    b.HasIndex("ProposalId");
 
                     b.ToTable("ClientProposalPayment", (string)null);
                 });
@@ -1902,14 +1909,6 @@ namespace Freelancing.Migrations
                         .HasForeignKey("Freelancing.Models.ClientProposalPayment", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Freelancing.Models.Proposal", "Proposal")
-                        .WithMany()
-                        .HasForeignKey("ProposalId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>

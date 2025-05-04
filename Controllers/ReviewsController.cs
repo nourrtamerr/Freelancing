@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Freelancing.DTOs;
 using Freelancing.Filters;
+using Freelancing.IRepositoryService;
 using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,15 @@ namespace Freelancing.Controllers
         private readonly IMapper mapper;
         private readonly ApplicationDbContext _context;
         private readonly INotificationRepositoryService _notifications;
+     
 
-		public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper, ApplicationDbContext context)
+        public ReviewsController(INotificationRepositoryService notifications,IReviewRepositoryService reviewService, IMapper mapper, ApplicationDbContext context)
         {
             this.reviewService = reviewService;
             this.mapper = mapper;
             _context = context;
             _notifications = notifications;
-
+           
 		}
 
         [HttpGet]
@@ -35,11 +37,11 @@ namespace Freelancing.Controllers
                 var y = _context.Reviews;
 
 
-				var reviews = await _context.Reviews.Include(r => r.Reviewee).Include(r => r.Reviewer).ToListAsync();
+                var reviews = await _context.Reviews.Include(r => r.Reviewee).Include(r => r.Reviewer).ToListAsync();
                 var reviewsDto = mapper.Map<List<ReviewDto>>(reviews);
                 return Ok(reviewsDto);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -62,7 +64,7 @@ namespace Freelancing.Controllers
         public async Task<ActionResult<List<GetReviewByRevieweeIdDto>>> GetReviewsByRevieweeId(string revieweeId)
         {
             var reviews = await reviewService.GetReviewsByRevieweeIdAsync(revieweeId);
-            if (reviews == null )
+            if (reviews == null)
             {
                 return BadRequest(new { Message = "No Reviews Found" });
             }
@@ -71,37 +73,38 @@ namespace Freelancing.Controllers
         }
 
         [HttpGet("reviewer/{reviewerId}")]
-        public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId) {
+        public async Task<ActionResult<List<ReviewDto>>> GetReviewsByReviewerId(string reviewerId)
+        {
 
             var reviews = await reviewService.GetReviewsByReviewerIdAsync(reviewerId);
-            if (reviews == null )
+            if (reviews == null)
             {
                 return BadRequest(new { Message = "No reviews Found" });
-			}
+            }
             var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
             return Ok(reviewDtos);
         }
-		[HttpGet("project/{projectId}")]
-		public async Task<ActionResult<List<ReviewDto>>> GetReviewsByProjectId(int projectId)
-		{
+        [HttpGet("project/{projectId}")]
+        public async Task<ActionResult<List<ReviewDto>>> GetReviewsByProjectId(int projectId)
+        {
 
-			var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
-			if (reviews == null )
-			{
-				return BadRequest(new { Message = "No reviews Found" });
-			}
-			var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
-			return Ok(reviewDtos);
-		}
+            var reviews = await reviewService.GetReviewsByProjectIdAsync(projectId);
+            if (reviews == null)
+            {
+                return BadRequest(new { Message = "No reviews Found" });
+            }
+            var reviewDtos = mapper.Map<List<ReviewDto>>(reviews);
+            return Ok(reviewDtos);
+        }
 
-		[HttpPost]
+        [HttpPost]
         public async Task<ActionResult<ReviewDto>> CreateReview([FromBody] ReviewDto reviewDto)
         {
             if (reviewDto == null)
             {
                 return BadRequest(new { Message = "Not Found" });
             }
-
+          // var sentiment = await sentimentService.AnalyzeAsync(reviewDto.Comment);
             var review = mapper.Map<Review>(reviewDto);
             review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);
