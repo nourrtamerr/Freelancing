@@ -48,7 +48,7 @@ namespace Freelancing.RepositoryService
 				return null;
 			}
 			var proposalDto = _mapper.Map<ProposalViewDTO>(proposal);
-
+			proposalDto.Price = proposal.suggestedMilestones.Sum(m => m.Amount);
 			return proposalDto;
 
 

@@ -1050,6 +1050,7 @@ namespace Freelancing.Controllers
 						EmailConfirmed = true,
 						RefreshToken = JWTHelpers.CreateRefreshToken(),
 						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+						subscriptionPlanId = 1
 					};
 					while((await _userManager.FindByNameAsync(user.UserName)is not null))
 						{
@@ -1070,6 +1071,7 @@ namespace Freelancing.Controllers
 						EmailConfirmed = true,
 						RefreshToken = JWTHelpers.CreateRefreshToken(),
 						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+						subscriptionPlanId = 1
 
 					};
 				while ((await _userManager.FindByNameAsync(user.UserName) is not null))
@@ -1103,7 +1105,14 @@ namespace Freelancing.Controllers
 
 				await _userManager.UpdateAsync(user);
 
-
+				if(user is Client)
+				{
+					await _userManager.AddToRoleAsync(user,"Client");
+				}
+				else
+				{
+					await _userManager.AddToRoleAsync(user, "Freelancer");
+				}
 
 				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/login");
             }
