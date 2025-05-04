@@ -193,6 +193,7 @@ namespace Freelancing.Helpers
             CreateMap<PortofolioProjectImage, PortofolioProjectImageDTO>();
             CreateMap<PortofolioProjectImageDTO, PortofolioProjectImage>();
 
+            CreateMap<Review, ReviewDto>().ReverseMap();
 
 
             CreateMap<PortofolioProject, PortofolioProjectDTO>()

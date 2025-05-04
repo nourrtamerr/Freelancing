@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Freelancing.Migrations
 {
     /// <inheritdoc />
-    public partial class standalone : Migration
+    public partial class sentimentscore : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,8 +79,7 @@ namespace Freelancing.Migrations
                     PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -177,24 +176,6 @@ namespace Freelancing.Migrations
                         column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientProposalPayment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    ProposalId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientProposalPayment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClientProposalPayment_Payments_Id",
-                        column: x => x.Id,
-                        principalTable: "Payments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -964,7 +945,9 @@ namespace Freelancing.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RevieweeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ReviewerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    Sentiment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SentimentScore = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -993,7 +976,8 @@ namespace Freelancing.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MilestoneId = table.Column<int>(type: "int", nullable: false),
-                    Complaint = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Complaint = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isResolved = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1045,6 +1029,29 @@ namespace Freelancing.Migrations
                         principalTable: "Payments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClientProposalPayment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    ProposalId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientProposalPayment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClientProposalPayment_Payments_Id",
+                        column: x => x.Id,
+                        principalTable: "Payments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClientProposalPayment_Proposals_ProposalId",
+                        column: x => x.ProposalId,
+                        principalTable: "Proposals",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1100,7 +1107,7 @@ namespace Freelancing.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AccountCreationDate", "CityId", "ConcurrencyStamp", "DateOfBirth", "Description", "Email", "EmailConfirmed", "IsVerified", "LockoutEnabled", "LockoutEnd", "NationalId", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "RefreshToken", "RefreshTokenExpiryDate", "SecurityStamp", "Title", "TwoFactorEnabled", "UserName", "firstname", "isDeleted", "lastname" },
-                values: new object[] { "1", 0, new DateOnly(1, 1, 1), 1, "76b2e7f8-fccf-4a30-b43d-c365fc8760b0", new DateOnly(1, 1, 1), "", "admin@example.com", true, false, false, null, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEAmtBSpnFdeSdxWu4YMXh3sGvx4apxKA8EcRmE0HVyIm6upIZjT/3AKZmRKnqv2M/Q==", null, false, null, "", new DateTime(2025, 5, 3, 22, 51, 25, 152, DateTimeKind.Local).AddTicks(7274), "e65e0397-a665-4003-9f44-35b59de61462", "Admin", false, "admin", "Admin", false, "User" });
+                values: new object[] { "1", 0, new DateOnly(1, 1, 1), 1, "a2cab11a-7546-416d-89ea-a3f5fd3067bc", new DateOnly(1, 1, 1), "", "admin@example.com", true, false, false, null, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==", null, false, null, "", new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107), "f0626891-0b94-4557-93ce-68120d564a64", "Admin", false, "admin", "Admin", false, "User" });
 
             migrationBuilder.InsertData(
                 table: "Admins",
@@ -1175,6 +1182,11 @@ namespace Freelancing.Migrations
                 name: "IX_Cities_CountryId",
                 table: "Cities",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientProposalPayment_ProposalId",
+                table: "ClientProposalPayment",
+                column: "ProposalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_clients_subscriptionPlanId",

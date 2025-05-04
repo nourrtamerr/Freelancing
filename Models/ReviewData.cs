@@ -9,5 +9,6 @@ namespace Freelancing.Models
 
         [LoadColumn(1)]  // Index 1: Label column from CSV
         public bool Label { get; set; }
+        
     }
 }

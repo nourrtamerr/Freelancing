@@ -731,11 +731,11 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SentimentPrediction")
+                    b.Property<string>("Sentiment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("SentimentProbability")
-                        .HasColumnType("real");
+                    b.Property<double?>("SentimentScore")
+                        .HasColumnType("float");
 
                     b.HasKey("id");
 
@@ -1065,9 +1065,6 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1257,7 +1254,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "01636bf3-d772-492f-956e-caad6312a329",
+                            ConcurrencyStamp = "a2cab11a-7546-416d-89ea-a3f5fd3067bc",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1266,11 +1263,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC1lby1x1+a+xoFOrVnjNqiJZZWCijYrm2V+vzRtvmcSF0xRK+NrbqD3/liceO3Ppw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 3, 1, 50, 618, DateTimeKind.Local).AddTicks(8704),
-                            SecurityStamp = "cbf0160e-2425-4138-8e88-c6a07d6cdbd5",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107),
+                            SecurityStamp = "f0626891-0b94-4557-93ce-68120d564a64",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",

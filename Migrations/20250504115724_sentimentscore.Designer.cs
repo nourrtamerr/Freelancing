@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250503205005_mm")]
-    partial class mm
+    [Migration("20250504115724_sentimentscore")]
+    partial class sentimentscore
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -347,6 +347,31 @@ namespace Freelancing.Migrations
                             Name = "temp Country",
                             isDeleted = false
                         });
+                });
+
+            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("Complaint")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MilestoneId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("isResolved")
+                        .HasColumnType("bit");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("MilestoneId");
+
+                    b.ToTable("Disputes");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -709,11 +734,11 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SentimentPrediction")
+                    b.Property<string>("Sentiment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("SentimentProbability")
-                        .HasColumnType("real");
+                    b.Property<double?>("SentimentScore")
+                        .HasColumnType("float");
 
                     b.HasKey("id");
 
@@ -1232,7 +1257,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "1fb71671-9148-428a-a9de-65e8131e197e",
+                            ConcurrencyStamp = "a2cab11a-7546-416d-89ea-a3f5fd3067bc",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1241,11 +1266,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELsEymShHRhtvoe/eGEgoBHkKfmwyuvixSsczIj7rgvqqrJ6cjSY9Us59jBqRk6mpg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 23, 50, 3, 783, DateTimeKind.Local).AddTicks(6116),
-                            SecurityStamp = "06b3135f-299c-4f39-a83f-2af5cf4ccffd",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107),
+                            SecurityStamp = "f0626891-0b94-4557-93ce-68120d564a64",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1326,6 +1351,8 @@ namespace Freelancing.Migrations
 
                     b.Property<int>("ProposalId")
                         .HasColumnType("int");
+
+                    b.HasIndex("ProposalId");
 
                     b.ToTable("ClientProposalPayment", (string)null);
                 });
@@ -1475,6 +1502,17 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
+                {
+                    b.HasOne("Milestone", "milestone")
+                        .WithMany("Disputes")
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("milestone");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -1876,6 +1914,14 @@ namespace Freelancing.Migrations
                         .HasForeignKey("Freelancing.Models.ClientProposalPayment", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Freelancing.Models.Proposal", "Proposal")
+                        .WithMany()
+                        .HasForeignKey("ProposalId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>
@@ -1992,6 +2038,8 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Milestone", b =>
                 {
+                    b.Navigation("Disputes");
+
                     b.Navigation("MilestoneFiles");
 
                     b.Navigation("MilestonePayment")
