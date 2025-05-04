@@ -36,7 +36,8 @@
         public int ExpectedDuration { get; set; }
 
         public string? FreelancerId { get; set; }
+		public decimal? currentBid { set; get; }
 
 
-    }
+	}
 }

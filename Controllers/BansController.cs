@@ -4,6 +4,7 @@ using Freelancing.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Freelancing.Controllers
 {
@@ -72,6 +73,10 @@ namespace Freelancing.Controllers
             );
         }
         [HttpPut("{id}")]
+
+
+
+
         public async Task<ActionResult<BanDto>> UpdateBan(int id, [FromBody] BanDto banDto)
         {
             if (banDto is null)
@@ -79,14 +84,16 @@ namespace Freelancing.Controllers
             var existingBan = await banService.GetBanByIdAsync(id);
             if (existingBan == null)
             {
-                return BadRequest(new { Message ="No Bans Found"});
+                return BadRequest(new { Message = "No Bans Found" });
             }
-            var updatedBan = mapper.Map<Ban>(banDto);
-            updatedBan.Id = id;
-            await banService.UpdateBanAsync(updatedBan);
-            var updatedBanDto = mapper.Map<BanDto>(updatedBan);
+            mapper.Map(banDto, existingBan);
+            //updatedBan.Id = id;
+            await banService.UpdateBanAsync(existingBan);
+            var updatedBanDto = mapper.Map<BanDto>(existingBan);
             return Ok(updatedBanDto);
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBan(int id)

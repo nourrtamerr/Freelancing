@@ -29,9 +29,20 @@ namespace Freelancing.Controllers
         [HttpGet]
         public async Task<ActionResult<ReviewDto>> GetAllReviews()
         {
-            var reviews = await _context.Reviews.Include(r=>r.Reviewee).Include(r=>r.Reviewer).ToListAsync();
-            var reviewsDto = mapper.Map<List<ReviewDto>>(reviews);
-            return Ok(reviewsDto);
+            try
+            {
+                var x = _context;
+                var y = _context.Reviews;
+
+
+				var reviews = await _context.Reviews.Include(r => r.Reviewee).Include(r => r.Reviewer).ToListAsync();
+                var reviewsDto = mapper.Map<List<ReviewDto>>(reviews);
+                return Ok(reviewsDto);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
 
@@ -90,6 +101,7 @@ namespace Freelancing.Controllers
             {
                 return BadRequest(new { Message = "Not Found" });
             }
+
             var review = mapper.Map<Review>(reviewDto);
             review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);

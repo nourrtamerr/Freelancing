@@ -55,10 +55,14 @@ namespace Freelancing.Controllers
 			{
 				projects = projects.Where(p => p.FreelancerId == userId).ToList();
 			}
+            else if (user.GetType() == typeof(Admin))
+            {
+                return Ok(new List<GetAllFixedProjectDto>());
+            }
 			else
-			{
-				return BadRequest(new { Message = "Invalid user type." });
-			}
+            {
+                return BadRequest(new { Message = "Invalid user type." });
+            }
             return Ok(projects.Select(p => new GetAllFixedProjectDto
             {
                 Id = p.Id,

@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.Controllers
 {
@@ -13,12 +14,14 @@ namespace Freelancing.Controllers
 	{
 		private readonly ICityService _cityService;
 		private readonly ICountryService _countryservice;
+        private readonly ApplicationDbContext _context;
 
-		public CityController(ICityService cityService, ICountryService countryService)
+        public CityController(ICityService cityService, ICountryService countryService ,ApplicationDbContext context)
 		{
 			_cityService = cityService;
 			_countryservice = countryService;
-		}
+            this._context = context;
+        }
 		[HttpGet]
 		public IActionResult Get()
 		{
@@ -54,31 +57,42 @@ namespace Freelancing.Controllers
 			return Ok(new { Message = "Created" });
 		}
 
-		//// GET: Countries/Edit/5
-		[HttpPut]
-		//[Authorize(Roles = "Admin")]
-		public IActionResult Edit(CityViewModel vm)
-		{
+        //// GET: Countries/Edit/5
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Edit(int id, [FromBody] CityViewModel vm)
+        {
+            if (id != vm.Id)
+            {
+                return BadRequest(new { Message = "ID mismatch" });
+            }
 
-			if (vm.Id is null)
-			{
-				return BadRequest(new { Message = "Not Found" });
-			}
-			var country = _cityService.GetById((int)vm.Id);
+            var city = _cityService.GetById(id);
+            if (city == null)
+            {
+                return NotFound(new { Message = "City not found" });
+            }
+
+            var country = _context.Countries.Find(vm.CountryId);
+            if (country == null)
+            {
+                return BadRequest(new { Message = "Invalid Country" });
+            }
+
+            try
+            {
+                _cityService.Update(vm);
+                return Ok(new { Message = "City updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while updating the city", Details = ex.Message });
+            }
+        }
 
 
-			if (country == null)
-			{
-				return BadRequest(new { Message = "Country Not Found" });
-			}
-			_cityService.Update(vm);
-			return Ok(new { Message = "Updated" });
-		}
-
-
-
-		//// POST: Countries/Delete/5
-		[HttpDelete]
+        //// POST: Countries/Delete/5
+        [HttpDelete]
 		[Authorize(Roles = "Admin")]
 		public IActionResult Delete(int id)
 		{
