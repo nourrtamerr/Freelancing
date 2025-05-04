@@ -2,7 +2,7 @@
 
 namespace Freelancing.Services
 {
-    public class AIService:IAIService
+    public class AIService : IAIService
     {
         private readonly HttpClient _httpClient;
 
