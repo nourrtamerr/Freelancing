@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250427000506_ProjectIdNonNullable")]
-    partial class ProjectIdNonNullable
+    [Migration("20250503205126_standalone")]
+    partial class standalone
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -201,6 +201,9 @@ namespace Freelancing.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
@@ -346,6 +349,28 @@ namespace Freelancing.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("Complaint")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MilestoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("MilestoneId");
+
+                    b.ToTable("Disputes");
+                });
+
             modelBuilder.Entity("Freelancing.Models.Education", b =>
                 {
                     b.Property<int>("Id")
@@ -462,6 +487,30 @@ namespace Freelancing.Migrations
                     b.HasIndex("freelancerId");
 
                     b.ToTable("freelancerLanguages");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.FreelancerWishlist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FreelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FreelancerId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("FreelancerWishlists");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestoneFile", b =>
@@ -1010,6 +1059,9 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1199,7 +1251,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "097a6efb-5b41-462a-9b45-0e6102fd2793",
+                            ConcurrencyStamp = "76b2e7f8-fccf-4a30-b43d-c365fc8760b0",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1208,11 +1260,12 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAe7TOlV/qE4Xj+rR8lG4+X/geXAh4osZsPqkVxC3sunNlYxU0fe6xzDulcMh5o3/g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAmtBSpnFdeSdxWu4YMXh3sGvx4apxKA8EcRmE0HVyIm6upIZjT/3AKZmRKnqv2M/Q==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 4, 27, 3, 5, 5, 899, DateTimeKind.Local).AddTicks(4044),
-                            SecurityStamp = "8ca6ffac-e23c-44c2-8ede-4cabe2559ba9",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 22, 51, 25, 152, DateTimeKind.Local).AddTicks(7274),
+                            SecurityStamp = "e65e0397-a665-4003-9f44-35b59de61462",
+                            Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
                             firstname = "Admin",
@@ -1443,6 +1496,17 @@ namespace Freelancing.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
+                {
+                    b.HasOne("Milestone", "milestone")
+                        .WithMany("Disputes")
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("milestone");
+                });
+
             modelBuilder.Entity("Freelancing.Models.Education", b =>
                 {
                     b.HasOne("Freelancing.Models.Freelancer", "Freelancer")
@@ -1474,6 +1538,25 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("freelancer");
+                });
+
+            modelBuilder.Entity("Freelancing.Models.FreelancerWishlist", b =>
+                {
+                    b.HasOne("Freelancing.Models.Freelancer", "Freelancer")
+                        .WithMany()
+                        .HasForeignKey("FreelancerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Freelancer");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestoneFile", b =>
@@ -1939,6 +2022,8 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Milestone", b =>
                 {
+                    b.Navigation("Disputes");
+
                     b.Navigation("MilestoneFiles");
 
                     b.Navigation("MilestonePayment")

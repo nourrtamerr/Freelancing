@@ -6,38 +6,39 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Freelancing.Migrations
 {
     /// <inheritdoc />
-    public partial class freelancerdescription : Migration
+    public partial class disputes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Description",
-                table: "freelancers",
-                type: "nvarchar(max)",
-                nullable: true);
+            migrationBuilder.AddColumn<bool>(
+                name: "isResolved",
+                table: "Disputes",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "1",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "RefreshTokenExpiryDate", "SecurityStamp" },
-                values: new object[] { "c8a044e4-b342-496c-be03-b27f5772703b", "AQAAAAIAAYagAAAAEJczzlGWLt3BbmlKZYAymXzujq1CRf1l0P1TFHqyLBn35h9d1GYKXTguQ+NmOB9DEA==", new DateTime(2025, 4, 23, 17, 40, 29, 509, DateTimeKind.Local).AddTicks(5300), "9be57ae2-82d5-4541-b4b2-4523e40e5f73" });
+                values: new object[] { "c5379df3-74d9-4897-8d49-3efb167f9ac2", "AQAAAAIAAYagAAAAEO05zvepo7s/4e9I65uSA+5H78mpnLRGzEpI70W+D1cwVMi+VrNjBw1b6j35YMje0A==", new DateTime(2025, 5, 4, 1, 47, 4, 49, DateTimeKind.Local).AddTicks(9439), "93ffaa90-aaa7-4d73-b982-11bd9049066b" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Description",
-                table: "freelancers");
+                name: "isResolved",
+                table: "Disputes");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "1",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "RefreshTokenExpiryDate", "SecurityStamp" },
-                values: new object[] { "3c78089f-d7e4-4e05-bf9e-b82d1a1de373", "AQAAAAIAAYagAAAAECSjevHPE/SdOLxC1FKQQoktgnxJLPirsNQxI/Ey2tqsG0QAp2RuaRhsnykw+dbLkg==", new DateTime(2025, 4, 18, 0, 24, 25, 557, DateTimeKind.Local).AddTicks(5303), "defe2304-2681-468c-85d1-ac957d40273f" });
+                values: new object[] { "76b2e7f8-fccf-4a30-b43d-c365fc8760b0", "AQAAAAIAAYagAAAAEAmtBSpnFdeSdxWu4YMXh3sGvx4apxKA8EcRmE0HVyIm6upIZjT/3AKZmRKnqv2M/Q==", new DateTime(2025, 5, 3, 22, 51, 25, 152, DateTimeKind.Local).AddTicks(7274), "e65e0397-a665-4003-9f44-35b59de61462" });
         }
     }
 }
