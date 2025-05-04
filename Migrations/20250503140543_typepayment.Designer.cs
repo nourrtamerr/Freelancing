@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503140543_typepayment")]
+    partial class typepayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,9 +200,6 @@ namespace Freelancing.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
@@ -706,12 +706,6 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SentimentPrediction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float?>("SentimentProbability")
-                        .HasColumnType("real");
-
                     b.HasKey("id");
 
                     b.HasIndex("ProjectId");
@@ -1040,6 +1034,13 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1229,7 +1230,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "1fb71671-9148-428a-a9de-65e8131e197e",
+                            ConcurrencyStamp = "10aa621a-4550-4f5c-9a04-6f7992b1213b",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1238,11 +1239,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELsEymShHRhtvoe/eGEgoBHkKfmwyuvixSsczIj7rgvqqrJ6cjSY9Us59jBqRk6mpg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH/7BAQUlTIlySWL2zbESFs83O/y2stg4IKABtKKsL+or0r54AkAN29/l6QXHuE+8w==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 23, 50, 3, 783, DateTimeKind.Local).AddTicks(6116),
-                            SecurityStamp = "06b3135f-299c-4f39-a83f-2af5cf4ccffd",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 17, 5, 42, 599, DateTimeKind.Local).AddTicks(2757),
+                            SecurityStamp = "2b5a1032-7714-4e3e-b255-bb169576e14f",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",

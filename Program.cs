@@ -13,7 +13,12 @@ using Microsoft.Extensions.Options;
 using static Freelancing.Models.Stripe;
 using Freelancing.Helpers;
 using Microsoft.AspNetCore.SignalR;
+
+using Microsoft.ML;
+
 using static Freelancing.SignalR.ChatHub;
+using DotNetEnv;
+
 
 
 namespace Freelancing
@@ -22,7 +27,10 @@ namespace Freelancing
 	{
 		public static async Task Main(string[] args)
 		{
-			var builder = WebApplication.CreateBuilder(args);
+
+            DotNetEnv.Env.Load();
+
+            var builder = WebApplication.CreateBuilder(args);
 
 			builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddSignalR();
@@ -32,11 +40,15 @@ namespace Freelancing
                 options.AddPolicy("AllowAll", policy =>
                 {
 					policy
-						//.AllowAnyOrigin()
-						.WithOrigins("http://localhost:4200")
+                         //.AllowAnyOrigin()
+                         .WithOrigins(
+                "http://localhost:4200",
+                "http://localhost:60663",
+                "http://127.0.0.1:4200"
+            )
 
-						//  .WithOrigins("http://127.0.0.1:4200")
-						.AllowAnyMethod()
+                        //  .WithOrigins("http://127.0.0.1:4200")
+                        .AllowAnyMethod()
 						.AllowAnyHeader()
 						.AllowCredentials();
                         //.SetIsOriginAllowed(_ => true); 
@@ -71,7 +83,7 @@ namespace Freelancing
 				{
 					OnMessageReceived = context =>
 					{
-						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification"))
+						if (context.Request.Path.StartsWithSegments("/chathub")|| context.Request.Path.StartsWithSegments("/notification")|| context.Request.Path.StartsWithSegments("/biddingHub"))
 						{
 							var accessToken = context.Request.Query["access_token"];
 							context.Token = accessToken;
@@ -176,7 +188,7 @@ namespace Freelancing
             builder.Services.AddScoped<IPortofolioProjectImage, PortofolioProgectImageService>();
             builder.Services.AddScoped<CloudinaryService>();
 
-
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IReviewRepositoryService, ReviewRepositoryService>();
             builder.Services.AddScoped<IChatRepositoryService, ChatRepositoryService>();
             builder.Services.AddScoped<IBanRepositoryService, BanRepositoryService>();
@@ -296,6 +308,7 @@ namespace Freelancing
 			app.MapControllers();
 			app.MapHub<ChatHub>("/chathub");
 			app.MapHub<NotificationHub>("/notification");
+			app.MapHub<BiddingHub>("/biddingHub");
 			//app.MapHub<NotificationHub>("/chathub");
 			app.Run();
 		}

@@ -42,7 +42,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 
 			}
@@ -56,12 +56,13 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					ClientId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
-					PaymentMethod = PaymentMethod.CreditCard
-				};
+					PaymentMethod = PaymentMethod.CreditCard,
+                   // TransactionType = TransactionType.Withdrawal
+                };
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 			}
 
@@ -94,12 +95,13 @@ namespace Freelancing.Controllers
 					Date = DateTime.Now,
 					FreelancerId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
-					PaymentMethod = PaymentMethod.Stripe
-				};
+					PaymentMethod = PaymentMethod.Stripe,
+					//TransactionType = TransactionType.AddFunds
+                };
 				_context.Funds.Add(FUND);
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
 				return Ok(url);
 
 			}
@@ -118,7 +120,7 @@ namespace Freelancing.Controllers
 				_context.Funds.Add(FUND);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
-				var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
 				return Ok(url);
 			}
 			await _notifications.CreateNotificationAsync(new()
@@ -207,7 +209,7 @@ namespace Freelancing.Controllers
 						Message = $"Funding completed with amount of {amount} using stripe please check your balance",
 						UserId = userId
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 				else
@@ -234,7 +236,7 @@ namespace Freelancing.Controllers
 					_context.Withdrawals.Add(withdrawal);
 					await _freelancers.UpdateAsync(current2);
 					_context.SaveChanges();
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 				else
@@ -290,13 +292,13 @@ namespace Freelancing.Controllers
 				return BadRequest(new { Message = "you are not a freelancer" });
 			}
 
-			if (freelancer is Freelancer freelancerr && string.IsNullOrEmpty(freelancerr.StripeAccountId))
+			if (freelancer is Freelancer freelancerr) //&& string.IsNullOrEmpty(freelancerr.StripeAccountId))
 			{
 				// Redirect to connect account setup
 				var url2 = Url.ActionLink("CreateConnectedAccount", "Stripe", new { freelancerEmail = email, amountInCents = (long)money * 1000 });
 				return Redirect(url2);
 			}
-			if (freelancer is Client clientt && string.IsNullOrEmpty(clientt.StripeAccountId))
+			if (freelancer is Client clientt) //&& string.IsNullOrEmpty(clientt.StripeAccountId))
 			{
 				// Redirect to connect account setup
 				var url2 = Url.ActionLink("CreateConnectedAccount", "Stripe", new { freelancerEmail = email, amountInCents = (long)money * 1000 });
@@ -316,7 +318,7 @@ namespace Freelancing.Controllers
 
 
 		[HttpGet("Success")]
-		public async Task<IActionResult> Success(string session_id, string amount)
+		public async Task<ActionResult> Success(string session_id, string amount)
 		{
 			var sessionService = new PaymentIntentService();
 			var retrievedPaymentIntent = sessionService.Get(session_id);
@@ -355,8 +357,9 @@ namespace Freelancing.Controllers
 						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
 						UserId = userid
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/paymentsucess";
-					return Redirect(url);
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
+					
+					return Redirect($"http://localhost:4200/paymentsucess?sessionId={session_id}");
 				}
 				else
 				{
@@ -388,7 +391,7 @@ namespace Freelancing.Controllers
 						Message = $"Withdrawal completed with amount of {amount} using stripe please check your balance",
 						UserId = userid
 					});
-					var url = configuration["AppSettings:AngularAppUrl"] + "/PaymentSuccess";
+					var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={session_id}";
 					return Redirect(url);
 				}
 

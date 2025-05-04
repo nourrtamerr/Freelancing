@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250502201309_update payment2")]
+    partial class updatepayment2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,9 +200,6 @@ namespace Freelancing.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
@@ -706,12 +706,6 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SentimentPrediction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float?>("SentimentProbability")
-                        .HasColumnType("real");
-
                     b.HasKey("id");
 
                     b.HasIndex("ProjectId");
@@ -1040,7 +1034,13 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
 
@@ -1229,7 +1229,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "1fb71671-9148-428a-a9de-65e8131e197e",
+                            ConcurrencyStamp = "07a84a19-a116-45a9-a2c8-d3eb8a2e2e6e",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1238,11 +1238,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELsEymShHRhtvoe/eGEgoBHkKfmwyuvixSsczIj7rgvqqrJ6cjSY9Us59jBqRk6mpg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKK5b+5m/PymbG7V5bANb5jOZwCC5Iz0VatQRid0uja/mTGAidhhcDw702a/agh/9Q==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 23, 50, 3, 783, DateTimeKind.Local).AddTicks(6116),
-                            SecurityStamp = "06b3135f-299c-4f39-a83f-2af5cf4ccffd",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 2, 23, 13, 6, 743, DateTimeKind.Local).AddTicks(7944),
+                            SecurityStamp = "91b38253-dadc-4552-b12e-224663feddec",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1755,6 +1755,17 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Payment", b =>
+                {
+                    b.HasOne("AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Project", b =>
