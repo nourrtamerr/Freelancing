@@ -5,6 +5,11 @@
 //    public class AIService:IAIService
 //    {
 //        private readonly HttpClient _httpClient;
+// namespace Freelancing.Services
+// {
+//     public class AIService : IAIService
+//     {
+//         private readonly HttpClient _httpClient;
 
 //        public AIService(HttpClient httpClient)
 //        {

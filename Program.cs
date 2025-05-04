@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.ML;
 
 using static Freelancing.SignalR.ChatHub;
+using DotNetEnv;
 
 
 
@@ -26,55 +27,8 @@ namespace Freelancing
 	{
 		public static async Task Main(string[] args)
 		{
-            var context = new MLContext();
 
-            
-
-            // Load data
-            var data = context.Data.LoadFromTextFile<ReviewData>("reviews.csv", separatorChar: ',', hasHeader: true, allowQuoting: true,
-    trimWhitespace: true);
-
-            // Build the pipeline
-            var pipeline = context.Transforms.Text.FeaturizeText("Features", nameof(ReviewData.Text))
-     .Append(context.BinaryClassification.Trainers.SdcaLogisticRegression(
-         labelColumnName: nameof(ReviewData.Label),
-         featureColumnName: "Features"
-     ));
-
-            // Train the model
-            var model = pipeline.Fit(data);
-            var modelDirectory = Path.Combine(Directory.GetCurrentDirectory(), "MLModels");
-            // Save the trained model
-            var modelPath = Path.Combine(Directory.GetCurrentDirectory(), "MLModels", "sentimentModel.zip");
-
-            // Create directory if it doesn't exist
-            if (!Directory.Exists(modelDirectory))
-            {
-                Directory.CreateDirectory(modelDirectory);
-            }
-
-            // Save the trained model
-            context.Model.Save(model, data.Schema, modelPath);
-            context.Model.Save(model, data.Schema, modelPath);
-
-            Console.WriteLine($"Model saved to: {modelPath}");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            DotNetEnv.Env.Load();
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -86,11 +40,15 @@ namespace Freelancing
                 options.AddPolicy("AllowAll", policy =>
                 {
 					policy
-						//.AllowAnyOrigin()
-						.WithOrigins("http://localhost:4200")
+                         //.AllowAnyOrigin()
+                         .WithOrigins(
+                "http://localhost:4200",
+                "http://localhost:60663",
+                "http://127.0.0.1:4200"
+            )
 
-						//  .WithOrigins("http://127.0.0.1:4200")
-						.AllowAnyMethod()
+                        //  .WithOrigins("http://127.0.0.1:4200")
+                        .AllowAnyMethod()
 						.AllowAnyHeader()
 						.AllowCredentials();
                         //.SetIsOriginAllowed(_ => true); 

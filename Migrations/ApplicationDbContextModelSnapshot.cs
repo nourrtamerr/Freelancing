@@ -361,6 +361,11 @@ namespace Freelancing.Migrations
                     b.Property<int>("MilestoneId")
                         .HasColumnType("int");
 
+
+                    b.Property<bool>("isResolved")
+                        .HasColumnType("bit");
+
+
                     b.HasKey("id");
 
                     b.HasIndex("MilestoneId");
@@ -1056,6 +1061,9 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1245,7 +1253,9 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
+
                             ConcurrencyStamp = "de232101-dee3-4e2a-ad74-e18ff84349ad",
+
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1254,11 +1264,13 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
+
                             PasswordHash = "AQAAAAIAAYagAAAAEIQntn7hUwvb1iaPww4ai3VgRoljjkWfHs6sm6dzlC0H3E3QlGahAf9tD4Dw+wVsbg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
                             RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 4, 4, 29, 81, DateTimeKind.Local).AddTicks(4776),
                             SecurityStamp = "d8793873-7dbd-4334-bc17-07cd81e10582",
+
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1495,7 +1507,9 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
                 {
                     b.HasOne("Milestone", "milestone")
-                        .WithMany()
+
+                        .WithMany("Disputes")
+
                         .HasForeignKey("MilestoneId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2026,6 +2040,8 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Milestone", b =>
                 {
+                    b.Navigation("Disputes");
+
                     b.Navigation("MilestoneFiles");
 
                     b.Navigation("MilestonePayment")

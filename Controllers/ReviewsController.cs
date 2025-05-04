@@ -106,6 +106,7 @@ namespace Freelancing.Controllers
             }
           // var sentiment = await sentimentService.AnalyzeAsync(reviewDto.Comment);
             var review = mapper.Map<Review>(reviewDto);
+            review.Date = DateTime.Now;
             review.ProjectId = reviewDto.projectId??0;
             var createdReview = await reviewService.CreateReviewAsync(review);
             await _notifications.CreateNotificationAsync(new()

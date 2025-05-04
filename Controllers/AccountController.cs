@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,9 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IProjectService projects,IMilestoneService milestoneService,ApplicationDbContext _context,IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+
+	public class AccountController(IChatRepositoryService chat,IProjectService projects,IMilestoneService milestoneService,ApplicationDbContext _context,IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+
 	{
 
 		[HttpGet("test")]
@@ -33,10 +36,69 @@ namespace Freelancing.Controllers
 			return Ok(new { str = "hh" });
 		}
 
+		[HttpPost("DisputeDecision")]
+		[Authorize]
+		public async Task<IActionResult> DisputeDecision([FromBody] DisputeDTO dto)
+		{
+			var dispute = _context.Disputes.Include(d => d.milestone)
+					.ThenInclude(m => m.Project).ThenInclude(p => p.Freelancer)
+					.Include(m => m.milestone.Project.Client).FirstOrDefault(d => d.id == dto.disputeId);
+			if (dispute == null)
+			{
+				return BadRequest(new { Message = "dispute wasnt found" });
+			}
+			switch (dto.decision)
+			{
+				case decision.freelancerfavor:
+					
+					
+					dispute.milestone.Project.Freelancer.Balance+= dispute.milestone.Amount;
+					dispute.isResolved = true;
+					dispute.milestone.Status = MilestoneStatus.Completed;
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Milestone money has been added to your balance by an admin, please proceed to the next step," +
+						$"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.FreelancerId
+					});
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Freelancer won the dispute on the current milestone, please proceed to the next milestone," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.ClientId
+					});
 
+					break;
+				case decision.clientfavor:
+					dispute.isResolved = true;
+
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Milestone files are not enough, please upload the rest of the work," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.FreelancerId
+					});
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Freelancer was noticed to upload the rest of the work," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.ClientId
+					});
+					break;
+				default:
+					return BadRequest(new { Message = "Pick a side, admin." });
+			}
+			await _context.SaveChangesAsync();
+			return Ok(new { Message = "parts were notified" });
+		}
 		[HttpPost("Dispute/{milestoneId}")]
 		[Authorize]
-		public async Task<IActionResult> Dispute(int milestoneId, string complaint)
+		//[Authorize]
+		public async Task<IActionResult> Dispute(int milestoneId, [FromBody]string complaint)
 		{
 			var MILESTONE=await milestoneService.GetByIdAsync(milestoneId);
 			if(MILESTONE==null)
@@ -69,6 +131,59 @@ namespace Freelancing.Controllers
 
 			});
 			return Ok(new {Message= "Dispute Created" });
+
+		}
+
+
+		[HttpGet("Disputes")]
+		//[Authorize(Roles ="Admin")]
+		public async Task<IActionResult> ViewAllDisputes()
+		{
+			var disputes =  _context.Disputes
+							.Include(d => d.milestone)
+								.ThenInclude(m => m.MilestoneFiles)
+							.Include(d => d.milestone)
+								.ThenInclude(m => m.Project)
+									.ThenInclude(p => p.Freelancer)
+										.ThenInclude(f => f.Reviewed)
+							.Include(d => d.milestone.Project.Client)
+								.ThenInclude(c => c.Reviewed)
+							.Where(d => !d.isResolved&&d.milestone.Status!=MilestoneStatus.Completed)
+							.AsEnumerable() // switch to client-side evaluation here
+							.DistinctBy(d => d.MilestoneId)
+							.ToList();
+									if (disputes == null)
+			{
+				return BadRequest(new { Message = "Milestone not found" });
+			}
+
+			return Ok(
+
+				disputes.Select(
+					d =>
+					new
+					{
+						d.id,
+						d.Complaint,
+						milestoneid=d.milestone.Id,
+						files = d.milestone.MilestoneFiles.Select(m => m.fileName),
+						clientpicture = d.milestone.Project.Client.ProfilePicture,
+						freelancerpicture = d.milestone.Project.Freelancer.ProfilePicture,
+
+
+						clientname = d.milestone.Project.Client.UserName,
+						freelancername = d.milestone.Project.Freelancer.UserName,
+
+						freelancerrank = d.milestone.Project.Freelancer.Rank,
+						clietrank = d.milestone.Project.Client.Rank,
+						d.milestone.Amount,
+						d.milestone.Description,
+						d.milestone.Title,
+						d.milestone.Status
+					}
+
+					)
+			);
 
 		}
 
