@@ -225,7 +225,7 @@ namespace Freelancing.Controllers
 
             if (chat == null) return NotFound();
 
-            //  var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+            var participants = new List<string> { chat.SenderId, chat.ReceiverId };
 
 
             if (chat == null)
