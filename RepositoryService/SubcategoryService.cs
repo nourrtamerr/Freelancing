@@ -15,7 +15,7 @@ namespace Freelancing.RepositoryService
             if (selectedsubcategory != null)
             {
                 selectedsubcategory.IsDeleted = true;
-                _context.Subcategories.Update(selectedsubcategory);
+                _context.Subcategories.Remove(selectedsubcategory);
                 return await _context.SaveChangesAsync() > 0;
             }
             return false;

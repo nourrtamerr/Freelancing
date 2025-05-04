@@ -15,7 +15,7 @@ namespace Freelancing.RepositoryService
             if (category != null)
             {
                 category.IsDeleted = true;
-                _context.categories.Update(category);
+                _context.categories.Remove(category);
                 return await _context.SaveChangesAsync() > 0;
             }
             return false;
