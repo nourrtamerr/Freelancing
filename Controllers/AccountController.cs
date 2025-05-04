@@ -2,6 +2,7 @@
 using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -974,6 +975,9 @@ namespace Freelancing.Controllers
 				return BadRequest(new { message = "Email confirmation failed." });
 			}
 		}
+
+
+
         [HttpGet("External-login")]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string provider, userRole? role = null, string returnUrl = null, string errorurl = null)
@@ -990,34 +994,118 @@ namespace Freelancing.Controllers
         {
             if (remoteError != null)
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
             var info = await _signinManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
             if (info.LoginProvider != "Google" && info.LoginProvider != "Facebook")
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Only Google and Facebook login are supported.")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(email))
-            {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
-            }
+			var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+			var name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
-            var user = await _userManager.FindByEmailAsync(email);
+			if (string.IsNullOrEmpty(email))
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
+			}
+			var userbyname = await _userManager.FindByNameAsync(name);
+			var userbyemail = await _userManager.FindByEmailAsync(email);
+			if ((userbyname != null && userbyemail != null) && (userbyemail.UserName != userbyname.UserName || userbyname.Email != userbyemail.Email))
+			{
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
 
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/register?error={Uri.EscapeDataString("Email is already associated with another account.")}";
+			}
+			//var user = userbyemail;
+
+			var user = await _userManager.FindByEmailAsync(email);
+			
             // If user not found, redirect to registration page with role
             if (user == null)
             {
-             
-                // Redirect to Angular registration page
-             return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+				if (role == null)
+				{
+					return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
+				}
+				if (role == userRole.Client)
+				{
+					user = new Client
+					{
+						UserName = Regex.Replace(info.Principal.FindFirstValue(ClaimTypes.Name), "[^a-zA-Z0-9]", ""),
+						Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+						firstname = info.Principal.FindFirstValue(ClaimTypes.GivenName)?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						lastname = info.Principal.FindFirstValue(ClaimTypes.Surname)??info.Principal.FindFirstValue(ClaimTypes.Name),
+						CityId = 2,
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+					};
+					while((await _userManager.FindByNameAsync(user.UserName)is not null))
+						{
+						user.UserName+= "1";
+					}
+				}
+					
+				
+				else
+				{
+					user = new Freelancer
+					{
+						UserName = Regex.Replace(info.Principal.FindFirstValue(ClaimTypes.Name), "[^a-zA-Z0-9]", ""),
+						Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+						firstname = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						lastname = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						CityId = 2,//TEMPCITY ID
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+
+					};
+				while ((await _userManager.FindByNameAsync(user.UserName) is not null))
+				{
+					user.UserName += "1";
+				}
+
+			}
+
+				var result = await _userManager.CreateAsync(user);
+				if (!result.Succeeded)
+				{
+					//return BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
+					var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				user.EmailConfirmed = true;
+				var result2 = await _userManager.UpdateAsync(user);
+				if (!result2.Succeeded)
+				{
+					var errorMessages = string.Join(", ", result2.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				await _userManager.AddLoginAsync(user, info);
+
+
+				
+				user.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
+
+				await _userManager.UpdateAsync(user);
+
+
+
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/login");
             }
 
             // Remove existing logins (clean state)

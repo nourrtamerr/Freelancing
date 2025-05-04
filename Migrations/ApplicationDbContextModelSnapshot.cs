@@ -361,10 +361,8 @@ namespace Freelancing.Migrations
                     b.Property<int>("MilestoneId")
                         .HasColumnType("int");
 
-
                     b.Property<bool>("isResolved")
                         .HasColumnType("bit");
-
 
                     b.HasKey("id");
 
@@ -733,6 +731,12 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Sentiment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("SentimentScore")
+                        .HasColumnType("float");
+
                     b.HasKey("id");
 
                     b.HasIndex("ProjectId");
@@ -1061,9 +1065,6 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1253,9 +1254,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-
-                            ConcurrencyStamp = "de232101-dee3-4e2a-ad74-e18ff84349ad",
-
+                            ConcurrencyStamp = "a2cab11a-7546-416d-89ea-a3f5fd3067bc",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1264,13 +1263,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-
-                            PasswordHash = "AQAAAAIAAYagAAAAEIQntn7hUwvb1iaPww4ai3VgRoljjkWfHs6sm6dzlC0H3E3QlGahAf9tD4Dw+wVsbg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 4, 4, 29, 81, DateTimeKind.Local).AddTicks(4776),
-                            SecurityStamp = "d8793873-7dbd-4334-bc17-07cd81e10582",
-
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107),
+                            SecurityStamp = "f0626891-0b94-4557-93ce-68120d564a64",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1507,9 +1504,7 @@ namespace Freelancing.Migrations
             modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
                 {
                     b.HasOne("Milestone", "milestone")
-
                         .WithMany("Disputes")
-
                         .HasForeignKey("MilestoneId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
