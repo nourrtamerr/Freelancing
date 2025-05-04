@@ -225,7 +225,8 @@ namespace Freelancing.Controllers
 
             if (chat == null) return NotFound();
 
-            var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+            //  var participants = new List<string> { chat.SenderId, chat.ReceiverId };
+
 
             if (chat == null)
             {
@@ -316,7 +317,7 @@ namespace Freelancing.Controllers
                     return NotFound(new { Message = "No conversation found" });
                 }
 
-          
+
 
                 // Remove messages
                 _context.Chats.RemoveRange(messages);
@@ -353,6 +354,6 @@ namespace Freelancing.Controllers
             return Ok(onlineUsers);
         }
 
-       
+
     }
 }

@@ -14,6 +14,8 @@ using Freelancing.DTOs;
 using Stripe.Issuing;
 using System.Numerics;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Freelancing.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Freelancing.Controllers
 {
@@ -24,12 +26,16 @@ namespace Freelancing.Controllers
         private readonly ApplicationDbContext _context;
         private readonly StripeSettings _stripeSettings;
         private readonly ILogger<SubscribtionPlanPaymentController> _logger;
+        private readonly IHubContext<NotificationHub> _NotifhubContext;
 
-        public SubscribtionPlanPaymentController(ApplicationDbContext context, IOptions<StripeSettings> stripeSettings, ILogger<SubscribtionPlanPaymentController> logger)
+       
+
+        public SubscribtionPlanPaymentController(ApplicationDbContext context, IHubContext<NotificationHub> notifhubContext,  IOptions<StripeSettings> stripeSettings, ILogger<SubscribtionPlanPaymentController> logger)
         {
             _context = context;
             _stripeSettings = stripeSettings.Value;
             _logger = logger;
+             _NotifhubContext = notifhubContext;
         }
 
         [HttpGet("create-checkout-session")]
@@ -437,6 +443,7 @@ namespace Freelancing.Controllers
                 // You can also redirect to the success URL if needed
                 return Redirect($"http://localhost:4200/paymentsucess?sessionId={sessionId}");
                 return Ok(new { Message = "Payment successful.", session });
+              
             }
             catch (Exception ex)
             {

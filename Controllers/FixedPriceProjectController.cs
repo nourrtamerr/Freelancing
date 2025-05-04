@@ -17,14 +17,16 @@ namespace Freelancing.Controllers
 
 
         private readonly IFixedProjectService _fixedProjectService;
+        private readonly IProjectSkillRepository _projectSkillRepository;
         private readonly ApplicationDbContext _dbContext;
         private readonly IMilestoneService _milestoneService;
         private readonly UserManager<AppUser> _userManager;
         private readonly INotificationRepositoryService notificationrepo;
         private readonly IConfiguration _configuration;
-		public FixedPriceProjectController(IFixedProjectService fixedProjectService, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
+		public FixedPriceProjectController(IFixedProjectService fixedProjectService, IProjectSkillRepository projectSkillRepository, ApplicationDbContext dbContext,IMilestoneService milestoneService,UserManager<AppUser> userManager,INotificationRepositoryService _notificationrepo,IConfiguration configuration)
         {
             _fixedProjectService = fixedProjectService;
+           _projectSkillRepository = projectSkillRepository;
             _dbContext = dbContext;
             _milestoneService = milestoneService;
 			_userManager = userManager;
@@ -279,6 +281,7 @@ namespace Freelancing.Controllers
                     ? p.ProjectSkills.Where(ps => ps.Skill != null).Select(ps => ps.Skill.Name).ToList()
                     : new List<string>(),
                 ClientCountry = p.Client.City.Country.Name,
+                PostedFrom = (int)(DateTime.Now - p.CreatedAt).TotalMinutes,
                 ClientRating = p.Client?.Reviewed != null && p.Client.Reviewed.Any()
                 ? p.Client.Reviewed.Average(r => r?.Rating ?? 0)
                 : 0,
@@ -543,12 +546,20 @@ namespace Freelancing.Controllers
                 Proposals = new List<Proposal>(), 
                 ProjectSkills = new List<ProjectSkill>(), 
                 Milestones = new List<Milestone>(),
-                ClientId = user.Id
+                ClientId = user.Id,
+                CreatedAt=DateTime.Now
+               
 
 			};
 
             var createdProject = await _fixedProjectService.CreateFixedPriceProjectAsync(project);
+            foreach(var p in dto.ProjectSkills)
+            {
+                await _projectSkillRepository.CreateProjectSkill(new ProjectSkill() { SkillId = p, ProjectId = createdProject.Id });
+            
+            }
 
+            createdProject = await _fixedProjectService.GetFixedPriceProjectByIdAsync(createdProject.Id);
 
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var freelancers = await _userManager.Users.OfType<Freelancer>().ToListAsync();
@@ -573,21 +584,21 @@ namespace Freelancing.Controllers
 			}
 			;
 
-			if (dto.ProjectSkills.Any())
-            {
-                foreach (var skillId in dto.ProjectSkills)
-                {
-                    var skill = await _dbContext.Skills.FindAsync(skillId);
-                    if (skill != null)
-                    {
-                        project.ProjectSkills.Add(new ProjectSkill { SkillId = skill.Id ,
-                            ProjectId = createdProject.Id
+			//if (dto.ProjectSkills.Any())
+   //         {
+   //             foreach (var skillId in dto.ProjectSkills)
+   //             {
+   //                 var skill = await _dbContext.Skills.FindAsync(skillId);
+   //                 if (skill != null)
+   //                 {
+   //                     project.ProjectSkills.Add(new ProjectSkill { SkillId = skill.Id ,
+   //                         ProjectId = createdProject.Id
 
 
-                        });
-                    }
-                }
-            }
+   //                     });
+   //                 }
+   //             }
+   //         }
 
             if (dto.Milestones.Any())
             {

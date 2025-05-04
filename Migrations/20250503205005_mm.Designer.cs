@@ -4,6 +4,7 @@ using Freelancing.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503205005_mm")]
+    partial class mm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,31 +347,6 @@ namespace Freelancing.Migrations
                             Name = "temp Country",
                             isDeleted = false
                         });
-                });
-
-            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("Complaint")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MilestoneId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isResolved")
-                        .HasColumnType("bit");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("MilestoneId");
-
-                    b.ToTable("Disputes");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -1065,9 +1043,6 @@ namespace Freelancing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -1257,7 +1232,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "01636bf3-d772-492f-956e-caad6312a329",
+                            ConcurrencyStamp = "1fb71671-9148-428a-a9de-65e8131e197e",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1266,11 +1241,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC1lby1x1+a+xoFOrVnjNqiJZZWCijYrm2V+vzRtvmcSF0xRK+NrbqD3/liceO3Ppw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELsEymShHRhtvoe/eGEgoBHkKfmwyuvixSsczIj7rgvqqrJ6cjSY9Us59jBqRk6mpg==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 3, 1, 50, 618, DateTimeKind.Local).AddTicks(8704),
-                            SecurityStamp = "cbf0160e-2425-4138-8e88-c6a07d6cdbd5",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 3, 23, 50, 3, 783, DateTimeKind.Local).AddTicks(6116),
+                            SecurityStamp = "06b3135f-299c-4f39-a83f-2af5cf4ccffd",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",
@@ -1351,8 +1326,6 @@ namespace Freelancing.Migrations
 
                     b.Property<int>("ProposalId")
                         .HasColumnType("int");
-
-                    b.HasIndex("ProposalId");
 
                     b.ToTable("ClientProposalPayment", (string)null);
                 });
@@ -1502,17 +1475,6 @@ namespace Freelancing.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("Freelancing.Models.DisputeResolution", b =>
-                {
-                    b.HasOne("Milestone", "milestone")
-                        .WithMany("Disputes")
-                        .HasForeignKey("MilestoneId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("milestone");
                 });
 
             modelBuilder.Entity("Freelancing.Models.Education", b =>
@@ -1914,14 +1876,6 @@ namespace Freelancing.Migrations
                         .HasForeignKey("Freelancing.Models.ClientProposalPayment", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Freelancing.Models.Proposal", "Proposal")
-                        .WithMany()
-                        .HasForeignKey("ProposalId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Proposal");
                 });
 
             modelBuilder.Entity("Freelancing.Models.MilestonePayment", b =>
@@ -2038,8 +1992,6 @@ namespace Freelancing.Migrations
 
             modelBuilder.Entity("Milestone", b =>
                 {
-                    b.Navigation("Disputes");
-
                     b.Navigation("MilestoneFiles");
 
                     b.Navigation("MilestonePayment")

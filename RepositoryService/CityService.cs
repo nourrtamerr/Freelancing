@@ -1,8 +1,9 @@
 ﻿using Freelancing.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Freelancing.RepositoryService
 {
-	public class CityService(ApplicationDbContext context):ICityService
+	public class CityService(ApplicationDbContext context) : ICityService
 	{
 		public List<City> GetAll()
 		{
@@ -34,13 +35,16 @@ namespace Freelancing.RepositoryService
 		}
 
 
-
 		public void Update(CityViewModel vm)
 		{
-			var cty = context.Cities.SingleOrDefault(c => c.Id == vm.Id);
-			cty.Name = vm.Name;
-			cty.CountryId = vm.CountryId;
-			
+			var city = context.Cities.SingleOrDefault(c => c.Id == vm.Id);
+			if (city == null)
+			{
+				throw new Exception("City not found");
+			}
+
+			city.Name = vm.Name;
+			city.CountryId = vm.CountryId;
 			context.SaveChanges();
 		}
 	}
