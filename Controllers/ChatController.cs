@@ -271,11 +271,11 @@ namespace Freelancing.Controllers
                 .Where(m => m.Sender != null && m.Receiver != null)
                 .OrderByDescending(m => m.SentAt);
 
-                if(messagess.Count() == 0)
-			{
-				return Ok(new List<ChatDto>());
-			}
-			var messages= await messagess.ToListAsync();
+            if (messagess.Count() == 0)
+            {
+                return Ok(new List<ChatDto>());
+            }
+            var messages = await messagess.ToListAsync();
 
             // Group messages by the other participant's ID and take the latest message
             var conversations = messages

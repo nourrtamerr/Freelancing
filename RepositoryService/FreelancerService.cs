@@ -59,6 +59,11 @@ namespace Freelancing.RepositoryService
                 freelancers = freelancers.Where(f => f.Languages.Any(fl => dto.Languages.Contains(fl.Language)));
 
 			}
+            if(freelancers.Count()==0)
+            {
+                return new List<ViewFreelancersDTO>();
+
+			}
 			var freelancerslist = await freelancers.ToListAsync();
 
 			if (dto.ranks != null && dto.ranks.Count > 0)

@@ -26,5 +26,9 @@ namespace Freelancing.Models
 		public int ProjectId { get; set; }
 		public Project Project { get; set; }
 
-	}
+        public string? Sentiment { get; set; }
+        public double? SentimentScore { get; set; }
+
+
+    }
 }

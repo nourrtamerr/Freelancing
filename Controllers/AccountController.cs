@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Freelancing.DTOs;
 using Freelancing.DTOs.AuthDTOs;
 using Freelancing.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +25,9 @@ namespace Freelancing.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AccountController(IProjectService projects,IMilestoneService milestoneService,ApplicationDbContext _context,IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+
+	public class AccountController(IChatRepositoryService chat,IProjectService projects,IMilestoneService milestoneService,ApplicationDbContext _context,IHttpContextAccessor _httpContextAccessor,IFreelancerService _freelancersmanager,IClientService _clientsmanager, INotificationRepositoryService _notifications,IConfiguration configuration,IWebHostEnvironment _env, SignInManager<AppUser> _signinManager, IEmailSettings _emailSettings, IMapper _mapper, RoleManager<IdentityRole> _roleManager, UserManager<AppUser> _userManager, IConfiguration _configuration, SignInManager<AppUser> signInManager) : ControllerBase
+
 	{
 
 		[HttpGet("test")]
@@ -33,10 +37,69 @@ namespace Freelancing.Controllers
 			return Ok(new { str = "hh" });
 		}
 
+		[HttpPost("DisputeDecision")]
+		[Authorize]
+		public async Task<IActionResult> DisputeDecision([FromBody] DisputeDTO dto)
+		{
+			var dispute = _context.Disputes.Include(d => d.milestone)
+					.ThenInclude(m => m.Project).ThenInclude(p => p.Freelancer)
+					.Include(m => m.milestone.Project.Client).FirstOrDefault(d => d.id == dto.disputeId);
+			if (dispute == null)
+			{
+				return BadRequest(new { Message = "dispute wasnt found" });
+			}
+			switch (dto.decision)
+			{
+				case decision.freelancerfavor:
+					
+					
+					dispute.milestone.Project.Freelancer.Balance+= dispute.milestone.Amount;
+					dispute.isResolved = true;
+					dispute.milestone.Status = MilestoneStatus.Completed;
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Milestone money has been added to your balance by an admin, please proceed to the next step," +
+						$"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.FreelancerId
+					});
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Freelancer won the dispute on the current milestone, please proceed to the next milestone," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.ClientId
+					});
 
+					break;
+				case decision.clientfavor:
+					dispute.isResolved = true;
+
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Milestone files are not enough, please upload the rest of the work," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.FreelancerId
+					});
+					await _notifications.CreateNotificationAsync(new()
+					{
+						Message = $"Freelancer was noticed to upload the rest of the work," +
+						$"\"admin:${dto.Comment}",
+						isRead = false,
+						UserId = dispute.milestone.Project.ClientId
+					});
+					break;
+				default:
+					return BadRequest(new { Message = "Pick a side, admin." });
+			}
+			await _context.SaveChangesAsync();
+			return Ok(new { Message = "parts were notified" });
+		}
 		[HttpPost("Dispute/{milestoneId}")]
 		[Authorize]
-		public async Task<IActionResult> Dispute(int milestoneId, string complaint)
+		//[Authorize]
+		public async Task<IActionResult> Dispute(int milestoneId, [FromBody]string complaint)
 		{
 			var MILESTONE=await milestoneService.GetByIdAsync(milestoneId);
 			if(MILESTONE==null)
@@ -69,6 +132,59 @@ namespace Freelancing.Controllers
 
 			});
 			return Ok(new {Message= "Dispute Created" });
+
+		}
+
+
+		[HttpGet("Disputes")]
+		//[Authorize(Roles ="Admin")]
+		public async Task<IActionResult> ViewAllDisputes()
+		{
+			var disputes =  _context.Disputes
+							.Include(d => d.milestone)
+								.ThenInclude(m => m.MilestoneFiles)
+							.Include(d => d.milestone)
+								.ThenInclude(m => m.Project)
+									.ThenInclude(p => p.Freelancer)
+										.ThenInclude(f => f.Reviewed)
+							.Include(d => d.milestone.Project.Client)
+								.ThenInclude(c => c.Reviewed)
+							.Where(d => !d.isResolved&&d.milestone.Status!=MilestoneStatus.Completed)
+							.AsEnumerable() // switch to client-side evaluation here
+							.DistinctBy(d => d.MilestoneId)
+							.ToList();
+									if (disputes == null)
+			{
+				return BadRequest(new { Message = "Milestone not found" });
+			}
+
+			return Ok(
+
+				disputes.Select(
+					d =>
+					new
+					{
+						d.id,
+						d.Complaint,
+						milestoneid=d.milestone.Id,
+						files = d.milestone.MilestoneFiles.Select(m => m.fileName),
+						clientpicture = d.milestone.Project.Client.ProfilePicture,
+						freelancerpicture = d.milestone.Project.Freelancer.ProfilePicture,
+
+
+						clientname = d.milestone.Project.Client.UserName,
+						freelancername = d.milestone.Project.Freelancer.UserName,
+
+						freelancerrank = d.milestone.Project.Freelancer.Rank,
+						clietrank = d.milestone.Project.Client.Rank,
+						d.milestone.Amount,
+						d.milestone.Description,
+						d.milestone.Title,
+						d.milestone.Status
+					}
+
+					)
+			);
 
 		}
 
@@ -859,6 +975,9 @@ namespace Freelancing.Controllers
 				return BadRequest(new { message = "Email confirmation failed." });
 			}
 		}
+
+
+
         [HttpGet("External-login")]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string provider, userRole? role = null, string returnUrl = null, string errorurl = null)
@@ -875,34 +994,127 @@ namespace Freelancing.Controllers
         {
             if (remoteError != null)
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString($"External authentication error: {remoteError}")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
             var info = await _signinManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Error loading external login information.")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
             if (info.LoginProvider != "Google" && info.LoginProvider != "Facebook")
             {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Only Google and Facebook login are supported.")}");
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
             }
 
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(email))
-            {
-                return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
-            }
+			var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+			var name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
-            var user = await _userManager.FindByEmailAsync(email);
+			if (string.IsNullOrEmpty(email))
+			{
+				return Redirect($"{errorurl}?error={Uri.EscapeDataString("Email not provided by the external provider.")}");
+			}
+			var userbyname = await _userManager.FindByNameAsync(name);
+			var userbyemail = await _userManager.FindByEmailAsync(email);
+			if ((userbyname != null && userbyemail != null) && (userbyemail.UserName != userbyname.UserName || userbyname.Email != userbyemail.Email))
+			{
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
 
+				var url = configuration["AppSettings:AngularAppUrl"] + $"/register?error={Uri.EscapeDataString("Email is already associated with another account.")}";
+			}
+			//var user = userbyemail;
+
+			var user = await _userManager.FindByEmailAsync(email);
+			
             // If user not found, redirect to registration page with role
             if (user == null)
             {
-             
-                // Redirect to Angular registration page
-             return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+				if (role == null)
+				{
+					return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/register?externalLoginFailed=true");
+
+				}
+				if (role == userRole.Client)
+				{
+					user = new Client
+					{
+						UserName = Regex.Replace(info.Principal.FindFirstValue(ClaimTypes.Name), "[^a-zA-Z0-9]", ""),
+						Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+						firstname = info.Principal.FindFirstValue(ClaimTypes.GivenName)?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						lastname = info.Principal.FindFirstValue(ClaimTypes.Surname)??info.Principal.FindFirstValue(ClaimTypes.Name),
+						CityId = 2,
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+						subscriptionPlanId = 1
+					};
+					while((await _userManager.FindByNameAsync(user.UserName)is not null))
+						{
+						user.UserName+= "1";
+					}
+				}
+					
+				
+				else
+				{
+					user = new Freelancer
+					{
+						UserName = Regex.Replace(info.Principal.FindFirstValue(ClaimTypes.Name), "[^a-zA-Z0-9]", ""),
+						Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+						firstname = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						lastname = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? info.Principal.FindFirstValue(ClaimTypes.Name),
+						CityId = 2,//TEMPCITY ID
+						EmailConfirmed = true,
+						RefreshToken = JWTHelpers.CreateRefreshToken(),
+						RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7),
+						subscriptionPlanId = 1
+
+					};
+				while ((await _userManager.FindByNameAsync(user.UserName) is not null))
+				{
+					user.UserName += "1";
+				}
+
+			}
+
+				var result = await _userManager.CreateAsync(user);
+				if (!result.Succeeded)
+				{
+					//return BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
+					var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				user.EmailConfirmed = true;
+				var result2 = await _userManager.UpdateAsync(user);
+				if (!result2.Succeeded)
+				{
+					var errorMessages = string.Join(", ", result2.Errors.Select(e => e.Description));
+					return Redirect($"{errorurl}?error={Uri.EscapeDataString(errorMessages)}");
+
+				}
+				await _userManager.AddLoginAsync(user, info);
+
+
+				
+				user.AccountCreationDate = DateOnly.FromDateTime(DateTime.Now);
+
+				await _userManager.UpdateAsync(user);
+
+				if(user is Client)
+				{
+					await _userManager.AddToRoleAsync(user,"Client");
+				}
+				else
+				{
+					await _userManager.AddToRoleAsync(user, "Freelancer");
+				}
+
+				return Redirect($"{_configuration["AppSettings:AngularAppUrl"]}/login");
             }
 
             // Remove existing logins (clean state)

@@ -10,5 +10,9 @@
         public string ReviewerId { get; set; }
         public string? ReviewerName { get; set; } 
         public int? projectId { set; get; }
+
+        public string? Sentiment { get; set; }
+        public double? SentimentScore { get; set; }
+
     }
 }
