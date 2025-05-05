@@ -25,7 +25,7 @@ namespace Freelancing.Controllers
 		[HttpGet]
 		public IActionResult Get()
 		{
-			return Ok(_cityService.GetAll().Select(c=>new {c.Name,countryname=c.Country.Name,c.Id}));
+			return Ok(_cityService.GetAll().Select(c=>new {c.Name,countryname=c.Country.Name,c.CountryId,c.Id}));
 		}
 
 		[HttpGet("{id}")]
