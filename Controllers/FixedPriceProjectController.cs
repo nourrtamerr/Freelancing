@@ -529,6 +529,11 @@ namespace Freelancing.Controllers
                 return BadRequest(new { Message = ModelState });
             }
             var user =await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+			if ((user as Client).RemainingNumberOfProjects < 0)
+			{
+				return BadRequest(new { Message = "You exceeded the number of posts, please wait or subscribe in a plan" });
+			}
 			if (!(user is Client))
             {
                 return BadRequest(new { Message = "Only clients can post projects" });

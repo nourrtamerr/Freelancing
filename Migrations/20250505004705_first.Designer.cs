@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Freelancing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250504115724_sentimentscore")]
-    partial class sentimentscore
+    [Migration("20250505004705_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1257,7 +1257,7 @@ namespace Freelancing.Migrations
                             AccessFailedCount = 0,
                             AccountCreationDate = new DateOnly(1, 1, 1),
                             CityId = 1,
-                            ConcurrencyStamp = "a2cab11a-7546-416d-89ea-a3f5fd3067bc",
+                            ConcurrencyStamp = "1afe5058-f251-48e9-861c-c41d8ff4f2a2",
                             DateOfBirth = new DateOnly(1, 1, 1),
                             Description = "",
                             Email = "admin@example.com",
@@ -1266,11 +1266,11 @@ namespace Freelancing.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIux4Ijiyf2mfDQl+ABtPw9Gmh75vNoLoi2xZ2q1dNoYqwLFW/VT6vybnLuv3ZAQ3g==",
                             PhoneNumberConfirmed = false,
                             RefreshToken = "",
-                            RefreshTokenExpiryDate = new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107),
-                            SecurityStamp = "f0626891-0b94-4557-93ce-68120d564a64",
+                            RefreshTokenExpiryDate = new DateTime(2025, 5, 5, 2, 47, 3, 102, DateTimeKind.Local).AddTicks(85),
+                            SecurityStamp = "c766359e-89b8-4790-b301-78edc2aef6e2",
                             Title = "Admin",
                             TwoFactorEnabled = false,
                             UserName = "admin",

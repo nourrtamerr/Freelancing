@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Freelancing.Migrations
 {
     /// <inheritdoc />
-    public partial class sentimentscore : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1107,7 +1107,7 @@ namespace Freelancing.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AccountCreationDate", "CityId", "ConcurrencyStamp", "DateOfBirth", "Description", "Email", "EmailConfirmed", "IsVerified", "LockoutEnabled", "LockoutEnd", "NationalId", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfilePicture", "RefreshToken", "RefreshTokenExpiryDate", "SecurityStamp", "Title", "TwoFactorEnabled", "UserName", "firstname", "isDeleted", "lastname" },
-                values: new object[] { "1", 0, new DateOnly(1, 1, 1), 1, "a2cab11a-7546-416d-89ea-a3f5fd3067bc", new DateOnly(1, 1, 1), "", "admin@example.com", true, false, false, null, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEP11YP8EtWD28bMBaHTO+/9JuJdLUBuIMUJadD3vwYevts1cTEpj03GqPT2Fg/Kigg==", null, false, null, "", new DateTime(2025, 5, 4, 13, 57, 13, 584, DateTimeKind.Local).AddTicks(4107), "f0626891-0b94-4557-93ce-68120d564a64", "Admin", false, "admin", "Admin", false, "User" });
+                values: new object[] { "1", 0, new DateOnly(1, 1, 1), 1, "1afe5058-f251-48e9-861c-c41d8ff4f2a2", new DateOnly(1, 1, 1), "", "admin@example.com", true, false, false, null, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEIux4Ijiyf2mfDQl+ABtPw9Gmh75vNoLoi2xZ2q1dNoYqwLFW/VT6vybnLuv3ZAQ3g==", null, false, null, "", new DateTime(2025, 5, 5, 2, 47, 3, 102, DateTimeKind.Local).AddTicks(85), "c766359e-89b8-4790-b301-78edc2aef6e2", "Admin", false, "admin", "Admin", false, "User" });
 
             migrationBuilder.InsertData(
                 table: "Admins",

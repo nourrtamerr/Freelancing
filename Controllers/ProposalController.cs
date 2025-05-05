@@ -5,6 +5,7 @@ using Freelancing.Filters;
 using Freelancing.Models;
 using Freelancing.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
@@ -64,10 +65,18 @@ namespace Freelancing.Controllers
 
 		// POST api/<ProposalController>
 		[HttpPost]
-		//[Authorize(Roles = "Freelancer")]
+		[Authorize(Roles = "Freelancer")]
 		public async Task<IActionResult> Post([FromBody] CreateProposalDTO dto)
 		{
 			//var proposal = _mapper.Map<Proposal>(dto);
+
+			var user = await usermanager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+			if ((user as Freelancer).RemainingNumberOfBids <= 0)
+			{
+				return BadRequest(new { Message = "You exceeded the number of bids, please wait or subscribe in a plan" });
+			}
+
 			var project = await _projects.GetProjectByIdAsync(dto.ProjectId);
 
 			if (project is null)
@@ -102,6 +111,8 @@ namespace Freelancing.Controllers
 
 			}
 			var proposal = await _proposals.CreateProposalAsync(dto, User.FindFirstValue(ClaimTypes.NameIdentifier)??"hhh" /*User.FindFirstValue(ClaimTypes.NameIdentifier)*/);
+			(user as Freelancer).RemainingNumberOfBids--;
+			await usermanager.UpdateAsync(user);
 			var average = (await _proposals.GetProposalsByProjectIdAsync(proposal.ProjectId)).Average(p => p.suggestedMilestones.Sum(m => m.Amount));
 			await hubContext.Clients.Group(proposal.ProjectId.ToString()).SendAsync("BiddingChanged",new{proposal.Price, average });
 

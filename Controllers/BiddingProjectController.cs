@@ -1,6 +1,7 @@
 ﻿using Freelancing.DTOs.AuthDTOs;
 using Freelancing.DTOs.BiddingProjectDTOs;
 using Freelancing.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -58,12 +59,17 @@ namespace Freelancing.Controllers
         //}
 
         [HttpPost]
+        [Authorize(Roles ="Client")]
         public async Task<IActionResult> Create(BiddingProjectCreateUpdateDTO p)
         {
             try
             {
                 var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+                if(((await _userManager.FindByIdAsync(userid))as Client).RemainingNumberOfProjects <=0)
+                {
+					return BadRequest(new { Message = "You exceeded the number of posts, please wait or subscribe in a plan" });
+				}
 				var project = await _biddingProjectService.CreateBiddingProjectAsync(p, userid);
                 var freelancers= await _userManager.Users.OfType<Freelancer>().ToListAsync();
 				foreach (var freelancer in freelancers)

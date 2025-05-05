@@ -131,6 +131,7 @@ namespace Freelancing.RepositoryService
         {
             var proposal=_mapper.Map<Proposal>(proposaldto);
             proposal.FreelancerId = freelancerId;
+			
 			try
 			{
 				await _context.Proposals.AddAsync(proposal);

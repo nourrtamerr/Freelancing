@@ -53,7 +53,6 @@ namespace Freelancing.Controllers
                 var freelancer = context.freelancers.FirstOrDefault(f => f.Id == userid);
                     if(freelancer is not null)
                 {
-                    freelancer.RemainingNumberOfBids--;
                 }
 				context.SaveChanges();
 				await _notification.CreateNotificationAsync(new()

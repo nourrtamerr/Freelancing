@@ -21,7 +21,7 @@ namespace Freelancing.Controllers
         public async Task<IActionResult> GetAllLanguages()
         {
             var languageslist = await _LanguageService.GetAllLanguagesAsync();
-            if (languageslist == null || languageslist.Count() == 0)
+            if (languageslist == null )
             {
                 return BadRequest(new { Message = "there is no languages found" });
             }

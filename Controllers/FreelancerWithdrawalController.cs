@@ -42,6 +42,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 
+				return Ok(new { Message = "Success" });
 				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 
@@ -57,11 +58,14 @@ namespace Freelancing.Controllers
 					ClientId = userid,
 					TransactionId = dto.Cardnumber + "," + dto.cvv,
 					PaymentMethod = PaymentMethod.CreditCard,
+
                    // TransactionType = TransactionType.Withdrawal
                 };
 				_context.Withdrawals.Add(withdrawal);
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
+				return Ok(new { Message = "Success" });
+
 				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={withdrawal.TransactionId}";
 				return Redirect(url);
 			}
@@ -102,7 +106,7 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(freelancer1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
-				return Ok(url);
+				return Ok(new { url = url });
 
 			}
 			if (user is Client client1)
@@ -121,7 +125,8 @@ namespace Freelancing.Controllers
 				await _freelancers.UpdateAsync(client1);
 				_context.SaveChanges();
 				var url = configuration["AppSettings:AngularAppUrl"] + $"/paymentsucess?sessionId={FUND.TransactionId}";
-				return Ok(url);
+				return Ok(new { url = url });
+
 			}
 			await _notifications.CreateNotificationAsync(new()
 			{
